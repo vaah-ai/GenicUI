@@ -1,0 +1,3 @@
+[submodule "ai-base-prompts"]
+	path = ai-base-prompts
+	url = git@git6.webreinvent.com:open/ai-base-prompts.git
