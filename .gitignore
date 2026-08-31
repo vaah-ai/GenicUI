@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Claude Code local settings (per-developer)
+.claude/
+
+# Playwright cache
+.playwright-mcp/
+
+# Runtime artifacts
+/tmp/genicui-*.log

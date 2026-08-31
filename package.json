@@ -1,0 +1,17 @@
+{
+  "name": "genicui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GenicUI — AI agent-driven component library (PoC)",
+  "scripts": {
+    "poc": "node poc/server/index.mjs",
+    "poc:smoke": "node poc/server/smoke-test.mjs",
+    "poc:parser-test": "node poc/server/chat-parser.test.mjs",
+    "poc:chat-smoke": "node poc/server/chat-smoke-test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ws": "^8.18.0"
+  }
+}

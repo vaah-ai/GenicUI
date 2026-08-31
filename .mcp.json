@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "genicui": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:9877/mcp"
+      ],
+      "env": {
+        "GENICUI_BRIDGE_PORT": "9876"
+      },
+      "alwaysLoad": true
+    }
+  }
+}

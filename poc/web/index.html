@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GenicUI — Chat</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>GenicUI <span class="small">Chat</span></h1>
+    <div id="status" class="status">connecting…</div>
+  </header>
+  <main id="messages" class="messages"></main>
+  <form id="composer" class="composer" autocomplete="off">
+    <textarea
+      id="prompt"
+      class="composer-input"
+      placeholder="Ask the agent to render a component…"
+      rows="1"
+      autofocus
+    ></textarea>
+    <button id="send" type="submit" class="composer-send" disabled>
+      Send
+    </button>
+  </form>
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>
