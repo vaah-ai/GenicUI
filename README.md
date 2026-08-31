@@ -1,13 +1,15 @@
 # GenicUI
 
-**Generative agentic UI framework** — install into any AI project to render custom UI components and bridge them to your agent.
+**The protocol that lets AI agents use your UI.**
 
-GenicUI lets an AI agent **render, update, and respond to** UI components inside a chat conversation. You wrap your existing component library (PrimeVue, Flowbite, ShadCN, anything) with a tiny adaptor, declare the component's contract in one place, and any MCP-capable agent — Claude Code, GPT, or your own — can discover and use it.
+MCP-native. Library-agnostic. Render PrimeVue, Mantine, shadcn, MUI — the UI library stays yours.
+
+GenicUI is a protocol layer that lets any AI agent render, update, and respond to real UI components in your existing application. You wrap your component library (PrimeVue, Mantine, shadcn, Skeleton, anything) with a tiny adapter, declare the component's contract in one place, and any MCP-capable agent — Claude Code, GPT, or your own — can discover and use it.
 
 ## What you get
 
 - **Render custom UI from agent output** — components appear inline in the chat surface as the agent talks
-- **Library-agnostic** — wrap PrimeVue, Flowbite, ShadCN, or hand-rolled components; the agent never knows which
+- **Library-agnostic** — wrap PrimeVue, Mantine, shadcn, or hand-rolled components; the agent never knows which
 - **Agent-agnostic** — works with any MCP-capable agent via standard MCP tools (`find_ui_component`, `render_component`, `update_component`, `subscribe_to_events`)
 - **Journey-agnostic** — ecommerce, support, ops, internal tools — the same framework
 - **Schema-as-source-of-truth** — one declaration generates TypeScript types, MCP tool definitions, and agent prompt fragments
@@ -44,6 +46,10 @@ The full design and contract surface lives in [docs/idea/](docs/idea/):
 - **[CartViewer in 3 Frameworks](docs/idea/examples-cartviewer.md)** — same component in Nuxt+PrimeVue, Next.js+Flowbite, SvelteKit+Skeleton
 - **[Lessons Learned](docs/idea/lessons-learned.md)** — what the PoC build taught us
 - **[Adaptor Specification](docs/idea/adaptor-spec.md)**, **[Agent Protocol](docs/idea/agent-protocol.md)** — interface contracts
+- **[Research Index](docs/idea/research-index.md)** — 7 research documents + synthesis
+- **[Foundational Q&A](docs/idea/foundational-qa.md)** — OSS viability, naming, tagline, tech stack defense
+- **[Package Distribution](docs/idea/package-distribution.md)** — 3 core packages + N community registries
+- **[Competitive Relevance](docs/idea/competitive-relevance-qa.md)** — competitor matrix + locked tagline + use cases
 
 ## Project status
 
