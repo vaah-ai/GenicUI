@@ -20,3 +20,23 @@ export type {
   GenicSchemaBuilder,
   JSONSchema2020_12,
 } from './schema/types.js';
+
+// F3 — Protocol envelope + sequence generator exports
+export {
+  SequenceGenerator,
+  envelope,
+  validateChannel,
+  FrameBuffer,
+  PROTOCOL_VERSION,
+  RESERVED_CHANNELS,
+  ERROR_CODE_RESERVED_CHANNEL,
+  MAX_CHANNELS_PER_SOCKET,
+  AG_UI_EVENT_TYPES,
+  FrameEnvelopeSchema,
+  GenicUIError,
+} from './protocol/index.js';
+export type {
+  FrameEnvelope,
+  FrameBufferResult,
+  AGUIEventType,
+} from './protocol/index.js';
