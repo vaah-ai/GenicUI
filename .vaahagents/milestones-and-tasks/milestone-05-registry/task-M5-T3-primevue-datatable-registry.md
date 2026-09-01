@@ -1,0 +1,68 @@
+# Task M5-T3 — PrimeVue DataTable registry adapter
+
+> **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
+> **Manifest feature:** F40 (PrimeVue DataTable registry)
+> **Priority:** Critical
+> **Status:** ⚪ Not Started
+> **Estimated Effort:** 5-7 days
+
+## Description
+
+Build the PrimeVue DataTable registry adapter: `@genicul-primevue/registry` with 8-prop API, PassThrough API integration, sort/filter/selection events. This is the first real component — the MVP's sole registry target.
+
+## Task Goals
+
+- Schema enforces exactly 8 top-level props (F40-AC1)
+- Sort header → `sort-change` event (F40-AC2)
+- Filter → debounced `filter-change` event (300ms) (F40-AC3)
+- Selection mode → `selection-change` event (F40-AC4)
+
+## Implementation Plan
+
+### Pre-Implementation Analysis
+
+- Effort = L (5-7 days) — invoke `brainstorming` if approach unclear
+- Depends on M5-T1 (F37) and M5-T2 (F38)
+- PrimeVue 4 PassThrough API per consolidated-requirements.md §L6
+- Conformance suite required (testing-strategy.md)
+
+### Steps
+
+1. Create `@genicul-primevue/registry` package
+2. Implement DataTable adaptor: 8-prop schema (rows, columns, sort, filter, selection, etc.)
+3. Wire PrimeVue PassThrough API for event capture
+4. Implement sort header → sort-change event
+5. Implement filter → debounced filter-change (300ms)
+6. Implement selection → selection-change event
+7. Write integration test: 8-prop schema (F40-AC1)
+8. Write integration test: sort event (F40-AC2)
+9. Write integration test: filter event (F40-AC3)
+10. Write integration test: selection event (F40-AC4)
+11. Run conformance suite: 5-rule suite green
+
+## Acceptance Criteria
+
+- Schema enforces exactly 8 top-level props
+- Sort header → `sort-change` event
+- Filter → debounced `filter-change` event (300ms)
+- Selection mode → `selection-change` event
+
+## Completion Criteria
+
+- [ ] All acceptance criteria above pass
+- [ ] `bun run test` exits green
+- [ ] `bun run lint` reports zero errors
+- [ ] `bun run build` succeeds
+- [ ] Coverage target met: 60% registry adapters
+- [ ] Conformance suite green
+
+## Dependencies
+
+- **Requires:** M5-T1 (F37), M5-T2 (F38)
+- **Blocks:** M4-T5 (F29 — runtime engine mounts DataTable)
+
+## Documentation References
+
+- Manifest: `docs/requirements/specs/manifest.json` → `features[F40]`
+- Per-feature: `docs/requirements/specs/features/feature-040-primevue-registry.md`
+- Registry contract: `docs/requirements/idea/consolidated-requirements.md` §G
