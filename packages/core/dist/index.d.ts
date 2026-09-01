@@ -16,4 +16,6 @@ export { SequenceGenerator, envelope, validateChannel, FrameBuffer, PROTOCOL_VER
 export type { FrameEnvelope, FrameBufferResult, AGUIEventType, } from './protocol/index.js';
 export { JsonPatchEngine, NonSerializableError, hasNonSerializable, findNonSerializableType, } from './patch/index.js';
 export type { JsonPatchOperation } from './patch/index.js';
+export { InMemoryStore } from './session/index.js';
+export type { SessionStore, SessionStoreCallback } from './session/index.js';
 //# sourceMappingURL=index.d.ts.map

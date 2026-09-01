@@ -3,7 +3,7 @@
 > **Milestone:** M1 (Foundations: Core Package)
 > **Manifest feature:** F5 (SessionStore interface + InMemoryStore)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2 days
 
 ## Description
@@ -44,11 +44,15 @@ Define the `SessionStore` interface (`get`, `set`, `append`, `subscribe`) and im
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 80% core
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 80% core
+
+## Delivery Summary
+
+Delivered 4 source files + 1 test file (11 tests, 0 failures). SessionStore interface with get/set/append/subscribe. InMemoryStore uses Map-based storage with two internal maps (#data for set/get, #logs for append) and per-key subscriber sets. All 80 core tests pass, build clean, lint clean.
 
 ## Dependencies
 
