@@ -51,9 +51,51 @@ The full design and contract surface lives in [docs/idea/](docs/idea/):
 - **[Package Distribution](docs/idea/package-distribution.md)** — 3 core packages + N community registries
 - **[Competitive Relevance](docs/idea/competitive-relevance-qa.md)** — competitor matrix + locked tagline + use cases
 
+## Package structure
+
+This is a monorepo managed via npm workspaces:
+
+```
+packages/
+└── core/                ← @genicui/core
+    ├── src/
+    │   ├── index.ts     ← Shared types and constants (VERSION)
+    │   └── index.test.ts ← Unit tests (F1-AC1 to F1-AC3)
+    ├── package.json     ← ESM, strict TypeScript, zero runtime deps
+    ├── tsconfig.json    ← ES2022 target, ESNext module, strict
+    └── eslint.config.js ← No `any` types enforced
+```
+
+| Package | Description | Status |
+|---|---|---|
+| `@genicui/core` | Shared types and constants | Implemented (M1-T1) |
+
+## Testing
+
+The test suite covers three layers:
+
+| Layer | Location | Runner | Scope |
+|---|---|---|---|
+| Package unit tests | `packages/core/src/` | `bun test` | F1-AC1 to F1-AC3 |
+| PoC unit tests | `poc/server/*.test.mjs`, `poc/adaptors/*.test.mjs` | `bun test` | Registry, lifecycle, broadcaster, chat parser |
+| E2E tests | `e2e/*.spec.ts` | `npx playwright test` | Chat surface, component render, event bridge, full flow |
+
+```bash
+# Run all tests
+bun test                        # unit + package tests
+npx playwright test             # E2E (starts PoC server via global-setup)
+
+# Run a specific layer
+bun test packages/core/         # @genicui/core only
+bun test poc/server/            # PoC server unit tests
+npx playwright test e2e/chat-surface.spec.ts  # single E2E spec
+```
+
 ## Project status
 
 PoC — working end-to-end on macOS with Claude Code. The framework is not yet packaged for npm distribution; this repo captures the design, the working PoC, and the contract surface we're building toward.
+
+**Completed:** `@genicui/core` package skeleton (M1-T1), PoC server unit tests, E2E test suite.
 
 ## License
 

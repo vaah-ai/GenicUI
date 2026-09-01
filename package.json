@@ -10,8 +10,14 @@
     "poc:parser-test": "node poc/server/chat-parser.test.mjs",
     "poc:chat-smoke": "node poc/server/chat-smoke-test.mjs"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

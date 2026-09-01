@@ -1,4 +1,15 @@
-# GenicUI PoC
+# GenicUI PoC ⚠️ DEPRECATED
+
+> **⚠️ This PoC has been superseded by production code in `packages/`.**
+>
+> | Package | Location | Purpose |
+> |---|---|---|
+> | `@genicui/core` | [`packages/core/`](../packages/core/) | Wire protocol, schema, patch engine, session store, MCP tool definitions |
+> | `@genicui/server` | `packages/server/` (coming: M2-M3) | WebSocket transport, frame multiplexing, tool handlers, trust boundary, event bus |
+> | `@genicui/client` | `packages/client/` (coming: M4-M6) | Web component runtime, patch engine, event capture, Vue 3 shim, Vite plugin |
+> | `@genicui-primevue/registry` | `registries/primevue/` (coming: M5) | Production component registry with PrimeVue wrappers |
+>
+> This PoC folder is kept **as a historical reference** to validate the original design decisions. It will be archived once all production packages (M1–M7) are complete and UAT passes.
 
 End-to-end demo of the [GenicUI](../docs/idea/README.md) concept, small enough to read in one sitting. Three components, one MCP server, one WebSocket bridge, and a single-page chat surface that drives Claude Code from the browser.
 
@@ -103,17 +114,61 @@ poc/
 │   ├── chat-broadcaster.mjs ← per-session SSE event emitter
 │   ├── chat-parser.mjs      ← stdout line → typed event mapper
 │   ├── chat-handler.mjs     ← spawns claude --print per turn
-│   └── smoke-test.mjs       ← 15 in-process assertions
+│   ├── smoke-test.mjs       ← 15 in-process assertions
+│   ├── registry.test.mjs    ← registry unit tests (register, get, list, search)
+│   ├── lifecycle.test.mjs   ← lifecycle unit tests (mount, update, unmount, ...)
+│   ├── chat-broadcaster.test.mjs ← broadcaster unit tests
+│   ├── chat-parser.test.mjs ← parser unit tests (mapStreamJsonEvent, parseOutputLine)
+│   └── integration.test.mjs ← full-flow integration tests
 ├── adaptors/
 │   ├── base-adaptor.mjs     ← shared validateProps + structure
 │   ├── counter.mjs          ← simplest component
 │   ├── todo-list.mjs        ← array props + item actions
-│   └── cart-viewer.mjs      ← composite + voice-resolution demo
+│   ├── cart-viewer.mjs      ← composite + voice-resolution demo
+│   └── base-adaptor.test.mjs ← validateProps unit tests
 └── web/
     ├── index.html           ← chat surface (single page)
     ├── app.mjs               ← EventSource client + composer + DOM mounting
     └── styles.css           ← chat + component styling
 ```
+
+## Tests
+
+### PoC unit tests (Bun)
+
+Run all PoC tests:
+
+```sh
+bun test poc/
+```
+
+Run a specific test file:
+
+```sh
+bun test poc/server/registry.test.mjs
+bun test poc/server/lifecycle.test.mjs
+bun test poc/server/integration.test.mjs
+bun test poc/server/chat-broadcaster.test.mjs
+bun test poc/server/chat-parser.test.mjs
+bun test poc/adaptors/base-adaptor.test.mjs
+```
+
+### E2E tests (Playwright)
+
+The E2E suite lives in `e2e/` and uses Playwright. It starts the PoC server automatically via `e2e/global-setup.mjs` and tears it down in `e2e/global-teardown.mjs`.
+
+```sh
+npx playwright test           # run all E2E tests
+npx playwright test e2e/chat-surface.spec.ts   # single spec
+npx playwright test --headed # with browser visible
+```
+
+| Spec | What it tests |
+|---|---|
+| `e2e/chat-surface.spec.ts` | Browser chat UI, session API, SSE, CORS |
+| `e2e/component-render.spec.ts` | Component mount/update/unmount lifecycle |
+| `e2e/event-bridge.spec.ts` | WebSocket bridge, hello, component actions |
+| `e2e/full-flow.spec.ts` | Full agent turn: render → update → event |
 
 ## Architecture
 
