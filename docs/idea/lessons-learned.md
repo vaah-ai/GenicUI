@@ -284,14 +284,45 @@ A few decisions held up without iteration:
 
 ---
 
-## 7. Reading order for newcomers
+## 7. Testing the PoC — what E2E and unit tests taught us
+
+### What we built
+
+A three-layer test suite covering the PoC:
+
+- **Unit tests** for `BaseAdaptor.validateProps`, `ComponentRegistry`, `ComponentLifecycle`, `ChatBroadcaster`, and `ChatParser` (Bun test, 6 files).
+- **Integration tests** that exercise the full tool flow: `find_ui_component → render_component → update → unmount` across real registry and lifecycle modules.
+- **E2E tests** (Playwright) that drive the browser chat surface, the WebSocket bridge, and the SSE chat API through real HTTP/WebSocket connections.
+
+### What broke
+
+1. **E2E tests need the server running.** The first attempt to run Playwright tests failed because the PoC server wasn't started. We added `e2e/global-setup.mjs` that spawns both the static web server (`python3 -m http.server 8080`) and the MCP server (`node poc/server/index.mjs`), then polls until both are ready. Teardown kills them via stored PIDs in `e2e/.server.pids`.
+
+2. **WebSocket messages can't be injected from Playwright.** The browser's WebSocket is in module scope, not a global. Playwright can't send messages directly to it. Instead, we verify the infrastructure is in place (DOM elements exist, status shows connected) and defer detailed WebSocket message tests to server-side integration tests.
+
+3. **SSE streams never end.** Playwright's `request.get()` waits for the response to finish, which SSE never does. We had to use `page.evaluate()` with `fetch()` + `AbortSignal.timeout()` to verify the SSE endpoint returns the right headers without waiting for the stream to end.
+
+### What we learned
+
+- **Test the right thing at the right layer.** Component rendering is best tested server-side (integration tests with real registry/lifecycle). Browser E2E is best at verifying the chat UI, DOM structure, and user interactions. The bridge WebSocket messages are tested server-side, not browser-side.
+- **Property-based testing for validators.** `BaseAdaptor.validateProps` has many edge cases (type validation, itemShape, required, optional, null). Enumerating them manually is error-prone; a future iteration should use `fast-check` to generate random props and validate against the schema.
+- **The `complete` event multi-turn lesson (§1) should be a test.** We added `chat-broadcaster.test.mjs` that explicitly tests the multi-turn model: `close()` doesn't lock the session, `push()` works after `close()`, and terminal events are emitted correctly. This would have caught the §1 bug before merge.
+
+### What it means for the contract
+
+The test strategy doc ([testing-strategy.md](../specs/testing-strategy.md)) defines property tests, integration tests, and E2E smoke. The PoC tests now prove the approach works — unit tests catch validator bugs, integration tests catch flow bugs, and E2E tests catch browser bugs. The next step is property-based tests for the core modules (SequenceGenerator, JsonPatchEngine, genicSchema) as defined in the testing strategy.
+---
+
+## 8. Reading order for newcomers
 
 If you're new to the codebase, read in this order:
 
 1. **`poc/README.md`** — what the PoC is, how to run it.
-2. **This doc** — what we learned building it.
+2. **This doc** — what we learned building it (§1–§8).
 3. **`docs/idea/architecture.md`** — the original design pitch (note: doesn't reflect §1 or §2).
 4. **`docs/idea/four-agnostic.md`** — the contract surface for what's *next*.
-5. **The code** (`poc/server/`, `poc/adaptors/`, `poc/web/`) — small enough to read in one sitting.
+5. **`docs/specs/testing-strategy.md`** — how we verify everything.
+6. **The code** (`poc/server/`, `poc/adaptors/`, `poc/web/`) — small enough to read in one sitting.
+7. **The tests** (`poc/server/*.test.mjs`, `e2e/*.spec.ts`) — small enough to read alongside the code.
 
 The original docs (architecture, adaptor-spec, agent-protocol) are kept as the design pitch. Use this doc + four-agnostic.md to understand what's actually built and what's planned.

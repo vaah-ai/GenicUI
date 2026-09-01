@@ -343,6 +343,40 @@ Mocking is a last resort. Inject real implementations for I/O when feasible — 
 
 ---
 
+## Current test inventory (PoC)
+
+Tests implemented as part of the PoC. These are the actual tests that run today, mapped to features and ACs.
+
+### Package unit tests (`packages/core/`)
+
+| File | Feature | ACs | Count |
+|---|---|---|---|
+| `packages/core/src/index.test.ts` | F1 | F1-AC1, F1-AC2, F1-AC3 | 3 |
+
+### PoC unit tests (`poc/`)
+
+| File | Module | Scope | Count |
+|---|---|---|---|
+| `poc/adaptors/base-adaptor.test.mjs` | BaseAdaptor | validateProps: required, type, itemShape, edge cases | ~18 |
+| `poc/server/registry.test.mjs` | ComponentRegistry | register, get, list, search (scoring, topK, edge cases) | ~15 |
+| `poc/server/lifecycle.test.mjs` | ComponentLifecycle | mount, update, unmount, get, getState, invoke, list | ~17 |
+| `poc/server/chat-broadcaster.test.mjs` | ChatBroadcaster | create, push, subscribe, close, claude session, isTerminal | ~18 |
+| `poc/server/chat-parser.test.mjs` | ChatParser | mapStreamJsonEvent (compact + verbose), parseOutputLine | ~35 |
+| `poc/server/integration.test.mjs` | Integration | find→render→update→unmount flow, search+validate round-trip | ~15 |
+
+### E2E tests (`e2e/`)
+
+| Spec | Features | Scope | Count |
+|---|---|---|---|
+| `e2e/chat-surface.spec.ts` | F9, F46 | Browser UI, session API, SSE, CORS | ~13 |
+| `e2e/component-render.spec.ts` | F16, F17, F19 | Component mount/update/unmount | ~6 |
+| `e2e/event-bridge.spec.ts` | F10, F18, F29, F30 | WebSocket bridge, hello, actions | ~8 |
+| `e2e/full-flow.spec.ts` | F13-F18, F30 | Full flow: render → update → event | ~5 |
+
+**Total:** ~130 tests (13 unit + ~83 PoC unit/integration + ~32 E2E).
+
+---
+
 ## Verification Ladder (Phase 5 reference)
 
 After Phase 4.5 docs are written, the verification ladder runs:
