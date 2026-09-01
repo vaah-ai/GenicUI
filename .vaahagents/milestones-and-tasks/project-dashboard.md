@@ -22,14 +22,14 @@
 
 ## Task Register
 
-### M1 — Foundations: Core Package (3/5 complete)
+### M1 — Foundations: Core Package (4/5 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M1-T1 | @genicui/core package skeleton | 🟢 Complete | Critical | 1 day | F1 | None (zero-dependency foundation) |
 | M1-T2 | GenicSchema<T> abstraction | ✅ Complete | Critical | 1 day | F2 | M1-T1 |
 | M1-T3 | Protocol envelope + sequence generator | ✅ Complete | Critical | 1 day | F3 | M1-T1 |
-| M1-T4 | JSON-Patch engine wrapper | ⚪ Not Started | Critical | 2 days | F4 | M1-T1 |
+| M1-T4 | JSON-Patch engine wrapper | ✅ Complete | Critical | 2 days | F4 | M1-T1 |
 | M1-T5 | SessionStore + InMemoryStore | ⚪ Not Started | Critical | 2 days | F5 | M1-T1 |
 
 ### M2 — Transport: Server + WS + Frames (0/3 complete)
