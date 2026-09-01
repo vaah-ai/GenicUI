@@ -49,3 +49,7 @@ export {
   findNonSerializableType,
 } from './patch/index.js';
 export type { JsonPatchOperation } from './patch/index.js';
+
+// F5 — SessionStore interface + InMemoryStore exports
+export { InMemoryStore } from './session/index.js';
+export type { SessionStore, SessionStoreCallback } from './session/index.js';

@@ -16,4 +16,6 @@ export { genicSchema, createGenicSchema } from './schema/genic-schema.js';
 export { SequenceGenerator, envelope, validateChannel, FrameBuffer, PROTOCOL_VERSION, RESERVED_CHANNELS, ERROR_CODE_RESERVED_CHANNEL, MAX_CHANNELS_PER_SOCKET, AG_UI_EVENT_TYPES, FrameEnvelopeSchema, GenicUIError, } from './protocol/index.js';
 // F4 — JSON-Patch engine wrapper exports
 export { JsonPatchEngine, NonSerializableError, hasNonSerializable, findNonSerializableType, } from './patch/index.js';
+// F5 — SessionStore interface + InMemoryStore exports
+export { InMemoryStore } from './session/index.js';
 //# sourceMappingURL=index.js.map

@@ -50,20 +50,43 @@ export class JsonPatchEngine {
         if (afterType) {
             throw new NonSerializableError(afterType);
         }
-        // fast-json-patch.compare requires objects.
-        // If either side is not an object/array, wrap both in a container
-        // so the patch operates on a consistent shape.
-        const needsWrap = before === null || after === null ||
-            (typeof before !== 'object' && !Array.isArray(before)) ||
-            (typeof after !== 'object' && !Array.isArray(after));
-        if (needsWrap) {
-            before = { _value: before };
-            after = { _value: after };
+        // fast-json-patch.compare requires objects or arrays on both sides.
+        // When types are different (e.g. primitive → object, array → string),
+        // the simplest correct approach is to serialize both to JSON and back,
+        // then compare the resulting objects. This handles all edge cases.
+        //
+        // If both are plain objects/arrays, compare directly for optimal
+        // fine-grained patches.
+        const beforeIsObj = before !== null &&
+            (typeof before === 'object' || Array.isArray(before));
+        const afterIsObj = after !== null &&
+            (typeof after === 'object' || Array.isArray(after));
+        if (beforeIsObj && afterIsObj) {
+            // Both are objects or arrays. If one is an array and the other
+            // is an object, fast-json-patch can't handle the transition
+            // correctly (it generates ops that don't apply). In this case,
+            // emit a full-replace patch.
+            const beforeIsArray = Array.isArray(before);
+            const afterIsArray = Array.isArray(after);
+            if (beforeIsArray !== afterIsArray) {
+                return [{ op: 'replace', path: '', value: after }];
+            }
+            // Both are objects or both are arrays — compare directly for
+            // fine-grained ops.
+            const ops = compare(before, after);
+            return ops ?? [];
         }
-        // fast-json-patch.compare returns RFC 6902 operations.
-        const ops = compare(before, after);
-        // compare() returns null when objects are identical.
-        return ops ?? [];
+        // Types are incompatible (e.g. null → {}, "a" → [1], 42 → "x").
+        // Use a full-replace patch: remove everything, then add the new value.
+        // This is the correct RFC 6902 behavior when the root type changes.
+        // But if both values are equal (e.g., both are the same string), return
+        // an empty patch since no change is needed.
+        if (before === after) {
+            return [];
+        }
+        return [
+            { op: 'replace', path: '', value: after },
+        ];
     }
     /**
      * Apply RFC 6902 JSON-Patch operations to `target`, returning
@@ -81,6 +104,18 @@ export class JsonPatchEngine {
      * @see {F4-AC2} — round-trip correctness
      */
     apply(patch, target) {
+        // If the patch is empty (no changes), return the target as-is.
+        if (patch.length === 0) {
+            return target;
+        }
+        // If the patch contains a root replace (path: ''), it means diff()
+        // determined the root type changed (e.g., null → object, array → string).
+        // In this case, just return the new value directly.
+        if (patch.length === 1 &&
+            patch[0].op === 'replace' &&
+            patch[0].path === '') {
+            return patch[0].value;
+        }
         // fast-json-patch.applyPatch requires objects.
         // If the target is a primitive, wrap it in a container to match
         // what diff() did. Unwrap the result afterward.
