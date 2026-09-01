@@ -1,8 +1,8 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-01
+> **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 0/7 milestones complete · 0/30 tasks complete · 30 tasks not started
+> **Status:** 0/7 milestones complete · 1/30 tasks complete · 29 tasks not started
 
 ---
 
@@ -10,7 +10,7 @@
 
 | ID | Title | Phase | Week | Status | Priority | Effort | Tasks | Manifest Features |
 |---|---|---|---|---|---|---|---|---|
-| M1 | Foundations: Core Package | Foundations | W1 | ⚪ Not Started | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
+| M1 | Foundations: Core Package | Foundations | W1 | 🟡 In Progress | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
 | M2 | Transport: Server + WS + Frames | Transport | W2 | ⚪ Not Started | Critical | 7-10 days | 3 | F9, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | ⚪ Not Started | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F21, F24, F29, F30, F33 |
@@ -22,11 +22,11 @@
 
 ## Task Register
 
-### M1 — Foundations: Core Package (0/5 complete)
+### M1 — Foundations: Core Package (1/5 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M1-T1 | @genicui/core package skeleton | ⚪ Not Started | Critical | 1 day | F1 | None (zero-dependency foundation) |
+| M1-T1 | @genicui/core package skeleton | 🟢 Complete | Critical | 1 day | F1 | None (zero-dependency foundation) |
 | M1-T2 | GenicSchema<T> abstraction | ⚪ Not Started | Critical | 1 day | F2 | M1-T1 |
 | M1-T3 | Protocol envelope + sequence generator | ⚪ Not Started | Critical | 1 day | F3 | M1-T1 |
 | M1-T4 | JSON-Patch engine wrapper | ⚪ Not Started | Critical | 2 days | F4 | M1-T1 |

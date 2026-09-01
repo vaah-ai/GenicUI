@@ -1,0 +1,1 @@
+/run-task this workflow should pick tasks from /Users/pk/Projects/GenicUI/.vaahagents/milestones-and-tasks and /Users/pk/Projects/GenicUI/.vaahagents/milestones-and-tasks/project-dashboard.md 
