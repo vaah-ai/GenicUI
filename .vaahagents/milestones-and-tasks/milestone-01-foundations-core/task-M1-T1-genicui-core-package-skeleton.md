@@ -3,7 +3,7 @@
 > **Milestone:** M1 (Foundations: Core Package)
 > **Manifest feature:** F1 (@genicui/core package skeleton)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** 🟢 Complete
 > **Estimated Effort:** 1 day
 
 ## Description
@@ -43,11 +43,20 @@ Create the `@genicui/core` monorepo workspace package with ESM exports, strict T
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds and emits `@genicui/core`
-- [ ] Coverage target met: 80% core
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (4/4 pass)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds and emits `@genicui/core`
+- [x] Coverage target met: 80% core
+
+## Completion Notes
+
+- Completed: 2026-09-02
+- Branch: `feature/M1-T1-genicui-core-package-skeleton` (merged into `develop`)
+- Tests: 4/4 pass (F1-AC1, F1-AC2, F1-AC3)
+- Build: `tsc` clean, Lint: ESLint clean
+- Files: `packages/core/{package.json, tsconfig.json, eslint.config.js, src/index.ts, src/index.test.ts, dist/}`
+- Root `package.json` updated: `workspaces: ["packages/*"]`, devDependencies: `@playwright/test ^1.62.1`
 
 ## Dependencies
 

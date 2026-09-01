@@ -9,7 +9,7 @@ GenicUI Task Execution Prompt generated at `.vaahagents/prompts/prompt-task-exec
 
 **Workflow phases:** Orientation (0-2), Planning (3-7), Execution (8-11), Completion (12-15).
 
-**Key deviations from template:** No milestone/task tracking system (no `ai-milestones-and-tasks/`), so task selection and impact propagation steps excluded. No AI context file detected.
+**Key deviations from template:** Milestone/task tracking system at `.vaahagents/milestones-and-tasks/` with 30 tasks across 7 milestones. No AI context file detected.
 
 **Tech stack:** Node.js/Bun ESM, `@modelcontextprotocol/sdk` ^1.0.0, `ws` ^8.18.0, TypeBox, Zod (PoC), fast-json-patch, Elysia (planned), PrimeVue 4, Vue 3, Nuxt (target), Playwright.
 
