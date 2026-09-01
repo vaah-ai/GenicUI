@@ -3,7 +3,7 @@
 > **Milestone:** M1 (Foundations: Core Package)
 > **Manifest feature:** F3 (Protocol envelope + sequence generator)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 1 day
 
 ## Description
