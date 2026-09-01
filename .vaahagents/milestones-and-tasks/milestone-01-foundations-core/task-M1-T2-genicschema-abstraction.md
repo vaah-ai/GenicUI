@@ -3,7 +3,7 @@
 > **Milestone:** M1 (Foundations: Core Package)
 > **Manifest feature:** F2 (GenicSchema<T> abstraction)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 1 day
 
 ## Description
@@ -48,6 +48,20 @@ Build the `GenicSchema<T>` abstraction layer wrapping TypeBox, producing JSON Sc
 - [ ] `bun run lint` reports zero errors
 - [ ] `bun run build` succeeds
 - [ ] Coverage target met: 80% core
+
+## Completion Summary
+
+**Delivered:** GenicSchema<T> abstraction with TypeBox wrapper, recursive `additionalProperties: false` injection, GenicUI metadata annotations, and deprecated field support.
+
+**Files delivered:**
+- `packages/core/src/schema/types.ts` — Type definitions (GenicSchemaOptions, GenicSchemaResult, GenicSchemaBuilder)
+- `packages/core/src/schema/genic-schema.ts` — Core implementation (genicSchema, createGenicSchema)
+- `packages/core/src/schema/index.ts` — Barrel exports
+- `packages/core/src/schema/genic-schema.test.ts` — 17 tests covering all ACs
+- `packages/core/src/index.ts` — Updated with schema re-exports
+- `packages/core/package.json` — Added @sinclair/typebox + fast-check dependencies
+
+**Test results:** 21 pass (17 F2 + 4 F1 regression), 0 fail. TypeScript strict mode clean.
 
 ## Dependencies
 
