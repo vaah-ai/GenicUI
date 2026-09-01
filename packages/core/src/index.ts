@@ -40,3 +40,12 @@ export type {
   FrameBufferResult,
   AGUIEventType,
 } from './protocol/index.js';
+
+// F4 — JSON-Patch engine wrapper exports
+export {
+  JsonPatchEngine,
+  NonSerializableError,
+  hasNonSerializable,
+  findNonSerializableType,
+} from './patch/index.js';
+export type { JsonPatchOperation } from './patch/index.js';
