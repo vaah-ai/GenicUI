@@ -122,11 +122,24 @@ export interface MountedComponent {
 }
 
 /**
+ * Deep clone a record to ensure immutability.
+ *
+ * @param obj — the object to clone
+ * @returns a new object with the same structure
+ */
+function deepCloneRecord(obj: unknown): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(obj)) as Record<string, unknown>;
+}
+
+/**
  * In-memory component store.
  *
  * Tracks mounted components and idempotency keys for the stateless
  * HTTP transport. For WS transport, each session would have its own
  * instance.
+ *
+ * Provides per-componentId async locks (F17-AC4) to serialize
+ * concurrent updates and prevent torn state.
  */
 export class ComponentStore {
   /** Mounted components indexed by componentId. */
@@ -134,6 +147,9 @@ export class ComponentStore {
 
   /** Idempotency keys mapped to componentIds. */
   private readonly idempotencyKeys = new Map<string, string>();
+
+  /** Per-componentId async locks for concurrent update serialization (F17-AC4). */
+  private readonly locks = new Map<string, Promise<void>>();
 
   /**
    * Check if an idempotency key exists and return the associated componentId.
@@ -189,6 +205,71 @@ export class ComponentStore {
   }
 
   /**
+   * Update a component's props atomically under a per-componentId lock.
+   *
+   * This ensures concurrent updates are serialized (F17-AC4), preventing
+   * torn state when multiple updates arrive simultaneously.
+   *
+   * @param componentId — the component to update
+   * @param newProps — the updated props (full replacement)
+   * @returns the updated component, or undefined if not found
+   * @throws if the componentId does not exist
+   */
+  public async update(
+    componentId: string,
+    newProps: Record<string, unknown>,
+  ): Promise<MountedComponent> {
+    // Acquire the per-componentId lock
+    await this.acquireLock(componentId);
+
+    try {
+      const component = this.components.get(componentId);
+      if (!component) {
+        throw new Error(`Component "${componentId}" not found`);
+      }
+
+      // Create a new component record with updated props (immutable update)
+      const updated: MountedComponent = {
+        componentId: component.componentId,
+        name: component.name,
+        channel: component.channel,
+        props: newProps,
+        mountedAt: component.mountedAt,
+      };
+
+      this.components.set(componentId, updated);
+      return updated;
+    } finally {
+      this.releaseLock(componentId);
+    }
+  }
+
+  /**
+   * Acquire a per-componentId async lock.
+   *
+   * Each call chains onto the previous promise, ensuring sequential
+   * execution for updates on the same componentId.
+   *
+   * @param componentId — the component to lock
+   */
+  private async acquireLock(componentId: string): Promise<void> {
+    const previous = this.locks.get(componentId);
+    const lock = new Promise<void>((resolve) => {
+      this.locks.set(componentId, (previous ?? Promise.resolve()).then(() => resolve()));
+    });
+    await lock;
+  }
+
+  /**
+   * Release the per-componentId lock by clearing it.
+   *
+   * @param componentId — the component to unlock
+   */
+  private releaseLock(componentId: string): void {
+    this.locks.delete(componentId);
+  }
+
+  /**
    * Get the count of mounted components.
    */
   public get count(): number {
@@ -202,6 +283,7 @@ export class ComponentStore {
   public clear(): void {
     this.components.clear();
     this.idempotencyKeys.clear();
+    this.locks.clear();
   }
 }
 

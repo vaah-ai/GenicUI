@@ -8,6 +8,7 @@
 import { describe, it, expect } from 'bun:test';
 import { createMcpServer, handleMcpRequest } from './server.js';
 import { GENICUI_ERROR_CODES } from './tool-registry.js';
+import { componentStore } from './component-store.js';
 
 // ---------------------------------------------------------------------------
 // Helper: send a JSON-RPC request via the in-memory transport
@@ -243,6 +244,21 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
   });
 
   it('update_component (patch) returns valid response', async () => {
+    // Register a component for the update_component test
+    componentStore.register({
+      componentId: 'dt-test-001',
+      name: 'DataTable',
+      channel: 'dt-test-001',
+      props: {
+        rows: [
+          { id: '1', name: 'Alice', status: 'pending' },
+          { id: '2', name: 'Bob', status: 'pending' },
+        ],
+        pageSize: 10,
+      },
+      mountedAt: new Date().toISOString(),
+    });
+
     await mcpRequest({
       jsonrpc: '2.0',
       id: 1,
@@ -269,8 +285,10 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
 
     expect(response.result).toBeDefined();
     const content = response.result!.content as Array<{ type: string; text: string }>;
-    expect(content.at(0)!.text).toContain('update_component');
+    // Real implementation returns JSON with componentId, channel, type, and patch
+    expect(content.at(0)!.text).toContain('componentId');
     expect(content.at(0)!.text).toContain('dt-test-001');
+    expect(content.at(0)!.text).toContain('STATE_DELTA');
   });
 
   it('subscribe_to_events returns valid response', async () => {
