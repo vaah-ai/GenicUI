@@ -330,7 +330,7 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
 describe('GenicUI error codes', () => {
   it('defines all error codes in -32001..-32010 range', () => {
     const values = Object.values(GENICUI_ERROR_CODES);
-    expect(values).toHaveLength(10);
+    expect(values).toHaveLength(11);
     for (const code of values) {
       expect(code).toBeGreaterThanOrEqual(-32010);
       expect(code).toBeLessThanOrEqual(-32001);
@@ -347,6 +347,10 @@ describe('GenicUI error codes', () => {
 
   it('internal is -32010', () => {
     expect(GENICUI_ERROR_CODES.internal).toBe(-32010);
+  });
+
+  it('invalid_resource_uri is -32002 (F28-AC3)', () => {
+    expect(GENICUI_ERROR_CODES.invalid_resource_uri).toBe(-32002);
   });
 });
 

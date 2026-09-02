@@ -3,7 +3,7 @@
 > **Milestone:** M3 (Tool Surface: MCP + 4 Public Tools)
 > **Manifest feature:** F28 (ui:// URI grammar)
 > **Priority:** Medium
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 1 day
 
 ## Description

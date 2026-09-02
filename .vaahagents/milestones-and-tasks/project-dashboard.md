@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 12/30 tasks complete · 18 tasks not started
+> **Status:** 3/6 milestones complete · 13/30 tasks complete · 17 tasks not started
 
 ---
 
@@ -40,7 +40,7 @@
 | M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ✅ Complete | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
 | M2-T4 | Frame envelope + channel multiplexing | ✅ Complete | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
-### M3 — Tool Surface: MCP + 4 Tools (6/7 complete)
+### M3 — Tool Surface: MCP + 4 Tools (7/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -50,7 +50,7 @@
 | M3-T4 | render_component | ✅ Complete | Critical | 3-5 days | F16 | M1-T2, M3-T1, M3-T3 |
 | M3-T5 | update_component (JSON-Patch + replace) | ✅ Complete | Critical | 3-5 days | F17 | M1-T4, M3-T1, M3-T4 |
 | M3-T6 | subscribe_to_events | ✅ Complete | High | 2-3 days | F18 | M3-T1 |
-| M3-T7 | ui:// URI grammar | ⚪ Not Started | Medium | 1 day | F28 | M3-T1 |
+| M3-T7 | ui:// URI grammar | ✅ Complete | Medium | 1 day | F28 | M3-T1 |
 
 ### M4 — Runtime: Events + WC + Engine (0/7 complete)
 
