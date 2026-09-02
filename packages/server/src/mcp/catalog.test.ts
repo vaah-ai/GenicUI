@@ -31,6 +31,7 @@ describe('getCatalog', () => {
       expect(typeof entry.name).toBe('string');
       expect(entry.description).toBeDefined();
       expect(entry.propsSchema).toBeDefined();
+      expect(entry.propsJsonSchema).toBeDefined();
       expect(Array.isArray(entry.events)).toBe(true);
       expect(Array.isArray(entry.examples)).toBe(true);
       expect(Array.isArray(entry.tags)).toBe(true);

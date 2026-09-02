@@ -237,8 +237,9 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
     expect(response.result).toBeDefined();
     const content = response.result!.content as Array<{ type: string; text: string }>;
     expect(content.at(0)!.type).toBe('text');
-    expect(content.at(0)!.text).toContain('render_component');
-    expect(content.at(0)!.text).toContain('DataTable');
+    // Real implementation returns JSON with component metadata
+    expect(content.at(0)!.text).toContain('componentId');
+    expect(content.at(0)!.text).toContain('initialState');
   });
 
   it('update_component (patch) returns valid response', async () => {
