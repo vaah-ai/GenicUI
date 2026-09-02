@@ -1,6 +1,6 @@
-# Task M7-T2 — Bun self-host deployment (single binary)
+# Task M6-T2 — Bun self-host deployment (single binary)
 
-> **Milestone:** M7 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
+> **Milestone:** M6 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
 > **Manifest feature:** F62 (Bun self-host deployment)
 > **Priority:** Medium
 > **Status:** ⚪ Not Started

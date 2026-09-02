@@ -44,7 +44,7 @@ Bootstrap the MCP server exposing 4 public tools: `find_ui_component`, `render_c
 
 ## Dependencies
 
-- **Requires:** M2-T1 (F9), M2-T3 (F11)
+- **Requires:** M2-T1 (F9), M2-T4 (F11)
 - **Blocks:** M3-T2 (F14), M3-T3 (F15), M3-T4 (F16), M3-T5 (F17), M3-T6 (F18), M3-T7 (F28)
 
 ## Documentation References

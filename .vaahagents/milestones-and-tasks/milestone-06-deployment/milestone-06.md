@@ -1,4 +1,4 @@
-# Milestone M7 — Deployment: Cloudflare, Bun, Durable Objects, Nitro
+# Milestone M6 — Deployment: Cloudflare, Bun, Durable Objects, Nitro
 
 > **Roadmap phase:** Deployment
 > **Roadmap week:** W11-W12
@@ -21,10 +21,10 @@ Ship the deployment targets: Cloudflare Workers + Durable Objects (primary), Bun
 
 ## Tasks
 
-- M7-T1 — Cloudflare Workers + DO deployment (maps to manifest F61)
-- M7-T2 — Bun self-host deployment (maps to manifest F62)
-- M7-T3 — DODurableObjectStore (CF DO session backend) (maps to manifest F62b)
-- M7-T4 — Nitro/Nuxt binding (maps to manifest F64)
+- M6-T1 — Cloudflare Workers + DO deployment (maps to manifest F61)
+- M6-T2 — Bun self-host deployment (maps to manifest F62)
+- M6-T3 — DODurableObjectStore (CF DO session backend) (maps to manifest F62b)
+- M6-T4 — Nitro/Nuxt binding (maps to manifest F64)
 
 ## Dependencies
 

@@ -43,7 +43,7 @@ Implement session recovery: when a client reconnects after disconnect, replay th
 
 ## Dependencies
 
-- **Requires:** M1-T5 (F5), M2-T2 (F10)
+- **Requires:** M1-T5 (F5), M2-T3 (F10)
 - **Blocks:** None directly (used by M7 — deployment)
 
 ## Documentation References

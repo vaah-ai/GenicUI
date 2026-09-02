@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 0/7 milestones complete · 4/30 tasks complete · 26 tasks not started
+> **Status:** 0/6 milestones complete · 4/29 tasks complete · 25 tasks not started
 
 ---
 
@@ -11,12 +11,11 @@
 | ID | Title | Phase | Week | Status | Priority | Effort | Tasks | Manifest Features |
 |---|---|---|---|---|---|---|---|---|
 | M1 | Foundations: Core Package | Foundations | W1 | 🟢 Complete | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
-| M2 | Transport: Server + WS + Frames | Transport | W2 | ⚪ Not Started | Critical | 7-10 days | 3 | F9, F10, F11 |
+| M2 | Transport: Server + WS + Frames | Transport | W2 | ⚪ Not Started | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | ⚪ Not Started | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
-| M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F21, F24, F29, F30, F33 |
+| M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue | Registry | W7 | ⚪ Not Started | Critical | 10-14 days | 3 | F37, F38, F40 |
-| M6 | Security: API Key Auth | Security | W10 | ⚪ Not Started | Critical | 3-5 days | 1 | F46 |
-| M7 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
+| M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
 
@@ -32,19 +31,20 @@
 | M1-T4 | JSON-Patch engine wrapper | ✅ Complete | Critical | 2 days | F4 | M1-T1 |
 | M1-T5 | SessionStore + InMemoryStore | ✅ Complete | Critical | 2 days | F5 | M1-T1 |
 
-### M2 — Transport: Server + WS + Frames (1/3 complete)
+### M2 — Transport: Server + WS + Frames (1/4 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M2-T1 | Bun + Elysia HTTP server skeleton | 🟢 Complete | Critical | 1-2 days | F9 | M1-T1 |
-| M2-T2 | WebSocket transport (handshake + auth + heartbeat) | ⚪ Not Started | Critical | 3-5 days | F10 | M2-T1, M6-T1 |
-| M2-T3 | Frame envelope + channel multiplexing | ⚪ Not Started | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
+| M2-T2 | API key auth (gnc_live_<32> Bearer) | ⚪ Not Started | Critical | 2-3 days | F46 | M2-T1 |
+| M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ⚪ Not Started | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
+| M2-T4 | Frame envelope + channel multiplexing | ⚪ Not Started | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
 ### M3 — Tool Surface: MCP + 4 Tools (0/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M3-T1 | MCP server with 4 public tools | ⚪ Not Started | Critical | 2-3 days | F13 | M2-T1, M2-T3 |
+| M3-T1 | MCP server with 4 public tools | ⚪ Not Started | Critical | 2-3 days | F13 | M2-T1, M2-T4 |
 | M3-T2 | Trust-boundary validation | ⚪ Not Started | Critical | 2 days | F14 | M1-T2, M3-T1 |
 | M3-T3 | find_ui_component | ⚪ Not Started | High | 2 days | F15 | M1-T2, M3-T1 |
 | M3-T4 | render_component | ⚪ Not Started | Critical | 3-5 days | F16 | M1-T2, M3-T1, M3-T3 |
@@ -57,12 +57,12 @@
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M4-T1 | Event capture from Custom Elements | ⚪ Not Started | High | 2 days | F19 | M3-T6 |
-| M4-T2 | Internal event bus (post-emit + backpressure) | ⚪ Not Started | High | 2-3 days | F20 | M1-T5, M2-T3, M4-T1 |
-| M4-T3 | GenicElement Web Component base | ⚪ Not Started | Critical | 3-5 days | F21 | M1-T4, M4-T5 (circular) |
-| M4-T4 | Server-side event application | ⚪ Not Started | High | 2-3 days | F24 | M1-T4, M4-T2 |
-| M4-T5 | Runtime engine (mount, patch, lifecycle) | ⚪ Not Started | Critical | 3-5 days | F29 | M4-T3, M4-T4 |
-| M4-T6 | Vite plugin + auto-registration | ⚪ Not Started | Medium | 2-3 days | F30 | M4-T3 |
-| M4-T7 | Session recovery (last-10-messages) | ⚪ Not Started | Medium | 2-3 days | F33 | M1-T5, M2-T2 |
+| M4-T2 | Internal event bus (post-emit + backpressure) | ⚪ Not Started | High | 2-3 days | F20 | M1-T5, M2-T4, M4-T1 |
+| M4-T3 | Server-side event application | ⚪ Not Started | High | 2-3 days | F24 | M1-T4, M4-T2 |
+| M4-T4 | GenicElement Web Component base | ⚪ Not Started | Critical | 3-5 days | F21 | M1-T4, M4-T5 (circular) |
+| M4-T5 | Runtime engine (mount, patch, lifecycle) | ⚪ Not Started | Critical | 3-5 days | F29 | M4-T4, M4-T3 |
+| M4-T6 | Vite plugin + auto-registration | ⚪ Not Started | Medium | 2-3 days | F30 | M4-T4 |
+| M4-T7 | Session recovery (last-10-messages) | ⚪ Not Started | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
 ### M5 — Registry: Registry + PrimeVue (0/3 complete)
 
@@ -72,20 +72,14 @@
 | M5-T2 | Registry trust tiers | ⚪ Not Started | High | 2-3 days | F38 | M5-T1 |
 | M5-T3 | PrimeVue DataTable registry | ⚪ Not Started | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
 
-### M6 — Security: API Key Auth (0/1 complete)
+### M6 — Deployment: CF + Bun + Nitro (0/4 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M6-T1 | API key auth (gnc_live_<32> Bearer) | ⚪ Not Started | Critical | 2-3 days | F46 | M2-T1 |
-
-### M7 — Deployment: CF + Bun + Nitro (0/4 complete)
-
-| ID | Title | Status | Priority | Effort | Manifest | Dependencies |
-|---|---|---|---|---|---|---|
-| M7-T1 | Cloudflare Workers + DO deployment | ⚪ Not Started | High | 5-7 days | F61 | M1-T5, M2-T1 |
-| M7-T2 | Bun self-host deployment | ⚪ Not Started | Medium | 2-3 days | F62 | M2-T1 |
-| M7-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M7-T1 |
-| M7-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
+| M6-T1 | Cloudflare Workers + DO deployment | ⚪ Not Started | High | 5-7 days | F61 | M1-T5, M2-T1 |
+| M6-T2 | Bun self-host deployment | ⚪ Not Started | Medium | 2-3 days | F62 | M2-T1 |
+| M6-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M6-T1 |
+| M6-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
 
 ---
 
@@ -94,23 +88,68 @@
 ```
 Layer 0:  M1-T1 (F1) — zero dependencies
 Layer 1:  M1-T2 (F2), M1-T3 (F3), M1-T4 (F4), M1-T5 (F5), M2-T1 (F9)
-Layer 2:  M6-T1 (F46) — depends on M2-T1
-Layer 3:  M2-T2 (F10), M2-T3 (F11) — depends on Layer 1-2
-Layer 4:  M3-T1 (F13) — depends on M2-T1, M2-T3
+Layer 2:  M2-T2 (F46), M2-T4 (F11), M6-T1 (F61), M6-T2 (F62), M6-T4 (F64)
+Layer 3:  M2-T3 (F10) — depends on M2-T1, M2-T2
+Layer 4:  M3-T1 (F13) — depends on M2-T1, M2-T4
 Layer 5:  M3-T2 (F14), M3-T3 (F15), M3-T7 (F28) — depends on M3-T1
 Layer 6:  M3-T4 (F16) — depends on M3-T3
 Layer 7:  M3-T5 (F17), M3-T6 (F18) — depends on M3-T4 / M3-T1
 Layer 8:  M4-T1 (F19) — depends on M3-T6
-Layer 9:  M4-T2 (F20) — depends on M4-T1
-Layer 10: M4-T4 (F24) — depends on M4-T2
-Layer 11: M4-T3 (F21), M4-T5 (F29) — circular dep; build with stub
-Layer 12: M4-T6 (F30), M4-T7 (F33) — depends on M4-T3 / M2-T2
+Layer 9:  M4-T2 (F20) — depends on M4-T1, M2-T4
+Layer 10: M4-T3 (F24) — depends on M4-T2
+Layer 11: M4-T4 (F21), M4-T5 (F29) — circular dep; build with stub
+Layer 12: M4-T6 (F30), M4-T7 (F33) — depends on M4-T4 / M2-T3
 Layer 13: M5-T1 (F37) — depends on M1-T2, M3-T1
 Layer 14: M5-T2 (F38) — depends on M5-T1
 Layer 15: M5-T3 (F40) — depends on M5-T1, M5-T2
-Layer 16: M7-T1 (F61) — depends on M1-T5, M2-T1
-Layer 17: M7-T2 (F62), M7-T4 (F64) — depends on M2-T1
-Layer 18: M7-T3 (F62b) — depends on M7-T1
+Layer 16: M6-T3 (F62b) — depends on M6-T1
+```
+
+## Execution Order (Optimized for Velocity)
+
+> **Analysis date:** 2026-09-02
+> **Completed:** M1-T1..T5 (5/5), M2-T1 (1/4)
+> **Remaining:** 25 tasks across 5 milestones
+
+### Ready to Start (zero unmet dependencies)
+
+| Priority | Task | Feature | Why first | Unblocks |
+|----------|------|---------|-----------|----------|
+| **P0** | M2-T2 | F46 | API key auth — prerequisite for M2-T3 (WebSocket) | M2-T3 → M4-T7 |
+| **P0** | M2-T4 | F11 | Gate to entire M3 milestone (7 tasks) | M3-T1 → All M3 |
+| **P2** | M6-T2 | F62 | Independent, low effort (2-3 days) | Nothing critical |
+| **P2** | M6-T4 | F64 | Independent, low effort (2-3 days) | Nothing critical |
+| **P2** | M6-T1 | F61 | Independent, medium effort (5-7 days) | M6-T3 |
+
+### Sequential Execution Plan
+
+```
+Step 1: M2-T2 (F46)  — API key auth [unblocks M2-T3]
+Step 2: M2-T4 (F11)  — Frame multiplexing [unlocks M3-T1 → all M3]
+        ─── Both can run in parallel ───
+Step 3: M2-T3 (F10)  — WebSocket transport [critical path]
+Step 4: M3-T1 (F13)  — MCP server + 4 tools [unlocks all M3 tools]
+Step 5: M3-T2/T3/T7  — Trust boundary, find_ui, URI [3 parallel tasks]
+Step 6: M3-T4 (F16)  — render_component
+Step 7: M3-T5 (F17)  — update_component
+Step 8: M3-T6 (F18)  — subscribe_to_events
+Step 9: M4-T1 (F19)  — Event capture
+Step 10: M4-T2 (F20) — Internal event bus
+Step 11: M4-T3 (F24) — Server-side event application
+Step 12: M4-T4/T5     — Web component + Runtime engine [circular, use stub]
+Step 13: M5-T1 (F37)  — Component registry
+Step 14: M5-T2 (F38)  — Registry trust tiers
+Step 15: M5-T3 (F40)  — PrimeVue DataTable registry
+Step 16: M4-T6 (F30)  — Vite plugin
+Step 17: M4-T7 (F33)  — Session recovery
+Step 18: M6-T1 (F61)  — CF Workers deploy [independent, can run earlier]
+Step 19: M6-T3 (F62b) — DO session store
+```
+
+### Longest Critical Path (determines MVP timeline)
+
+```
+M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → M4-T2 → M4-T3 → M4-T4/M4-T5 → M5-T1 → M5-T2 → M5-T3
 ```
 
 ---
@@ -158,7 +197,7 @@ Layer 18: M7-T3 (F62b) — depends on M7-T1
 
 ## Velocity Check
 
-- **Current date:** 2026-09-01
+- **Current date:** 2026-09-02
 - **Week 6 integration milestone:** Target date ~W6 of 12-week plan
-- **Scope:** 29 features, 93 ACs, 7 milestones, 30 tasks
+- **Scope:** 29 features, 93 ACs, 6 milestones, 29 tasks
 - **If any feature slips past W6:** propose cutting to deferred_for_post_mvp

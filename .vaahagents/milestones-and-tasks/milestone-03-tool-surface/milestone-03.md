@@ -32,7 +32,7 @@ Build the MCP server with 4 public tools (`find_ui_component`, `render_component
 ## Dependencies
 
 - **Blocks:** M4 (Runtime — F19 depends on F18, F23/F24/F29 depend on tool surface)
-- **Requires:** M2-T1 (F9 — server), M2-T3 (F11 — frames), M1-T2 (F2 — schema)
+- **Requires:** M2-T1 (F9 — server), M2-T4 (F11 — frames), M1-T2 (F2 — schema)
 
 ## Manifest Cross-References
 

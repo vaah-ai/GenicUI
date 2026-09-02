@@ -22,16 +22,17 @@ Build the server transport layer: Elysia HTTP server skeleton, WebSocket transpo
 ## Tasks
 
 - M2-T1 — Bun + Elysia HTTP server skeleton (maps to manifest F9)
-- M2-T2 — WebSocket transport (handshake + auth + heartbeat) (maps to manifest F10)
-- M2-T3 — Frame envelope serialization + channel multiplexing (maps to manifest F11)
+- M2-T2 — API key auth (`gnc_live_<32>` Bearer) (maps to manifest F46, moved from M6)
+- M2-T3 — WebSocket transport (handshake + auth + heartbeat) (maps to manifest F10)
+- M2-T4 — Frame envelope serialization + channel multiplexing (maps to manifest F11)
 
 ## Dependencies
 
 - **Blocks:** M3 (Tool Surface — F13 depends on F9, F11)
-- **Requires:** M1-T1 (F9 depends on F1), M1-T3 (F11 depends on F3), M6-T1 (F10 depends on F46 — API key auth)
+- **Requires:** M1-T1 (F1), M1-T3 (F3)
 
 ## Manifest Cross-References
 
-- Features: F9, F10, F11
+- Features: F9, F46, F10, F11
 - Quality attributes covered: Performance (F9-AC1), Reliability (F10-AC4, F10-AC5), Security (F10-AC2)
 - Pipeline handoff invariants honoured: WS transport primary only (consolidated-requirements.md §L8)
