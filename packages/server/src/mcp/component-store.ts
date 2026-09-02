@@ -270,6 +270,20 @@ export class ComponentStore {
   }
 
   /**
+   * Unmount a component by ID.
+   *
+   * Removes the component from the store and returns true if it existed.
+   * Callers should notify the event subscription manager after unmounting
+   * to trigger auto-cleanup (F18-AC3).
+   *
+   * @param componentId — the component to unmount
+   * @returns true if the component was found and removed, false otherwise
+   */
+  public unmount(componentId: string): boolean {
+    return this.components.delete(componentId);
+  }
+
+  /**
    * Get the count of mounted components.
    */
   public get count(): number {

@@ -318,7 +318,7 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
 
     expect(response.result).toBeDefined();
     const content = response.result!.content as Array<{ type: string; text: string }>;
-    expect(content.at(0)!.text).toContain('subscribe_to_events');
+    expect(content.at(0)!.text).toContain('subscriptionId');
     expect(content.at(0)!.text).toContain('dt-test-001');
   });
 });
