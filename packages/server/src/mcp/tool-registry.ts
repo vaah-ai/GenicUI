@@ -18,6 +18,7 @@ import { findComponents } from './catalog.js';
 import { renderComponent } from './render-handler.js';
 import { updateComponent } from './update-handler.js';
 import { eventSubscriptionManager } from './subscribe-handler.js';
+import { isCatalogUri } from './uri-validator.js';
 
 /**
  * GenicUI-specific JSON-RPC error codes.
@@ -28,8 +29,10 @@ import { eventSubscriptionManager } from './subscribe-handler.js';
 export const GENICUI_ERROR_CODES = {
   /** -32001: The requested component was not found. */
   component_not_found: -32001,
-  /** -32002: The component is already mounted with this ID. */
+  /** -32002: The component is already mounted / invalid resource URI. */
   component_already_mounted: -32002,
+  /** -32002: Catalog URI used where instance URI expected. */
+  invalid_resource_uri: -32002,
   /** -32003: The provided props or input are invalid. */
   props_invalid: -32003,
   /** -32004: The JSON-Patch operations are invalid. */
@@ -234,6 +237,14 @@ export function registerToolDefinitions(server: McpServer): void {
       inputSchema: RenderComponentInputSchema,
     },
     wrapWithValidation(async (input: z.infer<typeof RenderComponentInputSchema>): Promise<CallToolResult> => {
+      // F28-AC3: Reject catalog URIs for render_component
+      if (isCatalogUri(input.name)) {
+        return createErrorResult(
+          GENICUI_ERROR_CODES.invalid_resource_uri,
+          `invalid_resource_uri: catalog URI "${input.name}" cannot be used with render_component; use instance URI or component name`,
+        );
+      }
+
       const renderInput: {
         name: string;
         props: Record<string, unknown>;
