@@ -31,7 +31,7 @@ export async function startStdioMcpServer() {
     const server = createMcpServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    // eslint-disable-next-line no-console
+    // Logging to stderr only — stdout is MCP transport
     console.error('[MCP] Server started on stdio transport');
     return server;
 }
