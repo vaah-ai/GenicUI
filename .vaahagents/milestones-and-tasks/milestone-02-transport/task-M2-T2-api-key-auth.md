@@ -3,12 +3,14 @@
 > **Milestone:** M2 (Transport: Server + WS + Frames)
 > **Manifest feature:** F46 (API key auth)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
 
 Implement API key authentication middleware: `gnc_live_` prefix + 32 random chars (256 bits), validated against SHA-256 hashes. Plain-text keys are never logged. Timing-safe comparison prevents side-channel attacks. This is a hard prerequisite for WebSocket transport (M2-T3, F10).
+
+**Delivered:** 5 files in `packages/server/src/auth/` — types, key-validator, log-scrubber, barrel index, and 30 comprehensive tests. All 4 ACs verified. Auth middleware integrated into server with `/health` open, `/api/*` requiring Bearer token.
 
 ## Task Goals
 
@@ -46,12 +48,12 @@ Implement API key authentication middleware: `gnc_live_` prefix + 32 random char
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Trust-boundary strip verified, `additionalProperties: false` enforced
-- [ ] Security-touching: trust-boundary checks verified
+- [x] All acceptance criteria above pass (30 tests, 0 failures)
+- [x] `bun run test` exits green (68 tests pass)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds (tsc clean)
+- [x] Trust-boundary strip verified, `additionalProperties: false` enforced
+- [x] Security-touching: timing-safe compare, hash-only storage, log scrubbing verified
 
 ## Dependencies
 

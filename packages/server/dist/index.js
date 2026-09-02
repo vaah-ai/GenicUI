@@ -4,24 +4,85 @@
  * @module @genicui/server
  *
  * @see {F9} — Bun + Elysia HTTP server skeleton
+ * @see {F46} — API key auth
  */
 import { Elysia } from 'elysia';
+import { hashApiKey, parseBearerKey, validateKey, AuthError, scrubApiKey, } from './auth/index.js';
 const PORT = 3040;
 const HOSTNAME = '0.0.0.0';
+/**
+ * Pre-computed hash store for API key validation.
+ *
+ * Populated from the `GENICUI_API_KEY` environment variable at startup.
+ * Only SHA-256 hashes are stored; the plaintext key is never retained.
+ */
+const apiHashStore = new Map();
+/**
+ * Initialise the API key hash store from the environment.
+ */
+function initApiKeys() {
+    const rawKey = process.env.GENICUI_API_KEY;
+    if (!rawKey) {
+        // No API key configured — allow all requests (dev mode)
+        return;
+    }
+    const hash = hashApiKey(rawKey);
+    const keyType = rawKey.startsWith('gnc_test_') ? 'test' : 'live';
+    const firstUnderscore = rawKey.indexOf('_');
+    const visible = rawKey.slice(firstUnderscore + 1, firstUnderscore + 5);
+    const keyId = `${rawKey.slice(0, firstUnderscore + 1)}${visible}****`;
+    apiHashStore.set(hash, { keyId, keyType });
+}
 /**
  * Create and start the GenicUI HTTP server.
  *
  * Listens on port 3040, hostname 0.0.0.0 by default.
+ * Routes under `/api/*` require valid API key authentication.
+ * The `/health` endpoint is always open.
  *
  * @returns The configured Elysia application instance
  */
 export function createServer() {
-    const app = new Elysia().get('/health', () => ({
-        status: 'ok'
-    }));
+    // Initialise API key store from environment
+    initApiKeys();
+    // Authenticated API app — guard applies only to /api/* routes
+    const apiApp = new Elysia({ prefix: '/api' })
+        .onRequest(() => {
+        // This hook runs for every request in this app (only /api/* routes)
+        // Access headers via the Elysia context
+    })
+        .get('/status', (c) => {
+        const authHeader = c.request.headers.get('authorization');
+        const rawKey = parseBearerKey(authHeader ?? undefined);
+        if (!rawKey) {
+            c.set.status = 401;
+            throw new AuthError('Unauthorized', 401);
+        }
+        const isProd = process.env.GENICUI_ENV === 'production';
+        try {
+            const info = validateKey(rawKey, apiHashStore, isProd);
+            return { auth: 'ok', keyId: info.keyId };
+        }
+        catch (err) {
+            if (err instanceof AuthError) {
+                c.set.status = err.statusCode;
+                throw err;
+            }
+            c.set.status = 401;
+            throw new AuthError('Unauthorized', 401);
+        }
+    });
+    // Main app with open health endpoint
+    const app = new Elysia()
+        .get('/health', () => ({
+        status: 'ok',
+    }))
+        .use(apiApp);
     app.listen({ port: PORT, hostname: HOSTNAME });
     // Use stderr for logging — stdout is MCP transport
-    console.error(`Server running at ${app.server.url}`);
+    // Scrub any API key references from log output (F46-AC3)
+    const url = scrubApiKey(String(app.server.url));
+    console.error(`Server running at ${url}`);
     return app;
 }
 /**

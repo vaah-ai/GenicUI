@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 0/6 milestones complete · 4/29 tasks complete · 25 tasks not started
+> **Status:** 1/6 milestones complete · 5/29 tasks complete · 24 tasks not started
 
 ---
 
@@ -11,7 +11,7 @@
 | ID | Title | Phase | Week | Status | Priority | Effort | Tasks | Manifest Features |
 |---|---|---|---|---|---|---|---|---|
 | M1 | Foundations: Core Package | Foundations | W1 | 🟢 Complete | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
-| M2 | Transport: Server + WS + Frames | Transport | W2 | ⚪ Not Started | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
+| M2 | Transport: Server + WS + Frames | Transport | W2 | 🟡 In Progress | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | ⚪ Not Started | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue | Registry | W7 | ⚪ Not Started | Critical | 10-14 days | 3 | F37, F38, F40 |
@@ -31,12 +31,12 @@
 | M1-T4 | JSON-Patch engine wrapper | ✅ Complete | Critical | 2 days | F4 | M1-T1 |
 | M1-T5 | SessionStore + InMemoryStore | ✅ Complete | Critical | 2 days | F5 | M1-T1 |
 
-### M2 — Transport: Server + WS + Frames (1/4 complete)
+### M2 — Transport: Server + WS + Frames (2/4 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M2-T1 | Bun + Elysia HTTP server skeleton | 🟢 Complete | Critical | 1-2 days | F9 | M1-T1 |
-| M2-T2 | API key auth (gnc_live_<32> Bearer) | ⚪ Not Started | Critical | 2-3 days | F46 | M2-T1 |
+| M2-T2 | API key auth (gnc_live_<32> Bearer) | ✅ Complete | Critical | 2-3 days | F46 | M2-T1 |
 | M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ⚪ Not Started | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
 | M2-T4 | Frame envelope + channel multiplexing | ⚪ Not Started | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
@@ -108,14 +108,14 @@ Layer 16: M6-T3 (F62b) — depends on M6-T1
 ## Execution Order (Optimized for Velocity)
 
 > **Analysis date:** 2026-09-02
-> **Completed:** M1-T1..T5 (5/5), M2-T1 (1/4)
+> **Completed:** M1-T1..T5 (5/5), M2-T1..T2 (2/4)
 > **Remaining:** 25 tasks across 5 milestones
 
 ### Ready to Start (zero unmet dependencies)
 
 | Priority | Task | Feature | Why first | Unblocks |
 |----------|------|---------|-----------|----------|
-| **P0** | M2-T2 | F46 | API key auth — prerequisite for M2-T3 (WebSocket) | M2-T3 → M4-T7 |
+| **P0** | M2-T4 | F11 | Frame multiplexing — unlocks M3-T1 → all 7 M3 tasks | M3-T1 → All M3 |
 | **P0** | M2-T4 | F11 | Gate to entire M3 milestone (7 tasks) | M3-T1 → All M3 |
 | **P2** | M6-T2 | F62 | Independent, low effort (2-3 days) | Nothing critical |
 | **P2** | M6-T4 | F64 | Independent, low effort (2-3 days) | Nothing critical |
@@ -124,7 +124,10 @@ Layer 16: M6-T3 (F62b) — depends on M6-T1
 ### Sequential Execution Plan
 
 ```
-Step 1: M2-T2 (F46)  — API key auth [unblocks M2-T3]
+Step 1: M2-T2 (F46)  — API key auth [✅ Complete]
+Step 2: M2-T4 (F11)  — Frame multiplexing [unlocks M3-T1 → all M3]
+        ─── Both can run in parallel ───
+Step 3: M2-T3 (F10)  — WebSocket transport [critical path]
 Step 2: M2-T4 (F11)  — Frame multiplexing [unlocks M3-T1 → all M3]
         ─── Both can run in parallel ───
 Step 3: M2-T3 (F10)  — WebSocket transport [critical path]
