@@ -1,8 +1,8 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-02
+> **Last updated:** 2026-09-03
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 13/30 tasks complete · 17 tasks not started
+> **Status:** 3/6 milestones complete · 14/30 tasks complete · 16 tasks not started
 
 ---
 
@@ -13,7 +13,7 @@
 | M1 | Foundations: Core Package | Foundations | W1 | 🟢 Complete | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
 | M2 | Transport: Server + WS + Frames | Transport | W2 | 🟢 Complete | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟢 Complete | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
-| M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
+| M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue | Registry | W7 | ⚪ Not Started | Critical | 10-14 days | 3 | F37, F38, F40 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
@@ -52,11 +52,11 @@
 | M3-T6 | subscribe_to_events | ✅ Complete | High | 2-3 days | F18 | M3-T1 |
 | M3-T7 | ui:// URI grammar | ✅ Complete | Medium | 1 day | F28 | M3-T1 |
 
-### M4 — Runtime: Events + WC + Engine (0/7 complete)
+### M4 — Runtime: Events + WC + Engine (1/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M4-T1 | Event capture from Custom Elements | ⚪ Not Started | High | 2 days | F19 | M3-T6 |
+| M4-T1 | Event capture from Custom Elements | ✅ Complete | High | 2 days | F19 | M3-T6 |
 | M4-T2 | Internal event bus (post-emit + backpressure) | ⚪ Not Started | High | 2-3 days | F20 | M1-T5, M2-T4, M4-T1 |
 | M4-T3 | Server-side event application | ⚪ Not Started | High | 2-3 days | F24 | M1-T4, M4-T2 |
 | M4-T4 | GenicElement Web Component base | ⚪ Not Started | Critical | 3-5 days | F21 | M1-T4, M4-T5 (circular) |

@@ -3,8 +3,9 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F19 (Event capture from Custom Elements)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2 days
+> **Actual Delivery:** EventCapture class (250 lines), TokenBucket rate limiter, 24 tests (all passing). Barrel exports in @genicui/server/mcp.
 
 ## Description
 
