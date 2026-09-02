@@ -3,7 +3,7 @@
 > **Milestone:** M2 (Transport: Server + WebSocket + Frames)
 > **Manifest feature:** F11 (Frame envelope serialization + channel multiplexing)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -45,10 +45,24 @@ Implement frame envelope serialization with monotonic `seq` values and channel m
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (93 tests, 447 expect calls)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+
+## Delivery Summary
+
+**Files created:**
+- `packages/server/src/transport/frame-handler.ts` — parseFrame() + serializeFrame()
+- `packages/server/src/transport/channel-multiplexer.ts` — ChannelMultiplexer class
+- `packages/server/src/transport/frame.test.ts` — 39 tests (F11-AC1 through F11-AC4)
+
+**Files modified:**
+- `packages/server/src/transport/types.ts` — WsSession extended with multiplexer + seqGenerator
+- `packages/server/src/transport/websocket.ts` — Integrated multiplexer into open()/message()/close()
+
+**Tests:** 39 new tests, all passing. Total server test count: 93 across 4 files.
+**Branch:** `feature/F11-frame-envelope-multiplexing`
 
 ## Dependencies
 

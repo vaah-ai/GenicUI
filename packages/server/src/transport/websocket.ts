@@ -12,6 +12,7 @@
  */
 
 import type { ServerWebSocket } from 'bun';
+import { SequenceGenerator } from '@genicui/core';
 import type { WsSession, ServerHelloPayload } from './types.js';
 import {
   GENICUI_SUBPROTOCOL,
@@ -26,6 +27,8 @@ import {
   validateApiKeyFormat,
   scrubApiKey,
 } from '../auth/index.js';
+import { parseFrame, serializeFrame, CLOSE_CODE_PROTOCOL_ERROR } from './frame-handler.js';
+import { ChannelMultiplexer } from './channel-multiplexer.js';
 
 /** Server version string sent in server.hello. */
 const SERVER_VERSION = '0.1.0';
@@ -297,6 +300,10 @@ export function createWsHandler(): {
       // Generate session ID
       const sessionId = `sess-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
 
+      // Create channel multiplexer and sequence generator
+      const multiplexer = new ChannelMultiplexer();
+      const seqGenerator = new SequenceGenerator();
+
       // Create session state
       const session: WsSession = {
         sessionId,
@@ -305,6 +312,8 @@ export function createWsHandler(): {
         pongTimeout: null,
         missedPongs: 0,
         destroyed: false,
+        multiplexer,
+        seqGenerator,
       };
 
       // Store session state on ws.data (Elysia uses ws.data for context)
@@ -324,17 +333,58 @@ export function createWsHandler(): {
 
     /**
      * Handle incoming messages from the client.
-     * For F10, we accept messages and reset the pong counter.
+     * Parses the frame, validates it, dispatches to the channel multiplexer,
+     * and resets the pong counter.
+     *
+     * @see {F11-AC4} — Malformed frame -> WS close 1003
      */
-    message(ws) {
+    message(ws, message) {
       const session = ws.data as WsSession | undefined;
-      if (session) {
-        onPong(session);
+      if (!session) return;
+
+      // Reset pong counter on any inbound message
+      onPong(session);
+
+      // Parse the inbound frame
+      const frame = parseFrame(message as string);
+      if (frame === null) {
+        // Malformed frame — close with protocol error (F11-AC4)
+        console.error(
+          `[F11] Session ${session.sessionId} closed: malformed frame`,
+        );
+        ws.close(CLOSE_CODE_PROTOCOL_ERROR, 'Invalid frame');
+        return;
+      }
+
+      // Dispatch frame to channel multiplexer
+      const result = session.multiplexer.dispatch(frame);
+      if (result === null) {
+        // Channel limit exceeded (F11-AC2) — send error and close
+        const errorFrame = {
+          v: 1,
+          channel: frame.channel,
+          type: 'error',
+          payload: {
+            code: -32001,
+            message: 'Channel limit exceeded (256 channels per socket)',
+          },
+          seq: session.seqGenerator.next(),
+        };
+        // Type assertion safe: FrameEnvelope shape matches
+        ws.send(serializeFrame(errorFrame as never));
+        return;
+      }
+
+      // Log dispatched frames (useful for debugging)
+      if (result.frames.length > 0) {
+        console.error(
+          `[F11] Session ${session.sessionId} dispatched ${result.frames.length} frame(s) on channel "${result.channel}"`,
+        );
       }
     },
 
     /**
-     * Handle WebSocket close — clean up heartbeat timers.
+     * Handle WebSocket close — clean up heartbeat timers and multiplexer.
      */
     close(ws, _code, _reason) {
       const session = ws.data as WsSession | undefined;
@@ -342,6 +392,9 @@ export function createWsHandler(): {
 
       session.destroyed = true;
       stopHeartbeat(session);
+
+      // Clean up channel multiplexer
+      session.multiplexer.destroy();
 
       // Log disconnection
       const logMsg = scrubApiKey(
