@@ -84,4 +84,10 @@ export interface WsSession {
 
   /** Whether the connection has been cleaned up. */
   destroyed: boolean;
+
+  /** Channel multiplexer for frame dispatch. */
+  multiplexer: import('./channel-multiplexer.js').ChannelMultiplexer;
+
+  /** Sequence number generator for outbound frames. */
+  seqGenerator: import('@genicui/core').SequenceGenerator;
 }

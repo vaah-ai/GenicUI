@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 2/6 milestones complete · 6/29 tasks complete · 23 tasks not started
+> **Status:** 2/6 milestones complete · 7/29 tasks complete · 22 tasks not started
 
 ---
 
@@ -31,14 +31,14 @@
 | M1-T4 | JSON-Patch engine wrapper | ✅ Complete | Critical | 2 days | F4 | M1-T1 |
 | M1-T5 | SessionStore + InMemoryStore | ✅ Complete | Critical | 2 days | F5 | M1-T1 |
 
-### M2 — Transport: Server + WS + Frames (3/4 complete)
+### M2 — Transport: Server + WS + Frames (4/4 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M2-T1 | Bun + Elysia HTTP server skeleton | 🟢 Complete | Critical | 1-2 days | F9 | M1-T1 |
 | M2-T2 | API key auth (gnc_live_<32> Bearer) | ✅ Complete | Critical | 2-3 days | F46 | M2-T1 |
 | M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ✅ Complete | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
-| M2-T4 | Frame envelope + channel multiplexing | ⚪ Not Started | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
+| M2-T4 | Frame envelope + channel multiplexing | ✅ Complete | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
 ### M3 — Tool Surface: MCP + 4 Tools (0/7 complete)
 
