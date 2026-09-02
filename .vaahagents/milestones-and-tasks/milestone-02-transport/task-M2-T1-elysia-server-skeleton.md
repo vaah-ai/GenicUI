@@ -3,7 +3,7 @@
 > **Milestone:** M2 (Transport: Server + WebSocket + Frames)
 > **Manifest feature:** F9 (Bun + Elysia HTTP server skeleton)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 1-2 days
 
 ## Description
