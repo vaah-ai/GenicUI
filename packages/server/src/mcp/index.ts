@@ -8,6 +8,8 @@
 export { createMcpServer, startStdioMcpServer, handleMcpRequest } from './server.js';
 export { registerToolDefinitions, GENICUI_ERROR_CODES } from './tool-registry.js';
 export type { GenicUIErrorCode } from './tool-registry.js';
+export { findComponents, getCatalog } from './catalog.js';
+export type { CatalogEntry, SearchResult, FindResult } from './catalog.js';
 
 // Trust-boundary validation (F14)
 export {

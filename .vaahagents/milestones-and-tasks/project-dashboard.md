@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 2/6 milestones complete · 9/30 tasks complete · 21 tasks not started
+> **Status:** 2/6 milestones complete · 10/30 tasks complete · 20 tasks not started
 
 ---
 
@@ -40,13 +40,13 @@
 | M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ✅ Complete | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
 | M2-T4 | Frame envelope + channel multiplexing | ✅ Complete | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
-### M3 — Tool Surface: MCP + 4 Tools (2/7 complete)
+### M3 — Tool Surface: MCP + 4 Tools (3/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M3-T1 | MCP server with 4 public tools | ✅ Complete | Critical | 2-3 days | F13 | M2-T1, M2-T4 |
 | M3-T2 | Trust-boundary validation | ✅ Complete | Critical | 2 days | F14 | M1-T2, M3-T1 |
-| M3-T3 | find_ui_component | ⚪ Not Started | High | 2 days | F15 | M1-T2, M3-T1 |
+| M3-T3 | find_ui_component | ✅ Complete | High | 2 days | F15 | M1-T2, M3-T1 |
 | M3-T4 | render_component | ⚪ Not Started | Critical | 3-5 days | F16 | M1-T2, M3-T1, M3-T3 |
 | M3-T5 | update_component (JSON-Patch + replace) | ⚪ Not Started | Critical | 3-5 days | F17 | M1-T4, M3-T1, M3-T4 |
 | M3-T6 | subscribe_to_events | ⚪ Not Started | High | 2-3 days | F18 | M3-T1 |

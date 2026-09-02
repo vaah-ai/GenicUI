@@ -203,8 +203,9 @@ describe('F13-AC3: Valid input conforms to output schema', () => {
     expect(response.result!.content).toBeDefined();
     const content = response.result!.content as Array<{ type: string; text: string }>;
     expect(content.at(0)!.type).toBe('text');
-    expect(content.at(0)!.text).toContain('find_ui_component');
-    expect(content.at(0)!.text).toContain('data table');
+    // F15: Real implementation returns JSON with component metadata
+    expect(content.at(0)!.text).toContain('DataTable');
+    expect(content.at(0)!.text).toContain('tabular data');
   });
 
   it('render_component returns valid response', async () => {
