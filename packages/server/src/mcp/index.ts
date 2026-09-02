@@ -20,6 +20,19 @@ export type {
   SubscribeError,
 } from './subscribe-handler.js';
 
+// Event capture (F19)
+export { eventCapture, EventCapture } from '../events/event-capture.js';
+export { TokenBucket } from '../events/rate-limiter.js';
+export type {
+  CaptureResult,
+  DropReason,
+  ComponentEventSchemas,
+} from '../events/event-capture.js';
+export type {
+  RateLimitResult,
+  RateLimiterConfig,
+} from '../events/rate-limiter.js';
+
 // Trust-boundary validation (F14)
 export {
   stripProtoKeys,
