@@ -3,7 +3,7 @@
 > **Milestone:** M3 (Tool Surface: MCP + 4 Public Tools)
 > **Manifest feature:** F18 (subscribe_to_events)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -36,11 +36,11 @@ Implement `subscribe_to_events`: agent subscribes to component events by filter 
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 90% tool handlers
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (492 tests)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 90% tool handlers
 
 ## Dependencies
 

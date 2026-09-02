@@ -10,6 +10,15 @@ export { registerToolDefinitions, GENICUI_ERROR_CODES } from './tool-registry.js
 export type { GenicUIErrorCode } from './tool-registry.js';
 export { findComponents, getCatalog } from './catalog.js';
 export type { CatalogEntry, SearchResult, FindResult } from './catalog.js';
+export { eventSubscriptionManager, EventSubscriptionManager } from './subscribe-handler.js';
+export type {
+  EventSubscription,
+  ComponentEvent,
+  SubscribeResult,
+  UnsubscribeResult,
+  MatchedEvent,
+  SubscribeError,
+} from './subscribe-handler.js';
 
 // Trust-boundary validation (F14)
 export {

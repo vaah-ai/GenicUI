@@ -17,6 +17,7 @@ import { stripProtoKeys } from '../validation/strip-proto-keys.js';
 import { findComponents } from './catalog.js';
 import { renderComponent } from './render-handler.js';
 import { updateComponent } from './update-handler.js';
+import { eventSubscriptionManager } from './subscribe-handler.js';
 
 /**
  * GenicUI-specific JSON-RPC error codes.
@@ -302,25 +303,36 @@ export function registerToolDefinitions(server: McpServer): void {
     }),
   );
 
-  // subscribe_to_events — listen for component events
+  // subscribe_to_events — listen for component events (F18)
   server.registerTool(
     'subscribe_to_events',
     {
       description:
-        'Subscribe to events from a mounted component. Specify componentId, actions, and optional session/expiration.',
+        'Subscribe to events from a mounted component. Specify componentId and actions to filter, plus optional session/expiration. Returns a subscriptionId for later unsubscription.',
       inputSchema: SubscribeToEventsInputSchema,
     },
     wrapWithValidation(async (
       input: z.infer<typeof SubscribeToEventsInputSchema>,
     ): Promise<CallToolResult> => {
-      // Stub — real impl in M3-T6 (F18)
-      const parts: string[] = [];
-      if (input.componentId) parts.push(`componentId=${input.componentId}`);
-      if (input.actions?.length) parts.push(`actions=${input.actions.join(',')}`);
-      if (input.sessionId) parts.push(`sessionId=${input.sessionId}`);
-      if (input.expiresAt) parts.push(`expiresAt=${input.expiresAt}`);
+      const subscribeInput: {
+        componentId?: string;
+        actions?: readonly string[];
+        sessionId?: string;
+        expiresAt?: string;
+      } = {};
+      if (input.componentId) subscribeInput.componentId = input.componentId;
+      if (input.actions) subscribeInput.actions = input.actions;
+      if (input.sessionId) subscribeInput.sessionId = input.sessionId;
+      if (input.expiresAt) subscribeInput.expiresAt = input.expiresAt;
+
+      const result = eventSubscriptionManager.subscribe(subscribeInput);
+
       return createSuccessResult(
-        `[subscribe_to_events] Stub: subscribe (${parts.join('; ') || 'all events'})`,
+        JSON.stringify({
+          subscriptionId: result.subscriptionId,
+          componentId: result.componentId,
+          actions: result.actions,
+        }, null, 2),
       );
     }),
   );
