@@ -10,13 +10,17 @@ status: approved
 verified: true
 verified_by: pipeline-verifier
 verified_at: 2026-09-01
+verified_by_agent: claude-code
+completed_at: 2026-09-01
+branch: feature/M2-T1-bun-elysia-server-skeleton
+implementation: packages/server/
 sources:
   - ../../idea/consolidated-requirements.md#b-locked-technical-decisions
 ---
 
 # F9 — Bun + Elysia HTTP server skeleton
 
-`bun run dev` starts Elysia server on `:8080` with `/health` route.
+`bun run dev` starts Elysia server on `:3040` with `/health` route.
 
 ## Inputs / Outputs
 
@@ -25,13 +29,13 @@ sources:
 import { Elysia } from 'elysia';
 const app = new Elysia()
   .get('/health', () => ({ status: 'ok' }))
-  .listen({ port: 8080, hostname: '0.0.0.0' });
+  .listen({ port: 3040, hostname: '0.0.0.0' });
 console.log(`Server running at ${app.server!.url}`);
 ```
 
 **Output:**
 ```bash
-$ curl http://localhost:8080/health
+$ curl http://localhost:3040/health
 {"status":"ok"}
 ```
 
