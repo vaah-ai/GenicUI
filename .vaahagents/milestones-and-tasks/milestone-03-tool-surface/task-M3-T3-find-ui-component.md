@@ -3,7 +3,7 @@
 > **Milestone:** M3 (Tool Surface: MCP + 4 Public Tools)
 > **Manifest feature:** F15 (find_ui_component)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2 days
 
 ## Description
@@ -35,11 +35,11 @@ Implement `find_ui_component`: agent searches the component catalog by query. Fo
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 90% tool handlers
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (186 pass, 0 fail)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 90% tool handlers (18 catalog tests + 13 MCP tests)
 
 ## Dependencies
 

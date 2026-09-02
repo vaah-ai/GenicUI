@@ -14,6 +14,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 import { stripProtoKeys } from '../validation/strip-proto-keys.js';
+import { findComponents } from './catalog.js';
 
 /**
  * GenicUI-specific JSON-RPC error codes.
@@ -184,10 +185,40 @@ export function registerToolDefinitions(server: McpServer): void {
       inputSchema: FindUiComponentInputSchema,
     },
     wrapWithValidation(async (input: z.infer<typeof FindUiComponentInputSchema>): Promise<CallToolResult> => {
-      // Stub — real impl in M3-T3 (F15)
-      return createSuccessResult(
-        `[find_ui_component] Stub: search for "${input.query}" (topK=${input.topK})`,
-      );
+      // F15: Real implementation — search the in-memory catalog
+      const result = findComponents(input.query, input.topK);
+
+      if (result.components.length === 0) {
+        // F15-AC2: No match — return with reason
+        return createSuccessResult(
+          JSON.stringify({
+            components: [],
+            reason: result.reason ?? 'no_component_matches',
+          }, null, 2),
+        );
+      }
+
+      // Build the response with component metadata
+      const response = {
+        components: result.components.map((c) => ({
+          name: c.entry.name,
+          version: c.entry.version,
+          registryId: c.entry.registryId,
+          description: c.entry.description,
+          whenToUse: c.entry.whenToUse,
+          propsSchema: c.entry.propsSchema,
+          events: c.entry.events,
+          examples: c.entry.examples,
+          score: c.score,
+        })),
+      } as Record<string, unknown>;
+
+      // F15-AC3: Disambiguation — include if present
+      if (result.disambiguation) {
+        (response as Record<string, unknown>).disambiguation = result.disambiguation;
+      }
+
+      return createSuccessResult(JSON.stringify(response, null, 2));
     }),
   );
 
