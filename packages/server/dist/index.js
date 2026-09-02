@@ -10,6 +10,7 @@
 import { Elysia } from 'elysia';
 import { hashApiKey, parseBearerKey, validateKey, AuthError, scrubApiKey, } from './auth/index.js';
 import { createWsHandler, wsApiKeyStore } from './transport/websocket.js';
+import { handleMcpRequest } from './mcp/index.js';
 const PORT = 3040;
 const HOSTNAME = '0.0.0.0';
 /**
@@ -83,7 +84,7 @@ export function createServer() {
     });
     // WebSocket transport handler
     const wsHandler = createWsHandler();
-    // Main app with open health endpoint and WebSocket
+    // Main app with open health endpoint, WebSocket, and MCP routes
     const app = new Elysia()
         .get('/health', () => ({
         status: 'ok',
@@ -91,7 +92,13 @@ export function createServer() {
         // Elysia WS types are not exported; runtime behavior is correct.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .ws('/ws', wsHandler) // cast: Elysia WS types are not exported; runtime is correct
-        .use(apiApp);
+        .use(apiApp)
+        // MCP Streamable HTTP endpoint (F13)
+        // POST /mcp — handles JSON-RPC requests from MCP clients
+        .post('/mcp', async (c) => {
+        const message = c.body;
+        return handleMcpRequest(message);
+    });
     app.listen({ port: PORT, hostname: HOSTNAME });
     // Use stderr for logging — stdout is MCP transport
     // Scrub any API key references from log output (F46-AC3)
