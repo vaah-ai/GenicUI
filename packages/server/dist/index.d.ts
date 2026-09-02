@@ -84,6 +84,16 @@ export declare function createServer(): Elysia<"", {
             };
         };
     };
+} & {
+    mcp: {
+        post: {
+            body: unknown;
+            params: {};
+            query: unknown;
+            headers: unknown;
+            response: {};
+        };
+    };
 }, {
     derive: {};
     resolve: {};

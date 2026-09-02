@@ -9,6 +9,7 @@
  */
 
 import { Elysia } from 'elysia';
+import { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
 
 import {
   hashApiKey,
@@ -18,6 +19,7 @@ import {
   scrubApiKey,
 } from './auth/index.js';
 import { createWsHandler, wsApiKeyStore } from './transport/websocket.js';
+import { handleMcpRequest } from './mcp/index.js';
 
 /**
  * Health check response shape.
@@ -123,7 +125,7 @@ export function createServer() {
   // WebSocket transport handler
   const wsHandler = createWsHandler();
 
-  // Main app with open health endpoint and WebSocket
+  // Main app with open health endpoint, WebSocket, and MCP routes
   const app = new Elysia()
     .get('/health', (): HealthResponse => ({
       status: 'ok',
@@ -131,7 +133,13 @@ export function createServer() {
     // Elysia WS types are not exported; runtime behavior is correct.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .ws('/ws', wsHandler as any) // cast: Elysia WS types are not exported; runtime is correct
-    .use(apiApp);
+    .use(apiApp)
+    // MCP Streamable HTTP endpoint (F13)
+    // POST /mcp — handles JSON-RPC requests from MCP clients
+    .post('/mcp', async (c): Promise<unknown> => {
+      const message = c.body as JSONRPCMessage;
+      return handleMcpRequest(message);
+    });
 
   app.listen({ port: PORT, hostname: HOSTNAME });
 

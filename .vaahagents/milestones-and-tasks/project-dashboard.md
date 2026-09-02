@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-09-02
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 2/6 milestones complete · 7/29 tasks complete · 22 tasks not started
+> **Status:** 2/6 milestones complete · 8/30 tasks complete · 22 tasks not started
 
 ---
 
@@ -12,7 +12,7 @@
 |---|---|---|---|---|---|---|---|---|
 | M1 | Foundations: Core Package | Foundations | W1 | 🟢 Complete | Critical | 7-10 days | 5 | F1, F2, F3, F4, F5 |
 | M2 | Transport: Server + WS + Frames | Transport | W2 | 🟢 Complete | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
-| M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | ⚪ Not Started | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
+| M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟡 In Progress | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | ⚪ Not Started | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue | Registry | W7 | ⚪ Not Started | Critical | 10-14 days | 3 | F37, F38, F40 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
@@ -40,11 +40,11 @@
 | M2-T3 | WebSocket transport (handshake + auth + heartbeat) | ✅ Complete | Critical | 3-5 days | F10 | M2-T1, M2-T2 |
 | M2-T4 | Frame envelope + channel multiplexing | ✅ Complete | Critical | 2-3 days | F11 | M1-T3, M2-T1 |
 
-### M3 — Tool Surface: MCP + 4 Tools (0/7 complete)
+### M3 — Tool Surface: MCP + 4 Tools (1/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M3-T1 | MCP server with 4 public tools | ⚪ Not Started | Critical | 2-3 days | F13 | M2-T1, M2-T4 |
+| M3-T1 | MCP server with 4 public tools | ✅ Complete | Critical | 2-3 days | F13 | M2-T1, M2-T4 |
 | M3-T2 | Trust-boundary validation | ⚪ Not Started | Critical | 2 days | F14 | M1-T2, M3-T1 |
 | M3-T3 | find_ui_component | ⚪ Not Started | High | 2 days | F15 | M1-T2, M3-T1 |
 | M3-T4 | render_component | ⚪ Not Started | Critical | 3-5 days | F16 | M1-T2, M3-T1, M3-T3 |
