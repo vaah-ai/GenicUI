@@ -1,10 +1,11 @@
 /**
- * GenicUI Server — Elysia HTTP server entry point.
+ * GenicUI Server — Elysia HTTP + WebSocket server entry point.
  *
  * @module @genicui/server
  *
  * @see {F9} — Bun + Elysia HTTP server skeleton
  * @see {F46} — API key auth
+ * @see {F10} — WebSocket transport
  */
 import { Elysia } from 'elysia';
 /**
@@ -23,11 +24,12 @@ interface ApiStatusResponse {
     keyId: string;
 }
 /**
- * Create and start the GenicUI HTTP server.
+ * Create and start the GenicUI HTTP + WebSocket server.
  *
  * Listens on port 3040, hostname 0.0.0.0 by default.
  * Routes under `/api/*` require valid API key authentication.
  * The `/health` endpoint is always open.
+ * The `/ws` endpoint requires WebSocket subprotocol and API key auth.
  *
  * @returns The configured Elysia application instance
  */
@@ -56,6 +58,16 @@ export declare function createServer(): Elysia<"", {
             response: {
                 200: HealthResponse;
             };
+        };
+    };
+} & {
+    ws: {
+        subscribe: {
+            body: {};
+            params: {};
+            query: {};
+            headers: {};
+            response: {};
         };
     };
 } & {
