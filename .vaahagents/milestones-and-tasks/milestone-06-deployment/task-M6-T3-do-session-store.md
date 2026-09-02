@@ -1,6 +1,6 @@
-# Task M7-T3 — DODurableObjectStore (CF DO session backend)
+# Task M6-T3 — DODurableObjectStore (CF DO session backend)
 
-> **Milestone:** M7 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
+> **Milestone:** M6 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
 > **Manifest feature:** F62b (DODurableObjectStore)
 > **Priority:** High
 > **Status:** ⚪ Not Started
@@ -43,7 +43,7 @@ Implement `DODurableObjectStore` — the Cloudflare Durable Objects backend for 
 
 ## Dependencies
 
-- **Requires:** M1-T5 (F5), M7-T1 (F61)
+- **Requires:** M1-T5 (F5), M6-T1 (F61 — CF Workers, same milestone)
 - **Blocks:** None directly
 
 ## Documentation References

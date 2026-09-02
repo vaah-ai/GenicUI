@@ -1,4 +1,4 @@
-# Task M2-T3 — Frame envelope serialization + channel multiplexing
+# Task M2-T4 — Frame envelope serialization + channel multiplexing
 
 > **Milestone:** M2 (Transport: Server + WebSocket + Frames)
 > **Manifest feature:** F11 (Frame envelope serialization + channel multiplexing)
@@ -21,7 +21,7 @@ Implement frame envelope serialization with monotonic `seq` values and channel m
 
 ### Pre-Implementation Analysis
 
-- Depends on M1-T3 (F3 — sequence generator) and M2-T1 (F9 — server)
+- Depends on M1-T3 (F3 — sequence generator) and M2-T1 (F9 — Elysia server, same milestone)
 - Frame envelope: `{ v: 1, channel, type, payload, seq, causes? }` per §E Wire Protocol
 - Max 256 channels per socket
 
@@ -52,7 +52,7 @@ Implement frame envelope serialization with monotonic `seq` values and channel m
 
 ## Dependencies
 
-- **Requires:** M1-T3 (F3), M2-T1 (F9)
+- **Requires:** M1-T3 (F3 — protocol envelope), M2-T1 (F9 — Elysia server)
 - **Blocks:** M3-T1 (F13 — MCP server)
 
 ## Documentation References

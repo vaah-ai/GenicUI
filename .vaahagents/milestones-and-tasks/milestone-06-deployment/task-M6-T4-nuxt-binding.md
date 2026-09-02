@@ -1,6 +1,6 @@
-# Task M7-T4 — Nitro/Nuxt binding
+# Task M6-T4 — Nitro/Nuxt binding
 
-> **Milestone:** M7 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
+> **Milestone:** M6 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
 > **Manifest feature:** F64 (Nitro/Nuxt binding)
 > **Priority:** Medium
 > **Status:** ⚪ Not Started

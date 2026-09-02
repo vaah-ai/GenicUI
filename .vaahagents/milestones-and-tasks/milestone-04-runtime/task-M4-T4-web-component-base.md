@@ -1,4 +1,4 @@
-# Task M4-T3 — GenicElement Web Component base class
+# Task M4-T4 — GenicElement Web Component base class
 
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F21 (Web Component base class)
@@ -58,7 +58,7 @@ Implement `GenicElement` — the Web Component base class with closed Shadow DOM
 ## Dependencies
 
 - **Requires:** M1-T4 (F4), M4-T5 (F29) — circular dep; build with stub first
-- **Blocks:** M4-T6 (F30 — Vite plugin), M4-T7 (F33 — session recovery via F21→F23)
+- **Blocks:** M4-T6 (F30 — Vite plugin)
 
 ## Documentation References
 

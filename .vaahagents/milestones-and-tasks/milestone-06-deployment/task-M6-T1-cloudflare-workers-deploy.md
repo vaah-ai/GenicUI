@@ -1,6 +1,6 @@
-# Task M7-T1 — Cloudflare Workers + DO deployment
+# Task M6-T1 — Cloudflare Workers + DO deployment
 
-> **Milestone:** M7 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
+> **Milestone:** M6 (Deployment: Cloudflare, Bun, Durable Objects, Nitro)
 > **Manifest feature:** F61 (Cloudflare Workers + Durable Objects deployment)
 > **Priority:** High
 > **Status:** ⚪ Not Started
@@ -44,7 +44,7 @@ Deploy GenicUI to Cloudflare Workers with Durable Objects for session state. Col
 ## Dependencies
 
 - **Requires:** M1-T5 (F5), M2-T1 (F9)
-- **Blocks:** M7-T3 (F62b — DO store)
+- **Blocks:** M6-T3 (F62b — DO store, same milestone)
 
 ## Documentation References
 

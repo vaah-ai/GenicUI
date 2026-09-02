@@ -53,7 +53,7 @@ Implement the runtime engine: mounts components from `STATE_SNAPSHOT` within 50m
 
 ## Dependencies
 
-- **Requires:** M4-T3 (F21), M4-T4 (F24)
+- **Requires:** M4-T4 (F21), M4-T3 (F24)
 - **Blocks:** M5-T3 (F40 — PrimeVue registry)
 
 ## Documentation References

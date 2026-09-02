@@ -1,4 +1,4 @@
-# Task M2-T2 — WebSocket transport (handshake + auth + heartbeat)
+# Task M2-T3 — WebSocket transport (handshake + auth + heartbeat)
 
 > **Milestone:** M2 (Transport: Server + WebSocket + Frames)
 > **Manifest feature:** F10 (WebSocket transport)
@@ -22,7 +22,7 @@ Implement WebSocket transport: upgrade with `genicui.v1` subprotocol, API key au
 
 ### Pre-Implementation Analysis
 
-- Depends on M2-T1 (F9) and M6-T1 (F46 — auth)
+- Depends on M2-T1 (F9) and M2-T2 (F46 — auth, same milestone)
 - Subprotocol: `genicui.v1` per consolidated-requirements.md §E
 - Heartbeat: 30s ping, 5s pong deadline, 2 missed = close 1011
 
@@ -55,8 +55,8 @@ Implement WebSocket transport: upgrade with `genicui.v1` subprotocol, API key au
 
 ## Dependencies
 
-- **Requires:** M2-T1 (F9), M6-T1 (F46)
-- **Blocks:** M4-T7 (F33 — session recovery), M7-T1 (F61 — CF Workers)
+- **Requires:** M2-T1 (F9 — Elysia server), M2-T2 (F46 — API key auth)
+- **Blocks:** M4-T7 (F33 — session recovery), M6-T1 (F61 — CF Workers)
 
 ## Documentation References
 

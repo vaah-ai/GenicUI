@@ -1,6 +1,6 @@
-# Task M6-T1 — API key auth (`gnc_live_<32>` Bearer)
+# Task M2-T2 — API key auth (`gnc_live_<32>` Bearer)
 
-> **Milestone:** M6 (Security: API Key Auth)
+> **Milestone:** M2 (Transport: Server + WS + Frames)
 > **Manifest feature:** F46 (API key auth)
 > **Priority:** Critical
 > **Status:** ⚪ Not Started
@@ -8,7 +8,7 @@
 
 ## Description
 
-Implement API key authentication middleware: `gnc_live_` prefix + 32 random chars (256 bits), validated against SHA-256 hashes. Plain-text keys are never logged. Timing-safe comparison prevents side-channel attacks. This is a hard prerequisite for WebSocket transport (F10 depends on F46).
+Implement API key authentication middleware: `gnc_live_` prefix + 32 random chars (256 bits), validated against SHA-256 hashes. Plain-text keys are never logged. Timing-safe comparison prevents side-channel attacks. This is a hard prerequisite for WebSocket transport (M2-T3, F10).
 
 ## Task Goals
 
@@ -21,7 +21,7 @@ Implement API key authentication middleware: `gnc_live_` prefix + 32 random char
 
 ### Pre-Implementation Analysis
 
-- Depends on M2-T1 (F9 — Elysia server)
+- Depends on M2-T1 (F9 — Elysia server, same milestone)
 - Auth model: API key only per [consolidated-requirements.md §L10](../../../docs/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
 - Trust boundary: server re-validates every inbound call (§F)
 
@@ -55,8 +55,8 @@ Implement API key authentication middleware: `gnc_live_` prefix + 32 random char
 
 ## Dependencies
 
-- **Requires:** M2-T1 (F9)
-- **Blocks:** M2-T2 (F10 — WS transport)
+- **Requires:** M2-T1 (F9 — Elysia server, same milestone)
+- **Blocks:** M2-T3 (F10 — WS transport, same milestone)
 
 ## Documentation References
 

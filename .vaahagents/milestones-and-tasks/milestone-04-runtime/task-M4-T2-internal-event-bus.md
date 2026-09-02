@@ -46,7 +46,7 @@ Implement the internal event bus with post-emit hooks and backpressure. `emit` r
 
 ## Dependencies
 
-- **Requires:** M1-T5 (F5), M2-T3 (F11), M4-T1 (F19)
+- **Requires:** M1-T5 (F5), M2-T4 (F11), M4-T1 (F19)
 - **Blocks:** M4-T4 (F24 — server-side event application)
 
 ## Documentation References

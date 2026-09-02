@@ -1,4 +1,4 @@
-# Task M4-T4 — Server-side event application
+# Task M4-T3 — Server-side event application
 
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F24 (Server-side event application)

@@ -43,7 +43,7 @@ Implement the Vite plugin for GenicUI: auto-discovery of `GenicElement` subclass
 
 ## Dependencies
 
-- **Requires:** M4-T3 (F21)
+- **Requires:** M4-T4 (F21)
 - **Blocks:** None directly
 
 ## Documentation References
