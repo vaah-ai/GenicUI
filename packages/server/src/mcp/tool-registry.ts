@@ -15,6 +15,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 import { stripProtoKeys } from '../validation/strip-proto-keys.js';
 import { findComponents } from './catalog.js';
+import { renderComponent } from './render-handler.js';
 
 /**
  * GenicUI-specific JSON-RPC error codes.
@@ -206,7 +207,7 @@ export function registerToolDefinitions(server: McpServer): void {
           registryId: c.entry.registryId,
           description: c.entry.description,
           whenToUse: c.entry.whenToUse,
-          propsSchema: c.entry.propsSchema,
+          propsSchema: c.entry.propsJsonSchema,
           events: c.entry.events,
           examples: c.entry.examples,
           score: c.score,
@@ -231,9 +232,35 @@ export function registerToolDefinitions(server: McpServer): void {
       inputSchema: RenderComponentInputSchema,
     },
     wrapWithValidation(async (input: z.infer<typeof RenderComponentInputSchema>): Promise<CallToolResult> => {
-      // Stub — real impl in M3-T4 (F16)
+      const renderInput: {
+        name: string;
+        props: Record<string, unknown>;
+        idempotencyKey?: string;
+      } = {
+        name: input.name,
+        props: input.props,
+      };
+      if (input.idempotencyKey !== undefined) {
+        renderInput.idempotencyKey = input.idempotencyKey;
+      }
+      const result = renderComponent(renderInput);
+
+      // Error path — return error result
+      if (result.error) {
+        const detail = result.error.details?.join('; ') ?? '';
+        const msg = detail ? `${result.error.message}: ${detail}` : result.error.message;
+        return createErrorResult(result.error.code, msg);
+      }
+
+      // Success path — return component metadata
       return createSuccessResult(
-        `[render_component] Stub: render "${input.name}" on surface "${input.surface ?? 'default'}"`,
+        JSON.stringify({
+          componentId: result.componentId,
+          channel: result.channel,
+          schema: result.schema,
+          events: result.events,
+          initialState: result.initialState,
+        }, null, 2),
       );
     }),
   );

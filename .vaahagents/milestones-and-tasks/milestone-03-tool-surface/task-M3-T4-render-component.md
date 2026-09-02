@@ -3,7 +3,7 @@
 > **Milestone:** M3 (Tool Surface: MCP + 4 Public Tools)
 > **Manifest feature:** F16 (render_component)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 3-5 days
 
 ## Description
