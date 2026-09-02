@@ -16,6 +16,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { stripProtoKeys } from '../validation/strip-proto-keys.js';
 import { findComponents } from './catalog.js';
 import { renderComponent } from './render-handler.js';
+import { updateComponent } from './update-handler.js';
 
 /**
  * GenicUI-specific JSON-RPC error codes.
@@ -274,17 +275,30 @@ export function registerToolDefinitions(server: McpServer): void {
       inputSchema: UpdateComponentInputSchema,
     },
     wrapWithValidation(async (input: z.infer<typeof UpdateComponentInputSchema>): Promise<CallToolResult> => {
-      // Stub — real impl in M3-T5 (F17)
-      const isPatch = 'patch' in input && !('merge' in input);
-      if (isPatch) {
-        const patchArr = (input as { patch: unknown[] }).patch;
-        return createSuccessResult(
-          `[update_component] Stub: apply ${patchArr.length} patches to "${input.componentId}"`,
-        );
+      const result = await updateComponent(input);
+
+      if ('error' in result) {
+        const detail = result.error.details?.join('; ') ?? '';
+        const msg = detail ? `${result.error.message}: ${detail}` : result.error.message;
+        return createErrorResult(result.error.code, msg);
       }
-      return createSuccessResult(
-        `[update_component] Stub: merge into "${input.componentId}"`,
-      );
+
+      // Build response based on update type
+      const response: Record<string, unknown> = {
+        componentId: result.componentId,
+        channel: result.channel,
+        type: result.type,
+      };
+
+      if (result.type === 'STATE_DELTA' && result.patch) {
+        response.patch = result.patch;
+      }
+
+      if (result.type === 'STATE_SNAPSHOT' && result.snapshot) {
+        response.snapshot = result.snapshot;
+      }
+
+      return createSuccessResult(JSON.stringify(response, null, 2));
     }),
   );
 
