@@ -90,4 +90,7 @@ export interface WsSession {
 
   /** Sequence number generator for outbound frames. */
   seqGenerator: import('@genicui/core').SequenceGenerator;
+
+  /** Internal event bus for outbound frame emission and backpressure. */
+  eventBus: import('../bus/event-bus.js').InternalEventBus;
 }
