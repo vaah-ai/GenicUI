@@ -3,7 +3,7 @@
 > **Milestone:** M3 (Tool Surface: MCP + 4 Public Tools)
 > **Manifest feature:** F14 (Trust-boundary validation)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2 days
 
 ## Description
@@ -46,13 +46,20 @@ Implement trust-boundary validation: strip `__proto__`/`constructor`/`prototype`
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 90% tool handlers
-- [ ] Property-based test passing (fast-check 10K runs)
-- [ ] Security-touching: trust-boundary strip verified, `additionalProperties: false` enforced
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (336 tests across 20 files)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 90% tool handlers
+- [x] Property-based test passing (fast-check 10K runs)
+- [x] Security-touching: trust-boundary strip verified, `additionalProperties: false` enforced
+
+## Delivery Summary
+
+- **Modules created:** 5 source files in `packages/server/src/validation/` + 5 test files
+- **Tests:** 62 tests (17 strip-proto-keys, 9 schema-validation, 11 registry-validation, 18 patch-validation, 17 property-based)
+- **Integration:** `wrapWithValidation` middleware applied to all 4 tool handlers in `tool-registry.ts`
+- **Exports:** Updated `mcp/index.ts` to re-export validation module
 
 ## Dependencies
 

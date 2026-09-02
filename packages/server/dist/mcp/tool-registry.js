@@ -9,6 +9,7 @@
  * @see {F13} — MCP server with 4 public tools
  */
 import { z } from 'zod';
+import { stripProtoKeys } from '../validation/strip-proto-keys.js';
 /**
  * GenicUI-specific JSON-RPC error codes.
  * -32001..-32010
@@ -55,6 +56,22 @@ function createErrorResult(code, message) {
 function createSuccessResult(text) {
     return {
         content: [{ type: 'text', text }],
+    };
+}
+/**
+ * Wrap a tool handler with trust-boundary validation (F14).
+ *
+ * Applies `stripProtoKeys` to sanitize the input before the handler
+ * processes it, preventing prototype pollution attacks.
+ *
+ * @param handler — the original tool handler
+ * @returns wrapped handler with validation middleware
+ */
+function wrapWithValidation(handler) {
+    return async (input) => {
+        // F14-AC1: Strip prototype pollution keys from inbound input
+        const sanitized = stripProtoKeys(input);
+        return handler(sanitized);
     };
 }
 // ---------------------------------------------------------------------------
@@ -134,23 +151,23 @@ export function registerToolDefinitions(server) {
     server.registerTool('find_ui_component', {
         description: 'Search the component catalog and return top-K matches. Use this to discover available UI components before rendering them.',
         inputSchema: FindUiComponentInputSchema,
-    }, async (input) => {
+    }, wrapWithValidation(async (input) => {
         // Stub — real impl in M3-T3 (F15)
         return createSuccessResult(`[find_ui_component] Stub: search for "${input.query}" (topK=${input.topK})`);
-    });
+    }));
     // render_component — mount a component on the connected client
     server.registerTool('render_component', {
         description: 'Render a UI component on the connected client. Returns a componentId for subsequent updates and event subscriptions.',
         inputSchema: RenderComponentInputSchema,
-    }, async (input) => {
+    }, wrapWithValidation(async (input) => {
         // Stub — real impl in M3-T4 (F16)
         return createSuccessResult(`[render_component] Stub: render "${input.name}" on surface "${input.surface ?? 'default'}"`);
-    });
+    }));
     // update_component — mutate live component state
     server.registerTool('update_component', {
         description: 'Update a mounted component. Provide either a JSON-Patch array (patch) or a shallow merge object (merge), not both.',
         inputSchema: UpdateComponentInputSchema,
-    }, async (input) => {
+    }, wrapWithValidation(async (input) => {
         // Stub — real impl in M3-T5 (F17)
         const isPatch = 'patch' in input && !('merge' in input);
         if (isPatch) {
@@ -158,12 +175,12 @@ export function registerToolDefinitions(server) {
             return createSuccessResult(`[update_component] Stub: apply ${patchArr.length} patches to "${input.componentId}"`);
         }
         return createSuccessResult(`[update_component] Stub: merge into "${input.componentId}"`);
-    });
+    }));
     // subscribe_to_events — listen for component events
     server.registerTool('subscribe_to_events', {
         description: 'Subscribe to events from a mounted component. Specify componentId, actions, and optional session/expiration.',
         inputSchema: SubscribeToEventsInputSchema,
-    }, async (input) => {
+    }, wrapWithValidation(async (input) => {
         // Stub — real impl in M3-T6 (F18)
         const parts = [];
         if (input.componentId)
@@ -175,6 +192,6 @@ export function registerToolDefinitions(server) {
         if (input.expiresAt)
             parts.push(`expiresAt=${input.expiresAt}`);
         return createSuccessResult(`[subscribe_to_events] Stub: subscribe (${parts.join('; ') || 'all events'})`);
-    });
+    }));
 }
 //# sourceMappingURL=tool-registry.js.map
