@@ -3,8 +3,10 @@
 > **Milestone:** M2 (Transport: Server + WebSocket + Frames)
 > **Manifest feature:** F10 (WebSocket transport)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 3-5 days
+> **Completed:** 2026-09-02
+> **Delivered:** transport/types.ts, transport/websocket.ts, transport/websocket.test.ts (54 tests, 84 expects, 0 failures)
 
 ## Description
 
@@ -48,10 +50,10 @@ Implement WebSocket transport: upgrade with `genicui.v1` subprotocol, API key au
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (54 tests, 0 failures)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
 
 ## Dependencies
 
