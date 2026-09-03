@@ -93,4 +93,7 @@ export interface WsSession {
 
   /** Internal event bus for outbound frame emission and backpressure. */
   eventBus: import('../bus/event-bus.js').InternalEventBus;
+
+  /** Message buffer for session recovery (F33). */
+  recoveryBuffer: import('../session-recovery/message-buffer.js').MessageBuffer;
 }
