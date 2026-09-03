@@ -5,21 +5,39 @@
 
     <!-- Component cards -->
     <div
-      v-for="comp in components"
+      v-for="(comp, index) in components"
       :key="comp.componentId"
       class="component-card"
+      :style="{ animationDelay: `${index * 50}ms` }"
     >
       <!-- Component header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-        <span style="font-weight: 600;">{{ comp.name }}</span>
-        <span style="font-size: 0.75rem; color: var(--text-color-secondary);">
+      <div class="component-card-header">
+        <span class="component-card-name">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 6px; color: var(--gp-accent)"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18" />
+            <path d="M9 21V9" />
+          </svg>
+          {{ comp.name }}
+        </span>
+        <span class="component-card-id">
           {{ comp.componentId }}
         </span>
       </div>
 
       <!-- Component props preview -->
-      <div style="font-size: 0.75rem; background: var(--surface-ground); padding: 0.5rem; border-radius: 4px; overflow: auto; max-height: 300px;">
-        <pre style="margin: 0; font-size: 0.7rem; white-space: pre-wrap;">{{ JSON.stringify(comp.props, null, 2) }}</pre>
+      <div class="component-card-props">
+        <pre>{{ JSON.stringify(comp.props, null, 2) }}</pre>
       </div>
     </div>
   </div>
