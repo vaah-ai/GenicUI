@@ -1,0 +1,166 @@
+{
+  "id": "@genicul-primevue/registry",
+  "version": "0.1.0",
+  "framework": "primevue",
+  "components": [
+    {
+      "name": "data-table",
+      "version": "1.0.0",
+      "propsSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rows", "columns"],
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": { "type": "string" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["key", "label"],
+              "properties": {
+                "key": { "type": "string" },
+                "label": { "type": "string" },
+                "sortable": { "type": "boolean" },
+                "filterable": { "type": "boolean" }
+              }
+            }
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "sort": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "direction"],
+            "properties": {
+              "key": { "type": "string" },
+              "direction": {
+                "type": "string",
+                "enum": ["asc", "desc"]
+              }
+            }
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "selection": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["mode"],
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": ["single", "multiple"]
+              },
+              "dataKey": { "type": "string" }
+            }
+          },
+          "loading": {
+            "type": "boolean"
+          }
+        }
+      },
+      "tags": ["table", "data", "grid", "rows", "pagination", "sort", "filter"],
+      "events": [
+        {
+          "name": "sort-change",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "direction"],
+            "properties": {
+              "key": { "type": "string" },
+              "direction": {
+                "type": "string",
+                "enum": ["asc", "desc"]
+              }
+            }
+          }
+        },
+        {
+          "name": "filter-change",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string" },
+              "value": { "type": "string" }
+            }
+          }
+        },
+        {
+          "name": "selection-change",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "rowIds": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rowId": { "type": "string" }
+            }
+          }
+        },
+        {
+          "name": "page-change",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["page", "pageSize"],
+            "properties": {
+              "page": { "type": "integer", "minimum": 0 },
+              "pageSize": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        {
+          "name": "row-click",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rowId"],
+            "properties": {
+              "rowId": { "type": "string" }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "rows": [
+            { "id": "1", "name": "Alice", "status": "active" },
+            { "id": "2", "name": "Bob", "status": "inactive" }
+          ],
+          "columns": [
+            { "key": "name", "label": "Name", "sortable": true },
+            { "key": "status", "label": "Status", "sortable": true, "filterable": true }
+          ],
+          "pageSize": 10,
+          "page": 0
+        }
+      ]
+    }
+  ]
+}
