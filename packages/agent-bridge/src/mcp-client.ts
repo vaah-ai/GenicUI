@@ -82,11 +82,17 @@ export class MCPClientImpl implements MCPClient {
       throw new Error(`MCP initialize failed: ${initResponse.error.message}`);
     }
 
-    // Send initialized notification
-    await this.#post<JsonRpcRequest, void>({
-      jsonrpc: '2.0',
-      method: 'notifications/initialized',
-      params: {},
+    // Send initialized notification — fire and forget, no response expected
+    // for notifications. The server may not respond, so we don't await.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetch(this.#url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'notifications/initialized',
+        params: {},
+      }),
     });
 
     this.#connected = true;
