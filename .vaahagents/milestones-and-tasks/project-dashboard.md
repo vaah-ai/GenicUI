@@ -3,7 +3,7 @@
 > **Last updated:** 2026-09-03
 > **Last updated by:** M5-T4/T5/T6 added — Playground demo app (F41/F42/F43)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 20/33 tasks complete · 13 tasks not started
+> **Status:** 3/6 milestones complete · 21/33 tasks complete · 12 tasks not started
 
 ---
 
@@ -72,7 +72,7 @@
 | M5-T1 | Component registry + manifest loader | ✅ Complete | Critical | 3-5 days | F37 | M1-T2, M3-T1 |
 | M5-T2 | Registry trust tiers | ✅ Complete | High | 2-3 days | F38 | M5-T1 |
 | M5-T3 | PrimeVue DataTable registry | ✅ Complete | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
-| M5-T4 | Playground app skeleton (Nuxt + PrimeVue + WS) | ⚪ Not Started | High | 2-3 days | F41 | M5-T1 |
+| M5-T4 | Playground app skeleton (Nuxt + PrimeVue + WS) | ✅ Complete | High | 2-3 days | F41 | M5-T1 |
 | M5-T5 | Agent bridge package (platform-agnostic) | ⚪ Not Started | Critical | 3-5 days | F42 | M3-T1, M5-T1 |
 | M5-T6 | Suggestive prompts + registry selector | ⚪ Not Started | High | 2-3 days | F43 | M5-T4, M5-T5 |
 
