@@ -1,0 +1,51 @@
+{
+  "id": "@genicul-primevue/registry",
+  "version": "0.1.0",
+  "framework": "primevue",
+  "components": [
+    {
+      "name": "data-table",
+      "version": "1.0.0",
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          }
+        },
+        "required": ["rows"],
+        "additionalProperties": false
+      },
+      "tags": ["table", "sortable", "filterable"],
+      "events": [
+        {
+          "name": "row-click",
+          "payloadSchema": {
+            "type": "object",
+            "properties": {
+              "rowId": { "type": "string" }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "rows": [
+            { "id": "1", "name": "Alice" },
+            { "id": "2", "name": "Bob" }
+          ],
+          "pageSize": 10
+        }
+      ]
+    }
+  ]
+}

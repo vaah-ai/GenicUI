@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F37 (Component registry + manifest loader)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 > **Estimated Effort:** 3-5 days
 
 ## Description
