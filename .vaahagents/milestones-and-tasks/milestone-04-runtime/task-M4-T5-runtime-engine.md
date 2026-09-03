@@ -3,7 +3,7 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F29 (Runtime engine)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed (2026-09-03)
 > **Estimated Effort:** 3-5 days
 
 ## Description
@@ -45,11 +45,20 @@ Implement the runtime engine: mounts components from `STATE_SNAPSHOT` within 50m
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 70% client
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (45 tests, 0 failures)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 70% client
+
+## Delivery Summary
+
+- **Files created:** `runtime/types.ts`, `runtime/runtime.ts`, `runtime/runtime.test.ts`, `runtime/index.ts` (4 files)
+- **Files modified:** `src/index.ts` (added runtime re-exports)
+- **Tests:** 26 new tests, 45 total client tests pass
+- **RuntimeEngine** class with `onMessage(frame)` routing, `createRuntime()` factory
+- Wires itself as RuntimeBridge into GenicElement via `setRuntimeBridge()`
+- All 4 ACs verified: mount <50ms, patch <10ms, unmount on closed, no globals
 
 ## Dependencies
 
