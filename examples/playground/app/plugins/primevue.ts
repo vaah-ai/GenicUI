@@ -2,6 +2,7 @@
  * PrimeVue Nuxt plugin.
  *
  * Registers PrimeVue with the Aura theme for the playground app.
+ * Uses @primeuix/themes for CSS variable-based theming.
  *
  * @see {F41} — Playground demo app
  */
