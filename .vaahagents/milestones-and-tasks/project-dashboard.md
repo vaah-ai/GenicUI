@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-03
-> **Last updated by:** M5-T2 completion — Registry trust tiers (F38)
-> **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 20/30 tasks complete · 10 tasks not started
+> **Last updated by:** M5-T4/T5/T6 added — Playground demo app (F41/F42/F43)
+> **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
+> **Status:** 3/6 milestones complete · 20/33 tasks complete · 13 tasks not started
 
 ---
 
@@ -15,7 +15,7 @@
 | M2 | Transport: Server + WS + Frames | Transport | W2 | 🟢 Complete | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟢 Complete | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
-| M5 | Registry: Registry + PrimeVue | Registry | W7 | ⚪ Not Started | Critical | 10-14 days | 3 | F37, F38, F40 |
+| M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 6 | F37, F38, F40, F41, F42, F43 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
@@ -65,13 +65,16 @@
 | M4-T6 | Vite plugin + auto-registration | ✅ Complete | Medium | 2-3 days | F30 | M4-T4 |
 | M4-T7 | Session recovery (last-10-messages) | ✅ Complete | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
-### M5 — Registry: Registry + PrimeVue (2/3 complete)
+### M5 — Registry: Registry + PrimeVue + Playground (6/6 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M5-T1 | Component registry + manifest loader | ✅ Complete | Critical | 3-5 days | F37 | M1-T2, M3-T1 |
 | M5-T2 | Registry trust tiers | ✅ Complete | High | 2-3 days | F38 | M5-T1 |
-| M5-T3 | PrimeVue DataTable registry | ⚪ Not Started | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
+| M5-T3 | PrimeVue DataTable registry | ✅ Complete | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
+| M5-T4 | Playground app skeleton (Nuxt + PrimeVue + WS) | ⚪ Not Started | High | 2-3 days | F41 | M5-T1 |
+| M5-T5 | Agent bridge package (platform-agnostic) | ⚪ Not Started | Critical | 3-5 days | F42 | M3-T1, M5-T1 |
+| M5-T6 | Suggestive prompts + registry selector | ⚪ Not Started | High | 2-3 days | F43 | M5-T4, M5-T5 |
 
 ### M6 — Deployment: CF + Bun + Nitro (0/4 complete)
 
@@ -103,6 +106,9 @@ Layer 12: M4-T6 (F30), M4-T7 (F33) — depends on M4-T4 / M2-T3
 Layer 13: M5-T1 (F37) — depends on M1-T2, M3-T1
 Layer 14: M5-T2 (F38) — depends on M5-T1
 Layer 15: M5-T3 (F40) — depends on M5-T1, M5-T2
+Layer 16: M5-T4 (F41) — depends on M5-T1 (playground app)
+Layer 17: M5-T5 (F42) — depends on M3-T1, M5-T1 (agent bridge)
+Layer 18: M5-T6 (F43) — depends on M5-T4, M5-T5 (suggestive prompts)
 Layer 16: M6-T3 (F62b) — depends on M6-T1
 ```
 
@@ -144,6 +150,9 @@ Step 12: M4-T4/T5     — Web component + Runtime engine [circular, use stub]
 Step 13: M5-T1 (F37)  — Component registry
 Step 14: M5-T2 (F38)  — Registry trust tiers
 Step 15: M5-T3 (F40)  — PrimeVue DataTable registry
+Step 16: M5-T4 (F41)  — Playground app skeleton
+Step 17: M5-T5 (F42)  — Agent bridge package
+Step 18: M5-T6 (F43)  — Suggestive prompts + registry selector
 Step 16: M4-T6 (F30)  — Vite plugin
 Step 17: M4-T7 (F33)  — Session recovery
 Step 18: M6-T1 (F61)  — CF Workers deploy [independent, can run earlier]
@@ -153,7 +162,7 @@ Step 19: M6-T3 (F62b) — DO session store
 ### Longest Critical Path (determines MVP timeline)
 
 ```
-M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → M4-T2 → M4-T3 → M4-T4/M4-T5 → M5-T1 → M5-T2 → M5-T3
+M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → M4-T2 → M4-T3 → M4-T4/M4-T5 → M5-T1 → M5-T2 → M5-T3 → M5-T4 → M5-T5 → M5-T6
 ```
 
 ---
@@ -201,7 +210,7 @@ M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → 
 
 ## Velocity Check
 
-- **Current date:** 2026-09-02
+- **Current date:** 2026-09-03
 - **Week 6 integration milestone:** Target date ~W6 of 12-week plan
-- **Scope:** 29 features, 93 ACs, 6 milestones, 29 tasks
+- **Scope:** 32 features, 93 ACs, 6 milestones, 33 tasks
 - **If any feature slips past W6:** propose cutting to deferred_for_post_mvp

@@ -11,7 +11,8 @@
     "poc:chat-smoke": "node poc/server/chat-smoke-test.mjs"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "registries/*"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
