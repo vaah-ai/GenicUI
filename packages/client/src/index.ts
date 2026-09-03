@@ -11,3 +11,16 @@ export type {
   RuntimeBridge,
   RuntimeBridgeCallbacks,
 } from './types.js';
+
+// F29 — Runtime engine exports
+export { createRuntime, RuntimeEngine } from './runtime/index.js';
+export type {
+  RuntimeFrameType,
+  RuntimeFrame,
+  RuntimeOptions,
+  MountResult,
+  PatchResult,
+  ComponentState,
+  SnapshotPayload,
+  DeltaPayload,
+} from './runtime/index.js';

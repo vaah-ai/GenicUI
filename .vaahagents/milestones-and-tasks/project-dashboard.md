@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-03
-> **Last updated by:** M4-T3 completion — Server-side event application (F24)
+> **Last updated by:** M4-T5 completion — Runtime engine (mount, patch, lifecycle) (F29)
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 16/30 tasks complete · 14 tasks not started
+> **Status:** 3/6 milestones complete · 17/30 tasks complete · 13 tasks not started
 
 ---
 
@@ -53,7 +53,7 @@
 | M3-T6 | subscribe_to_events | ✅ Complete | High | 2-3 days | F18 | M3-T1 |
 | M3-T7 | ui:// URI grammar | ✅ Complete | Medium | 1 day | F28 | M3-T1 |
 
-### M4 — Runtime: Events + WC + Engine (4/7 complete)
+### M4 — Runtime: Events + WC + Engine (5/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -61,7 +61,7 @@
 | M4-T2 | Internal event bus (post-emit + backpressure) | ✅ Complete | High | 2-3 days | F20 | M1-T5, M2-T4, M4-T1 |
 | M4-T3 | Server-side event application | ✅ Complete | High | 2-3 days | F24 | M1-T4, M4-T2 |
 | M4-T4 | GenicElement Web Component base | ✅ Complete | Critical | 3-5 days | F21 | M1-T4, M4-T5 (circular) |
-| M4-T5 | Runtime engine (mount, patch, lifecycle) | ⚪ Not Started | Critical | 3-5 days | F29 | M4-T4, M4-T3 |
+| M4-T5 | Runtime engine (mount, patch, lifecycle) | ✅ Complete | Critical | 3-5 days | F29 | M4-T4, M4-T3 |
 | M4-T6 | Vite plugin + auto-registration | ⚪ Not Started | Medium | 2-3 days | F30 | M4-T4 |
 | M4-T7 | Session recovery (last-10-messages) | ⚪ Not Started | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
