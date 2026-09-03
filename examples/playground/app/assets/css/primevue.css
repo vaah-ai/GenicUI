@@ -380,6 +380,47 @@ pre {
   50% { opacity: 0.4; }
 }
 
+/* Spinner for connecting state */
+.status-spinner {
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Error Message Banner ---------- */
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gp-space-2);
+  padding: var(--gp-space-3) var(--gp-space-4);
+  border-radius: var(--gp-radius);
+  background: var(--gp-error-bg);
+  color: var(--gp-error-text);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  animation: error-enter var(--gp-transition-slow) ease-out;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@keyframes error-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ---------- Divider ---------- */
 .config-divider {
   border: none;

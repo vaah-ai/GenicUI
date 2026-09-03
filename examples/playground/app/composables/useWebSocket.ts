@@ -37,6 +37,11 @@ interface ServerHello {
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
 /**
+ * Maximum connection retries before marking the connection as failed.
+ */
+const MAX_RETRIES = 5;
+
+/**
  * WebSocket client composable.
  *
  * @returns Reactive state and methods for managing the WebSocket connection.
@@ -46,9 +51,12 @@ export function useWebSocket() {
   const sessionId = ref<string | null>(null);
   const serverVersion = ref<string | null>(null);
   const messageCount = ref(0);
+  const errorMsg = ref<string | null>(null);
+  const retryCount = ref(0);
 
   let socket: WebSocket | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let retryAttempts = 0;
 
   /**
    * Message callback type for subscribers.
@@ -104,7 +112,11 @@ export function useWebSocket() {
       return;
     }
 
+    // Reset retry counter on explicit connect attempt
+    retryAttempts = 0;
+    errorMsg.value = null;
     state.value = 'connecting';
+    retryCount.value = 0;
 
     try {
       // Build protocol header: genicui.v1, optionally with api-key
@@ -116,6 +128,8 @@ export function useWebSocket() {
       socket = new WebSocket(url, protocols);
 
       socket.onopen = () => {
+        retryAttempts = 0;
+        errorMsg.value = null;
         state.value = 'connected';
         console.log(`[useWebSocket] Connected to ${url}`);
       };
@@ -130,25 +144,53 @@ export function useWebSocket() {
       };
 
       socket.onclose = (event) => {
+        socket = null;
+
+        if (state.value === 'connecting') {
+          // Still connecting when socket closed — connection was refused
+          state.value = 'error';
+          retryCount.value = retryAttempts;
+          errorMsg.value =
+            event.reason
+              ? `Connection failed: ${event.reason}`
+              : 'Connection refused — is the GenicUI server running?';
+          return;
+        }
+
         state.value = 'disconnected';
         console.log(
           `[useWebSocket] Closed: code=${event.code} reason=${event.reason}`,
         );
-        socket = null;
 
-        // Auto-reconnect after 3s
-        reconnectTimer = setTimeout(() => {
-          console.log('[useWebSocket] Attempting reconnect...');
-          connect(url, apiKey);
-        }, 3000);
+        // Auto-reconnect after 3s (max 5 retries)
+        if (retryAttempts < MAX_RETRIES) {
+          reconnectTimer = setTimeout(() => {
+            retryAttempts++;
+            retryCount.value = retryAttempts;
+            console.log(
+              `[useWebSocket] Attempting reconnect (${retryAttempts}/${MAX_RETRIES})...`,
+            );
+            state.value = 'connecting';
+            errorMsg.value = null;
+            connect(url, apiKey);
+          }, 3000);
+        } else {
+          state.value = 'error';
+          errorMsg.value = `Connection failed after ${MAX_RETRIES} attempts.`;
+          console.warn(
+            `[useWebSocket] Max retries (${MAX_RETRIES}) reached — giving up.`,
+          );
+        }
       };
 
       socket.onerror = () => {
-        state.value = 'error';
         console.error('[useWebSocket] Connection error');
       };
     } catch (err) {
       state.value = 'error';
+      retryCount.value = retryAttempts;
+      errorMsg.value =
+        err instanceof Error ? err.message : 'Connection failed';
       console.error('[useWebSocket] Connect failed:', err);
     }
   }
@@ -167,6 +209,9 @@ export function useWebSocket() {
       socket = null;
     }
 
+    retryAttempts = 0;
+    retryCount.value = 0;
+    errorMsg.value = null;
     state.value = 'disconnected';
     sessionId.value = null;
   }
@@ -189,6 +234,8 @@ export function useWebSocket() {
     sessionId: readonly(sessionId),
     serverVersion: readonly(serverVersion),
     messageCount: readonly(messageCount),
+    errorMsg: readonly(errorMsg),
+    retryCount: readonly(retryCount),
     connect,
     disconnect,
     onMessage,

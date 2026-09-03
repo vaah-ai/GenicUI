@@ -29,10 +29,51 @@
       :class="wsState"
       :aria-label="`Connection status: ${wsState}`"
     >
-      <span>{{ wsState }}</span>
+      <!-- Spinner while connecting -->
+      <svg
+        v-if="wsState === 'connecting'"
+        class="status-spinner"
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-dasharray="40 60"
+          stroke-linecap="round"
+        />
+      </svg>
+      <span>{{ wsStateLabel }}</span>
       <span v-if="session" style="opacity: 0.6">
         · {{ session }}
       </span>
+      <span v-if="wsState === 'connecting'" style="opacity: 0.6">
+        (attempt {{ retryCount }})
+      </span>
+    </div>
+
+    <!-- Error Message -->
+    <div v-if="errorMessage" class="error-message" role="alert">
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <span>{{ errorMessage }}</span>
     </div>
 
     <!-- WebSocket URL -->
@@ -44,6 +85,7 @@
         id="ws-url"
         v-model="wsUrl"
         placeholder="ws://localhost:3040/ws"
+        :disabled="wsState === 'connecting'"
         aria-describedby="ws-url-help"
       />
       <span id="ws-url-help" style="font-size: 0.6875rem; color: var(--gp-text-muted);">
@@ -61,13 +103,21 @@
         v-model="apiKey"
         type="password"
         placeholder="gnc_live_…"
+        :disabled="wsState === 'connecting'"
       />
     </div>
 
     <!-- Connect / Disconnect -->
     <div style="margin-top: var(--gp-space-2);">
       <Button
-        v-if="wsState !== 'connected'"
+        v-if="wsState === 'connecting'"
+        label="Connecting…"
+        icon="pi pi-spin pi-spinner"
+        severity="secondary"
+        disabled
+      />
+      <Button
+        v-else-if="wsState !== 'connected'"
         label="Connect"
         icon="pi pi-link"
         @click="handleConnect"
@@ -114,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
@@ -130,6 +180,24 @@ const { components, subscribe } = useComponents();
 const wsState = ws.state;
 const session = ws.sessionId;
 const messageCount = ws.messageCount;
+const errorMessage = ws.errorMsg;
+const retryCount = ws.retryCount;
+
+/**
+ * Human-readable label for the connection state.
+ */
+const wsStateLabel = computed(() => {
+  switch (wsState.value) {
+    case 'connecting':
+      return 'Connecting';
+    case 'connected':
+      return 'Connected';
+    case 'error':
+      return 'Connection failed';
+    default:
+      return 'Disconnected';
+  }
+});
 
 // Subscribe to WebSocket messages
 let unsubscribe: () => void = () => {};
