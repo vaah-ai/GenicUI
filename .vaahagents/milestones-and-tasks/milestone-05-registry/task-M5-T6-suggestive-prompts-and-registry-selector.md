@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F43 (Suggestive prompts and registry selector for playground)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description

@@ -39,6 +39,7 @@ import {
   retrieveSessionBuffer,
   removeSessionBuffer,
 } from '../session-recovery/index.js';
+import { handleChatMessage } from '../chat/chat-handler.js';
 
 /** Server version string sent in server.hello. */
 const SERVER_VERSION = '0.1.0';
@@ -421,6 +422,16 @@ export function createWsHandler(): {
           `[F11] Session ${session.sessionId} closed: malformed frame`,
         );
         ws.close(CLOSE_CODE_PROTOCOL_ERROR, 'Invalid frame');
+        return;
+      }
+
+      // F43: Handle chat messages on the __chat__ channel
+      if (frame.channel === '__chat__' && frame.type === 'chat.message') {
+        const chatPayload = frame.payload as Record<string, unknown>;
+        handleChatMessage(session, {
+          prompt: (chatPayload.prompt as string) ?? '',
+          registry: chatPayload.registry as string | undefined,
+        });
         return;
       }
 

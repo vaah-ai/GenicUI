@@ -147,6 +147,13 @@
           }
         }
       ],
+      "examplePrompts": [
+        "Show me a data table with orders",
+        "Create a data table with users and their status",
+        "Build a data table with products, prices, and categories",
+        "Display a data table of employees with department and role",
+        "Show a data table with inventory items and stock levels"
+      ],
       "examples": [
         {
           "rows": [

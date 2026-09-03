@@ -139,6 +139,35 @@
     <!-- Divider -->
     <Divider class="config-divider" />
 
+    <!-- Registry Selector -->
+    <div class="config-section">
+      <RegistrySelector
+        v-model="selectedRegistry"
+        :server-url="wsUrl"
+      />
+    </div>
+
+    <!-- Prompt Chips -->
+    <div v-if="examplePrompts.length > 0" class="prompts-section">
+      <h3>Try a Prompt</h3>
+      <PromptChips
+        :prompts="examplePrompts"
+        @select="handlePromptSelect"
+      />
+    </div>
+
+    <!-- Chat History -->
+    <div v-if="chatHistory.length > 0 || chatLoading" class="chat-section">
+      <h3>Chat</h3>
+      <ChatHistory
+        :messages="chatHistory"
+        :loading="chatLoading"
+      />
+    </div>
+
+    <!-- Divider -->
+    <Divider class="config-divider" />
+
     <!-- Components List -->
     <div class="components-section">
       <h3>
@@ -168,20 +197,38 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
+import PromptChips from './PromptChips.vue';
+import ChatHistory from './ChatHistory.vue';
+import RegistrySelector from './RegistrySelector.vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useComponents } from '~/composables/useComponents.ts';
+import { useChat } from '~/composables/useChat.ts';
 
 const wsUrl = ref('ws://localhost:3040/ws');
 const apiKey = ref('');
+const selectedRegistry = ref('');
 
 const ws = useWebSocket();
 const { components, subscribe } = useComponents();
+const chat = useChat();
 
 const wsState = ws.state;
 const session = ws.sessionId;
 const messageCount = ws.messageCount;
 const errorMessage = ws.errorMsg;
 const retryCount = ws.retryCount;
+
+const chatHistory = chat.history;
+const chatLoading = chat.isLoading;
+
+// Example prompts derived from the selected registry or default set
+const examplePrompts = ref<string[]>([
+  'Show me a data table with orders',
+  'Create a data table with users and their status',
+  'Build a data table with products, prices, and categories',
+  'Display a data table of employees with department and role',
+  'Show a data table with inventory items and stock levels',
+]);
 
 /**
  * Human-readable label for the connection state.
@@ -203,6 +250,17 @@ const wsStateLabel = computed(() => {
 let unsubscribe: () => void = () => {};
 onMounted(() => {
   unsubscribe = subscribe(ws);
+
+  // Subscribe to chat responses
+  ws.onMessage((frame) => {
+    if (frame.channel === '__chat__') {
+      if (frame.type === 'chat.response') {
+        chat.handleResponse(frame);
+      } else if (frame.type === 'chat.error') {
+        chat.handleError();
+      }
+    }
+  });
 });
 onUnmounted(() => {
   unsubscribe();
@@ -214,5 +272,43 @@ async function handleConnect(): Promise<void> {
 
 function handleDisconnect(): void {
   ws.disconnect();
+  chat.clear();
+}
+
+/**
+ * Handle prompt chip click — send the prompt through WebSocket.
+ */
+function handlePromptSelect(prompt: string): void {
+  chat.sendMessage(prompt, ws, selectedRegistry.value || undefined);
 }
 </script>
+
+<style scoped>
+.prompts-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-1);
+  margin-top: var(--gp-space-2);
+}
+
+.prompts-section h3 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--gp-text);
+}
+
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-1);
+  margin-top: var(--gp-space-2);
+}
+
+.chat-section h3 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--gp-text);
+}
+</style>

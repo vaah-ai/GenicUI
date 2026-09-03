@@ -20,6 +20,7 @@ import {
 } from './auth/index.js';
 import { createWsHandler, wsApiKeyStore } from './transport/websocket.js';
 import { handleMcpRequest } from './mcp/index.js';
+import { loadRegistries, getRegistries } from './registry/registries-loader.js';
 
 /**
  * Health check response shape.
@@ -79,6 +80,33 @@ interface ApiStatusResponse {
 }
 
 /**
+ * A single component in a registry listing response.
+ */
+interface RegistryComponentListing {
+  name: string;
+  version: string;
+  tags: string[];
+  examplePrompts: string[] | undefined;
+}
+
+/**
+ * A registry entry in the listing response.
+ */
+interface RegistryListing {
+  id: string;
+  version: string;
+  framework: string;
+  components: RegistryComponentListing[];
+}
+
+/**
+ * Response for GET /api/registries.
+ */
+interface ApiRegistriesResponse {
+  registries: RegistryListing[];
+}
+
+/**
  * Create and start the GenicUI HTTP + WebSocket server.
  *
  * Listens on port 3040, hostname 0.0.0.0 by default.
@@ -91,6 +119,12 @@ interface ApiStatusResponse {
 export function createServer() {
   // Initialise API key store from environment
   initApiKeys();
+
+  // Load component registries from the registries/ directory (F43)
+  const registriesDir = process.env.GENICUI_REGISTRIES_DIR ?? '';
+  if (registriesDir) {
+    loadRegistries(registriesDir);
+  }
 
   // Authenticated API app — guard applies only to /api/* routes
   const apiApp = new Elysia({ prefix: '/api' })
@@ -120,6 +154,18 @@ export function createServer() {
         c.set.status = 401;
         throw new AuthError('Unauthorized', 401);
       }
+    })
+    // F43: List available component registries for the playground frontend
+    .get('/registries', (): ApiRegistriesResponse => {
+      const regs = getRegistries();
+      return {
+        registries: regs.map((reg) => ({
+          id: reg.id,
+          version: reg.version,
+          framework: reg.framework,
+          components: reg.components,
+        })),
+      };
     });
 
   // WebSocket transport handler
