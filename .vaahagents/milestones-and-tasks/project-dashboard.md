@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-03
-> **Last updated by:** M5-T1 completion — Component registry + manifest loader (F37)
+> **Last updated by:** M5-T2 completion — Registry trust tiers (F38)
 > **Development phase:** Testable MVP — 29 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 19/30 tasks complete · 11 tasks not started
+> **Status:** 3/6 milestones complete · 20/30 tasks complete · 10 tasks not started
 
 ---
 
@@ -65,12 +65,12 @@
 | M4-T6 | Vite plugin + auto-registration | ✅ Complete | Medium | 2-3 days | F30 | M4-T4 |
 | M4-T7 | Session recovery (last-10-messages) | ✅ Complete | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
-### M5 — Registry: Registry + PrimeVue (1/3 complete)
+### M5 — Registry: Registry + PrimeVue (2/3 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M5-T1 | Component registry + manifest loader | ✅ Complete | Critical | 3-5 days | F37 | M1-T2, M3-T1 |
-| M5-T2 | Registry trust tiers | ⚪ Not Started | High | 2-3 days | F38 | M5-T1 |
+| M5-T2 | Registry trust tiers | ✅ Complete | High | 2-3 days | F38 | M5-T1 |
 | M5-T3 | PrimeVue DataTable registry | ⚪ Not Started | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
 
 ### M6 — Deployment: CF + Bun + Nitro (0/4 complete)

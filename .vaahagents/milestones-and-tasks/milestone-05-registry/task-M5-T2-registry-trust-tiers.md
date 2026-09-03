@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F38 (Registry trust tiers)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -36,11 +36,11 @@ Implement registry trust tiers: project (highest), user (medium), remote (lowest
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
-- [ ] Coverage target met: 60% registry adapters
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (972 tests)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+- [x] Coverage target met: 60% registry adapters
 
 ## Dependencies
 
