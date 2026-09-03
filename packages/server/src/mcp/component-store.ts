@@ -252,7 +252,7 @@ export class ComponentStore {
    *
    * @param componentId — the component to lock
    */
-  private async acquireLock(componentId: string): Promise<void> {
+  public async acquireLock(componentId: string): Promise<void> {
     const previous = this.locks.get(componentId);
     const lock = new Promise<void>((resolve) => {
       this.locks.set(componentId, (previous ?? Promise.resolve()).then(() => resolve()));
@@ -265,7 +265,7 @@ export class ComponentStore {
    *
    * @param componentId — the component to unlock
    */
-  private releaseLock(componentId: string): void {
+  public releaseLock(componentId: string): void {
     this.locks.delete(componentId);
   }
 

@@ -3,8 +3,10 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F24 (Server-side event application)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 > **Estimated Effort:** 2-3 days
+> **Completed:** 2026-09-03
+> **Delivered:** EventApplier class with atomic apply, snapshot fallback, schema validation, and idempotency. 20 tests, 43 assertions.
 
 ## Description
 
@@ -39,10 +41,21 @@ Implement server-side event application: atomic apply of events (no torn reads),
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (768 tests)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+
+## Delivery Summary
+
+- **Files created:** 3
+  - `packages/server/src/runtime/types.ts` — ApplyEventOptions, ApplyEventResult, ApplyEventError, ApplyEventOutcome
+  - `packages/server/src/runtime/event-applier.ts` — EventApplier class
+  - `packages/server/src/runtime/event-applier.test.ts` — 20 tests, 43 expect() calls
+- **Files modified:** 1
+  - `packages/server/src/mcp/component-store.ts` — made `acquireLock`/`releaseLock` public
+- **Tests:** 20 tests pass (768 total), 43 assertions
+- **ACs:** F24-AC1 (atomic apply), F24-AC2 (snapshot fallback), F24-AC3 (schema rollback), F24-AC4 (idempotency)
 
 ## Dependencies
 
