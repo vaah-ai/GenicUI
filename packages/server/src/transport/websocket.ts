@@ -30,6 +30,15 @@ import {
 import { parseFrame, serializeFrame, CLOSE_CODE_PROTOCOL_ERROR } from './frame-handler.js';
 import { ChannelMultiplexer } from './channel-multiplexer.js';
 import { InternalEventBus } from '../bus/event-bus.js';
+import {
+  MessageBuffer,
+  parseLastEventId,
+  extractLastEventIdHeader,
+  recoverSession,
+  storeSessionBuffer,
+  retrieveSessionBuffer,
+  removeSessionBuffer,
+} from '../session-recovery/index.js';
 
 /** Server version string sent in server.hello. */
 const SERVER_VERSION = '0.1.0';
@@ -289,6 +298,19 @@ export function createWsHandler(): {
         }
       }
 
+      // F33: Parse Last-Event-ID header for session recovery
+      const lastEventIdHeader = extractLastEventIdHeader(ctx);
+      const lastEventId = parseLastEventId(lastEventIdHeader);
+
+      // F33: Extract previous session ID for reconnect (client sends it
+      // in X-GenicUI-Session-Id header during reconnect)
+      const previousSessionId = ctx.request.headers.get('x-genicui-session-id') ?? null;
+
+      // Store parsed data on context for use in open()
+      // Elysia passes upgrade context to the ws.data after connection
+      (ctx as Record<string, unknown>).__genicuiLastEventId = lastEventId;
+      (ctx as Record<string, unknown>).__genicuiPreviousSessionId = previousSessionId;
+
       // Accept — return the subprotocol to negotiate
       return GENICUI_SUBPROTOCOL;
     },
@@ -296,18 +318,42 @@ export function createWsHandler(): {
     /**
      * Fires after successful WebSocket upgrade.
      * Sends `server.hello` and starts the heartbeat timer.
+     * On reconnect, replays buffered messages (F33).
      */
     open(ws) {
-      // Generate session ID
-      const sessionId = `sess-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
+      // F33: Extract Last-Event-ID and previous session ID from upgrade context.
+      // Elysia passes the upgrade context as ws.data before open() is called.
+      // We read the stored __genicuiLastEventId, then overwrite ws.data with the session.
+      const upgradeContext = ws.data as Record<string, unknown> | undefined;
+      const lastEventId = (upgradeContext?.__genicuiLastEventId as { channel: string; seq: bigint } | null) ?? null;
+
+      // F33: On reconnect, extract the previous session ID from the request header
+      // (stored on upgradeContext via extractSessionIdHeader in upgrade())
+      const previousSessionId = upgradeContext?.__genicuiPreviousSessionId as string | null;
+
+      // F33: Look up the previous session's buffer for replay
+      let storedBuffer: MessageBuffer | null = null;
+      if (previousSessionId) {
+        storedBuffer = retrieveSessionBuffer(previousSessionId);
+      }
+
+      // Generate session ID (reuse previous ID on reconnect, generate new for first connect)
+      const sessionId = previousSessionId ?? `sess-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
 
       // Create channel multiplexer and sequence generator
       const multiplexer = new ChannelMultiplexer();
       const seqGenerator = new SequenceGenerator();
 
+      // Create message buffer for session recovery (F33)
+      const recoveryBuffer = new MessageBuffer();
+
       // Create internal event bus (F20) with backpressure support
       const eventBus = new InternalEventBus(
-        (data: string) => ws.send(data),
+        (data: string) => {
+          ws.send(data);
+          // F33: Buffer outbound frames for session recovery
+          recoveryBuffer.add(JSON.parse(data) as never);
+        },
         seqGenerator,
         (code: number, reason: string) => ws.close(code, reason),
       );
@@ -323,6 +369,7 @@ export function createWsHandler(): {
         multiplexer,
         seqGenerator,
         eventBus,
+        recoveryBuffer,
       };
 
       // Store session state on ws.data (Elysia uses ws.data for context)
@@ -330,6 +377,18 @@ export function createWsHandler(): {
 
       // Start heartbeat
       startHeartbeat(session);
+
+      // F33: Session recovery — replay buffered messages before server.hello
+      const replayResult = recoverSession(storedBuffer, lastEventId, ws.send.bind(ws), seqGenerator);
+      if (replayResult.replayed) {
+        // Clear the stored buffer after successful replay
+        if (previousSessionId) {
+          removeSessionBuffer(previousSessionId);
+        }
+      } else if (lastEventId !== null && previousSessionId) {
+        // Gap too large or no buffer — clean up stored buffer
+        removeSessionBuffer(previousSessionId);
+      }
 
       // Log connection (scrub any API key references)
       const logMsg = scrubApiKey(`[F10] WebSocket connected: ${sessionId}`);
@@ -394,6 +453,7 @@ export function createWsHandler(): {
 
     /**
      * Handle WebSocket close — clean up heartbeat timers and multiplexer.
+     * F33: Store the message buffer for potential replay on reconnect.
      */
     close(ws, _code, _reason) {
       const session = ws.data as WsSession | undefined;
@@ -401,6 +461,10 @@ export function createWsHandler(): {
 
       session.destroyed = true;
       stopHeartbeat(session);
+
+      // F33: Store the message buffer for potential replay on reconnect
+      // This allows a reconnecting client to replay from the last known state
+      storeSessionBuffer(session.sessionId, session.recoveryBuffer);
 
       // Clean up channel multiplexer
       session.multiplexer.destroy();

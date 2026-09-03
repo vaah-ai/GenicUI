@@ -53,7 +53,7 @@
 | M3-T6 | subscribe_to_events | ✅ Complete | High | 2-3 days | F18 | M3-T1 |
 | M3-T7 | ui:// URI grammar | ✅ Complete | Medium | 1 day | F28 | M3-T1 |
 
-### M4 — Runtime: Events + WC + Engine (6/7 complete)
+### M4 — Runtime: Events + WC + Engine (7/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -63,7 +63,7 @@
 | M4-T4 | GenicElement Web Component base | ✅ Complete | Critical | 3-5 days | F21 | M1-T4, M4-T5 (circular) |
 | M4-T5 | Runtime engine (mount, patch, lifecycle) | ✅ Complete | Critical | 3-5 days | F29 | M4-T4, M4-T3 |
 | M4-T6 | Vite plugin + auto-registration | ✅ Complete | Medium | 2-3 days | F30 | M4-T4 |
-| M4-T7 | Session recovery (last-10-messages) | ⚪ Not Started | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
+| M4-T7 | Session recovery (last-10-messages) | ✅ Complete | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
 ### M5 — Registry: Registry + PrimeVue (0/3 complete)
 

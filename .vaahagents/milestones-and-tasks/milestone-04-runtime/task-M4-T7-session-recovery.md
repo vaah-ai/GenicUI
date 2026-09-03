@@ -3,7 +3,7 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F33 (Session recovery)
 > **Priority:** Medium
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -36,10 +36,14 @@ Implement session recovery: when a client reconnects after disconnect, replay th
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+
+## Summary
+
+Session recovery (F33) implemented with 4 source files in `packages/server/src/session-recovery/`. MessageBuffer (circular buffer, 10 entries, 5s TTL), Last-Event-ID parsing (channel:seq), session buffer store (global Map), and replay logic. Integrated into WebSocket handler (upgrade, open, close). 45 tests cover F33-AC1, F33-AC2, F33-AC3.
 
 ## Dependencies
 
