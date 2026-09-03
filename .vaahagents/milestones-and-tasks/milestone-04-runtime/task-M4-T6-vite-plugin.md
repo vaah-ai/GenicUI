@@ -3,7 +3,7 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F30 (Vite plugin + component auto-registration)
 > **Priority:** Medium
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -36,10 +36,17 @@ Implement the Vite plugin for GenicUI: auto-discovery of `GenicElement` subclass
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (36 tests, 0 failures)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
+
+## Summary
+
+Delivered `@genicui/vite-plugin` package with 5 source files and 36 tests.
+- **F30-AC1**: AST scanner auto-discovers GenicElement subclasses, customElements.define tags, static propsSchema/events metadata
+- **F30-AC2**: HMR via virtual module `\0genicui:components` with handleHotUpdate hook
+- **F30-AC3**: `genui-registry.json` emitted on closeBundle with version, component metadata, and registry entries
 
 ## Dependencies
 
