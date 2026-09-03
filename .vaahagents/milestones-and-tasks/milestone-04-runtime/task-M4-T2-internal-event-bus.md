@@ -3,7 +3,9 @@
 > **Milestone:** M4 (Runtime: Events, Web Components, Runtime Engine)
 > **Manifest feature:** F20 (Internal event bus)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
+> **Completed:** 2026-09-03
+> **Delivered:** InternalEventBus class (5 files, 18 tests), integrated with WsSession lifecycle
 > **Estimated Effort:** 2-3 days
 
 ## Description
@@ -39,10 +41,10 @@ Implement the internal event bus with post-emit hooks and backpressure. `emit` r
 
 ## Completion Criteria
 
-- [ ] All acceptance criteria above pass
-- [ ] `bun run test` exits green
-- [ ] `bun run lint` reports zero errors
-- [ ] `bun run build` succeeds
+- [x] All acceptance criteria above pass
+- [x] `bun run test` exits green (728 pass, 0 fail)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds
 
 ## Dependencies
 

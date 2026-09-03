@@ -29,6 +29,7 @@ import {
 } from '../auth/index.js';
 import { parseFrame, serializeFrame, CLOSE_CODE_PROTOCOL_ERROR } from './frame-handler.js';
 import { ChannelMultiplexer } from './channel-multiplexer.js';
+import { InternalEventBus } from '../bus/event-bus.js';
 
 /** Server version string sent in server.hello. */
 const SERVER_VERSION = '0.1.0';
@@ -304,6 +305,13 @@ export function createWsHandler(): {
       const multiplexer = new ChannelMultiplexer();
       const seqGenerator = new SequenceGenerator();
 
+      // Create internal event bus (F20) with backpressure support
+      const eventBus = new InternalEventBus(
+        (data: string) => ws.send(data),
+        seqGenerator,
+        (code: number, reason: string) => ws.close(code, reason),
+      );
+
       // Create session state
       const session: WsSession = {
         sessionId,
@@ -314,6 +322,7 @@ export function createWsHandler(): {
         destroyed: false,
         multiplexer,
         seqGenerator,
+        eventBus,
       };
 
       // Store session state on ws.data (Elysia uses ws.data for context)
@@ -395,6 +404,9 @@ export function createWsHandler(): {
 
       // Clean up channel multiplexer
       session.multiplexer.destroy();
+
+      // Clean up event bus (F20)
+      session.eventBus.dispose();
 
       // Log disconnection
       const logMsg = scrubApiKey(
