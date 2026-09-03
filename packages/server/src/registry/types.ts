@@ -134,3 +134,68 @@ export class RegistryLoadError extends Error {
     this.name = 'RegistryLoadError';
   }
 }
+
+// ---------------------------------------------------------------------------
+// Trust Tiers — F38
+// ---------------------------------------------------------------------------
+
+/**
+ * Registry trust tier.
+ *
+ * Priority: project (highest) > user (medium) > remote (lowest).
+ * Project tier wins on conflict.
+ *
+ * @see {F38} — Registry trust tiers
+ */
+export type RegistryTier = 'project' | 'user' | 'remote';
+
+/**
+ * Trust-tier priority (higher = wins on conflict).
+ */
+export const TIER_PRIORITY: Readonly<Record<RegistryTier, number>> = {
+  project: 3,
+  user: 2,
+  remote: 1,
+} as const;
+
+/**
+ * A component entry with its trust tier attached.
+ *
+ * @see {F38} — Registry trust tiers
+ */
+export interface TieredComponentEntry extends ComponentEntry {
+  /** The trust tier this entry belongs to. */
+  readonly tier: RegistryTier;
+}
+
+/**
+ * Options for loading a registry with a trust tier.
+ *
+ * @see {F38} — Registry trust tiers
+ */
+export interface LoadRegistryOptions {
+  /** Trust tier for entries loaded from this file. Default: 'project'. */
+  readonly tier?: RegistryTier;
+}
+
+/**
+ * Allow-list pattern for remote registries.
+ *
+ * Supports glob-like patterns: `@official/*`, `@org/*`, etc.
+ *
+ * @see {F38-AC2} — Remote allow-list enforced
+ */
+export interface RegistryAllowListEntry {
+  /** Glob pattern (e.g., `@official/*`). */
+  readonly pattern: string;
+}
+
+/**
+ * Configuration for remote allow-list.
+ *
+ * @see {F38-AC2} — Remote allow-list enforced
+ */
+export interface RemoteAllowList {
+  /** List of allow-list patterns. */
+  readonly patterns: readonly string[];
+}
