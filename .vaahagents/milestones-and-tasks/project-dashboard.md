@@ -65,7 +65,7 @@
 | M4-T6 | Vite plugin + auto-registration | ✅ Complete | Medium | 2-3 days | F30 | M4-T4 |
 | M4-T7 | Session recovery (last-10-messages) | ✅ Complete | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
-### M5 — Registry: Registry + PrimeVue + Playground (6/6 complete)
+### M5 — Registry: Registry + PrimeVue + Playground (5/6 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -73,7 +73,7 @@
 | M5-T2 | Registry trust tiers | ✅ Complete | High | 2-3 days | F38 | M5-T1 |
 | M5-T3 | PrimeVue DataTable registry | ✅ Complete | Critical | 5-7 days | F40 | M5-T1, M5-T2 |
 | M5-T4 | Playground app skeleton (Nuxt + PrimeVue + WS) | ✅ Complete | High | 2-3 days | F41 | M5-T1 |
-| M5-T5 | Agent bridge package (platform-agnostic) | ⚪ Not Started | Critical | 3-5 days | F42 | M3-T1, M5-T1 |
+| M5-T5 | Agent bridge package (platform-agnostic) | ✅ Complete | Critical | 3-5 days | F42 | M3-T1, M5-T1 |
 | M5-T6 | Suggestive prompts + registry selector | ⚪ Not Started | High | 2-3 days | F43 | M5-T4, M5-T5 |
 
 ### M6 — Deployment: CF + Bun + Nitro (0/4 complete)

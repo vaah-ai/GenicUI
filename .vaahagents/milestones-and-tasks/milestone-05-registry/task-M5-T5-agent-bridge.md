@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F42 (Agent bridge — platform-independent LLM integration)
 > **Priority:** Critical
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 3-5 days
 
 ## Description
