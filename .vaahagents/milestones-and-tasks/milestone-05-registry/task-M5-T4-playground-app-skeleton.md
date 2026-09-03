@@ -3,8 +3,10 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F41 (Playground demo app)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2-3 days
+> **Completed:** 2026-09-03
+> **Summary:** Nuxt 4 + PrimeVue playground at examples/playground/ with 3-panel layout, WebSocket client, component renderer, empty state. 8 tests pass, build clean.
 
 ## Description
 

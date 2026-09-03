@@ -1,0 +1,25 @@
+{
+  "name": "genicui-playground",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "GenicUI Playground — demo app for the full GenicUI pipeline",
+  "scripts": {
+    "dev": "nuxt dev --port 3000",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "test": "bun test",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "nuxt": "^4.0.0",
+    "primevue": "^4.2.0",
+    "@primeuix/themes": "^1.0.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^2.0.0",
+    "eslint": "^9.0.0",
+    "@types/ws": "^8.5.0"
+  }
+}
