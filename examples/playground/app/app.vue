@@ -82,9 +82,10 @@
  * The center is the visual focus. Prompts surface here as a hero when
  * no components are rendered yet so the user always has something to do.
  */
-import { computed } from 'vue';
+import { computed, onBeforeUnmount } from 'vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useComponents } from '~/composables/useComponents.ts';
+import { useChat } from '~/composables/useChat.ts';
 
 const ws = useWebSocket();
 const wsState = ws.state;
@@ -97,6 +98,41 @@ const session = ws.sessionId;
 // ignore the frame and the user would never see the rendered component.
 const { subscribe: subscribeComponents } = useComponents();
 subscribeComponents(ws);
+
+// Subscribe the chat composable to WS frames so the chat panel reacts
+// to streamed `chat.event` chunks (assistant prose + tool calls),
+// `chat.response` (legacy echo path), `chat.complete`, and `chat.error`.
+//
+// This is the load-bearing fix from the F43 follow-up: without this
+// subscription the chat panel only ever displayed the optimistic pending
+// state — every free-text prompt sent by the new ChatInput bar and
+// every chip click would be invisible.
+//
+// We filter on `frame.channel === '__chat__'` because the multiplexer
+// broadcasts every frame to every subscriber; each consumer must pick
+// out its own channel.
+const chat = useChat();
+const unsubscribeChat = ws.onMessage((frame) => {
+  if (frame.channel !== '__chat__') return;
+  switch (frame.type) {
+    case 'chat.response':
+      chat.handleResponse(frame);
+      break;
+    case 'chat.event':
+      chat.handleEvent(frame);
+      break;
+    case 'chat.complete':
+      chat.handleComplete(frame);
+      break;
+    case 'chat.error':
+      chat.handleError(frame);
+      break;
+    default:
+      // ignore — only chat-channel frame types above are routed here.
+      break;
+  }
+});
+onBeforeUnmount(() => unsubscribeChat());
 
 const wsStateLabel = computed(() => {
   switch (wsState.value) {

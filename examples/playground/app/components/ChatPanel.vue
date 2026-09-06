@@ -47,18 +47,62 @@
     </div>
 
     <div class="chat-panel-body">
-      <ChatHistory :messages="history" :loading="isLoading" />
+      <ChatHistory class="chat-panel-history" :messages="history" :loading="isLoading" />
+      <ChatInput class="chat-panel-input" @submit="handleSubmit" />
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
 import { useChat } from '~/composables/useChat.ts';
+import { useWebSocket } from '~/composables/useWebSocket.ts';
+import { useRegistries } from '~/composables/useRegistries.ts';
+import { useProviders } from '~/composables/useProviders.ts';
 import ChatHistory from './ChatHistory.vue';
+import ChatInput from './ChatInput.vue';
 
-const { history, isLoading, clear } = useChat();
+const { history, isLoading, clear, sendMessage } = useChat();
+const ws = useWebSocket();
+const registries = useRegistries();
+const providers = useProviders();
 
 function handleClear(): void {
   clear();
 }
+
+/**
+ * Submit handler for the prompt bar.
+ *
+ * Mirrors `RenderSurface.handlePromptSelect` verbatim — reads the
+ * currently selected registry id + the active provider wire payload
+ * and forwards both to `chat.sendMessage`. The chat composable then
+ * emits a `chat.message` frame on the `__chat__` channel which the
+ * server's `chat-handler` spawns a provider CLI for (or echoes back
+ * when no provider is configured).
+ */
+function handleSubmit(prompt: string): void {
+  const reg = registries.selected();
+  const providerPayload = providers.getWirePayload();
+  sendMessage(prompt, ws, reg?.id, providerPayload);
+}
 </script>
+
+<style scoped>
+.chat-panel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-panel-history {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.chat-panel-input {
+  flex: 0 0 auto;
+}
+</style>

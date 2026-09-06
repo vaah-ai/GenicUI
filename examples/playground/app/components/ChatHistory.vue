@@ -23,7 +23,7 @@
       >
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
-      <span>No messages yet. Click a prompt to start.</span>
+      <span>Send a prompt or click a chip below.</span>
     </div>
 
     <article
@@ -31,7 +31,7 @@
       :key="index"
       class="chat-message"
     >
-      <!-- User prompt -->
+      <!-- User prompt (right-aligned bubble, accent-subtle background) -->
       <div class="chat-bubble chat-bubble-user">
         <div class="chat-bubble-meta">
           <span class="chat-role-badge user" aria-label="User message">You</span>
@@ -42,31 +42,39 @@
         <p class="chat-text">{{ msg.prompt }}</p>
       </div>
 
-      <!-- LLM response (or pending) -->
+      <!-- LLM response (left-aligned bubble) -->
       <div class="chat-bubble chat-bubble-assistant" :class="assistantClass(msg)">
         <div class="chat-bubble-meta">
           <span class="chat-role-badge assistant" aria-label="Assistant response">
             Assistant
           </span>
+          <span v-if="msg.status === 'streaming'" class="chat-streaming-label">
+            typing…
+          </span>
         </div>
+        <!-- Prose -->
         <p v-if="msg.response" class="chat-text" v-html="formatResponse(msg.response)" />
         <div
-          v-else-if="msg.status === 'streaming'"
-          class="chat-pending"
-          aria-label="Streaming response"
-        >
-          <span class="chat-pending-dot" />
-          <span class="chat-pending-dot" />
-          <span class="chat-pending-dot" />
-        </div>
-        <div
-          v-else
+          v-else-if="msg.status === 'streaming' || msg.status === 'pending'"
           class="chat-pending"
           aria-label="Awaiting response"
         >
           <span class="chat-pending-dot" />
           <span class="chat-pending-dot" />
           <span class="chat-pending-dot" />
+        </div>
+
+        <!-- Tool calls (structured accordions) -->
+        <ToolCallAccordion
+          v-for="(call, callIdx) in msg.toolCalls"
+          :key="`${msg.timestamp}-tool-${callIdx}`"
+          class="chat-tool"
+          :entry="call"
+        />
+
+        <!-- Error banner (when the assistant bubble ends in error state) -->
+        <div v-if="msg.status === 'error'" class="chat-error-banner" role="status">
+          The assistant turn ended with an error.
         </div>
       </div>
     </article>
@@ -98,15 +106,31 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
+import ToolCallAccordion from './ToolCallAccordion.vue';
 
 /**
- * A single chat message shape — mirrors `useChat().history.value`.
+ * Shape of a single chat message — mirrors `useChat().history.value`.
+ * `toolCalls` is the new structured array (F43 follow-up); each entry
+ * renders as its own `ToolCallAccordion` below the prose.
  */
+type ToolCallStatus = 'running' | 'done' | 'error';
+
+interface ToolCallEntry {
+  id: string;
+  name: string;
+  input: unknown;
+  result?: unknown;
+  status: ToolCallStatus;
+  startedAt: string;
+  error?: string;
+}
+
 type ChatHistoryMessage = {
   prompt: string;
   response: string;
   timestamp: string;
   status: 'pending' | 'streaming' | 'complete' | 'error';
+  toolCalls: ToolCallEntry[];
 };
 
 /**
@@ -134,20 +158,20 @@ function assistantClass(msg: ChatHistoryMessage): string {
 }
 
 /**
- * Render the response text. Lines like `[calling render_component…]`
- * get a faint mono treatment so tool activity is visible without
- * dominating the chat log.
+ * Render the response prose with HTML escaping. The old `[calling …]`
+ * inline annotations are gone — tool calls render as accordions
+ * below the prose — so this is just plain escaped text with line
+ * breaks preserved (pre-wrap on `.chat-text`).
  */
 function formatResponse(text: string): string {
-  const escaped = text
+  return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  return escaped.replace(/\[([^\]]+)\]/g, '<span class="chat-meta-inline">[$1]</span>');
 }
 
 watch(
-  () => [props.messages.length, props.messages[props.messages.length - 1]?.response],
+  () => [props.messages.length, props.messages[props.messages.length - 1]?.response, props.messages[props.messages.length - 1]?.toolCalls.length],
   async () => {
     await nextTick();
     if (containerRef.value) {
@@ -179,7 +203,6 @@ function formatTime(isoString: string): string {
   flex-direction: column;
   gap: var(--gp-space-3);
   padding: var(--gp-space-3) var(--gp-space-4);
-  /* No max-height here — let the parent panel-body scroll */
 }
 
 .chat-history-empty {
@@ -225,10 +248,15 @@ function formatTime(isoString: string): string {
 .chat-bubble-user {
   background: var(--gp-accent-subtle);
   border-color: rgba(34, 197, 94, 0.25);
+  /* Right-align within the column to match Claude Code parity. */
+  align-self: flex-end;
+  max-width: 88%;
 }
 
 .chat-bubble-assistant {
   background: var(--gp-surface);
+  align-self: flex-start;
+  max-width: 95%;
 }
 
 .chat-bubble-streaming {
@@ -238,15 +266,6 @@ function formatTime(isoString: string): string {
 .chat-bubble-error {
   border-color: rgba(239, 68, 68, 0.45);
   background: rgba(239, 68, 68, 0.06);
-}
-
-.chat-meta-inline {
-  font-family: var(--gp-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.85em;
-  color: var(--gp-text-muted);
-  background: rgba(99, 102, 241, 0.08);
-  border-radius: 4px;
-  padding: 1px 4px;
 }
 
 .chat-bubble-meta {
@@ -279,6 +298,12 @@ function formatTime(isoString: string): string {
   border: 1px solid var(--gp-border);
 }
 
+.chat-streaming-label {
+  font-size: 0.6875rem;
+  color: var(--gp-text-muted);
+  font-style: italic;
+}
+
 .chat-timestamp {
   font-size: 0.6875rem;
   color: var(--gp-text-muted);
@@ -292,6 +317,24 @@ function formatTime(isoString: string): string {
   color: var(--gp-text);
   word-break: break-word;
   white-space: pre-wrap;
+}
+
+/* Tool-call accordion spacing inside the assistant bubble. */
+.chat-tool {
+  margin-top: var(--gp-space-2);
+}
+.chat-tool + .chat-tool {
+  margin-top: var(--gp-space-1);
+}
+
+.chat-error-banner {
+  margin-top: var(--gp-space-2);
+  padding: var(--gp-space-1) var(--gp-space-2);
+  font-size: 0.75rem;
+  color: rgba(239, 68, 68, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--gp-radius-sm);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 /* ----- Pending dots (assistant typing) ----- */

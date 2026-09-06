@@ -107,10 +107,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useComponents } from '~/composables/useComponents.ts';
-import { useChat } from '~/composables/useChat.ts';
-import { useWebSocket } from '~/composables/useWebSocket.ts';
+import { useChatInput } from '~/composables/useChatInput.ts';
 import { useRegistries } from '~/composables/useRegistries.ts';
-import { useProviders } from '~/composables/useProviders.ts';
 import PromptChips from './PromptChips.vue';
 
 /**
@@ -120,14 +118,18 @@ import PromptChips from './PromptChips.vue';
  * Prompts come from the *selected* registry's `examplePrompts` field. When no
  * registry is selected we show a hint rather than a misleading chip list.
  *
+ * F43 follow-up: chip clicks now route through `useChatInput().fillAndSubmit()`
+ * so the prompt fills the new ChatInput bar AND auto-submits, instead of
+ * bypassing the chat input. The actual `chat.sendMessage()` call lives in
+ * `ChatPanel.handleSubmit()` so the chat input bar is the single source of
+ * truth for prompt submission.
+ *
  * @see {F43} — Suggestive prompts come from registry data
  * @see {F16} — Rendered components arrive via render_component
  */
 const { components } = useComponents();
-const chat = useChat();
-const ws = useWebSocket();
 const registries = useRegistries();
-const providers = useProviders();
+const chatInput = useChatInput();
 
 const registrySelected = computed(() => !!registries.selected());
 const registryReady = computed(
@@ -145,14 +147,16 @@ const dynamicPrompts = computed<string[]>(() => {
 });
 
 /**
- * Forward a clicked prompt to the chat channel. Includes the active
- * registry id (so the server can scope tool calls) and the active
- * provider wire payload (so the server can route to the right adaptor).
+ * Forward a clicked prompt to the chat input bar.
+ *
+ * `fillAndSubmit` sets the singleton draft + flips `submitRequested`.
+ * The `ChatInput` component watches that flag, fires the submit
+ * handler (which reads the selected registry + active provider and
+ * calls `chat.sendMessage`), then clears the singleton so the next
+ * chip click works.
  */
 function handlePromptSelect(prompt: string): void {
-  const reg = registries.selected();
-  const providerPayload = providers.getWirePayload();
-  chat.sendMessage(prompt, ws, reg?.id, providerPayload);
+  chatInput.fillAndSubmit(prompt);
 }
 </script>
 
