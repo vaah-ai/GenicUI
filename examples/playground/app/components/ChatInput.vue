@@ -21,9 +21,9 @@
     <button
       type="submit"
       class="chat-input-send"
-      :disabled="disabled || draft.trim().length === 0"
+      :disabled="!canSubmit"
       :aria-label="'Send prompt'"
-      :aria-disabled="disabled || draft.trim().length === 0"
+      :aria-disabled="!canSubmit"
     >
       <svg
         width="16"
@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useChatInput } from '~/composables/useChatInput.ts';
 
@@ -81,13 +81,26 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const MAX_ROWS = 5;
 const LINE_HEIGHT_PX = 20;
 
-/** Disabled when not connected — keeps the user from firing into nothing. */
-const disabled = (): boolean => ws.state.value !== 'connected';
+/**
+ * Reactive disabled state — `computed` (NOT a plain arrow function)
+ * so Vue can track the dependency on `ws.state.value`. Previously
+ * these were plain functions and only evaluated once at setup time,
+ * leaving the input stuck in "Connect the socket to send prompts…"
+ * even after the WS flipped to `connected`.
+ */
+const isConnected = computed<boolean>(() => ws.state.value === 'connected');
+const disabled = computed<boolean>(() => !isConnected.value);
 
-const placeholderText = (): string =>
-  ws.state.value === 'connected'
+const placeholderText = computed<string>(() =>
+  isConnected.value
     ? 'Ask anything or describe a UI to render…'
-    : 'Connect the socket to send prompts…';
+    : 'Connect the socket to send prompts…',
+);
+
+/** Send button is disabled when the WS is down OR the draft is empty. */
+const canSubmit = computed<boolean>(
+  () => isConnected.value && draft.value.trim().length > 0,
+);
 
 /**
  * Resize the textarea between 1 and MAX_ROWS based on its scrollHeight.
@@ -110,9 +123,8 @@ async function autoResize(): Promise<void> {
  * `useChatInput().submitRequested` watcher (chip click).
  */
 function handleSubmit(): void {
+  if (!canSubmit.value) return;
   const trimmed = draft.value.trim();
-  if (trimmed.length === 0) return;
-  if (disabled()) return;
   emit('submit', trimmed);
   draft.value = '';
   void autoResize();
