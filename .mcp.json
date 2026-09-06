@@ -5,7 +5,7 @@
       "command": "npx",
       "args": [
         "mcp-remote",
-        "http://localhost:3040/mcp"
+        "http://localhost:3041/mcp"
       ],
       "alwaysLoad": true
     }
