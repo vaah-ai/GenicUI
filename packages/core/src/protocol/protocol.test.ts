@@ -222,6 +222,51 @@ describe('F3-AC2: FrameBuffer', () => {
     expect(buf.pendingCount('ch-a')).toBe(0);
     expect(buf.pendingCount('ch-b')).toBe(0);
   });
+
+  it('primeForServerInit() seeds nextExpectedSeq so server-initiated frames flush immediately', () => {
+    // Regression for F43 follow-up: the chat handler's bridge emits
+    // COMPONENT_MOUNTED on a brand-new channel with the global
+    // session.seqGenerator.next() value (e.g. 12), but a fresh
+    // FrameBuffer starts at nextExpectedSeq = 0. Without priming,
+    // the buffer holds the frame indefinitely and the bridge frame
+    // never reaches the client.
+    const buf = new FrameBuffer();
+    buf.primeForServerInit('da-abc', 12n);
+
+    const flushed = buf.add(makeFrame('da-abc', 12n));
+    expect(flushed).toHaveLength(1);
+    expect(flushed[0]!.seq).toBe(12n);
+    expect(buf.pendingCount('da-abc')).toBe(0);
+
+    // Subsequent frames continue ordering normally from there.
+    const next = buf.add(makeFrame('da-abc', 13n));
+    expect(next).toHaveLength(1);
+    expect(next[0]!.seq).toBe(13n);
+  });
+
+  it('primeForServerInit() is a no-op once the channel has already advanced', () => {
+    const buf = new FrameBuffer();
+    buf.add(makeFrame('da-abc', 0n)); // client-originated
+    buf.add(makeFrame('da-abc', 1n));
+
+    // nextExpectedSeq is now 2 — a late primeForServerInit should
+    // NOT reset it.
+    buf.primeForServerInit('da-abc', 99n);
+
+    // A frame with seq 99 should be buffered because 2 is expected.
+    const flushed = buf.add(makeFrame('da-abc', 99n));
+    expect(flushed).toHaveLength(0);
+    expect(buf.pendingCount('da-abc')).toBe(1);
+  });
+
+  it('primeForServerInit() is a no-op on a different channel', () => {
+    const buf = new FrameBuffer();
+    buf.primeForServerInit('da-abc', 12n);
+
+    // Pre-existing client frame on ch-xyz keeps seq 0 as expected.
+    const flushed = buf.add(makeFrame('ch-xyz', 0n));
+    expect(flushed).toHaveLength(1);
+  });
 });
 
 // ─── F3-AC3: Reserved channel rejection ─────────────────────────────────────

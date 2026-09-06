@@ -91,6 +91,35 @@ export class FrameBuffer {
   }
 
   /**
+   * Seed the channel's expected sequence number so that the very next
+   * `add()` call flushes immediately rather than buffering.
+   *
+   * Used by the server when it publishes the FIRST frame on a brand
+   * new channel — e.g. when Claude Code's `render_component` MCP
+   * tool is bridged into a `COMPONENT_MOUNTED` frame. The server's
+   * `session.seqGenerator` is a single counter shared across every
+   * channel, so the first outgoing seq on a fresh channel is rarely
+   * `0`. Without this, the FrameBuffer holds the frame until a frame
+   * with seq `0` arrives (which never does for a server-initiated
+   * channel), and the bridge silently never reaches the client.
+   *
+   * @param channel — Channel whose expected seq should be advanced.
+   * @param seq — Sequence number of the frame being primed (so
+   *   `nextExpectedSeq` becomes exactly `seq`, ready to flush on the
+   *   next `add()`).
+   */
+  primeForServerInit(channel: string, seq: bigint): void {
+    const state = this.#getChannelState(channel);
+    if (state.nextExpectedSeq === 0n) {
+      // Only seed on the very first outgoing frame. Subsequent
+      // server-initiated frames on the same channel should flow
+      // through `add()` normally so any client-originated frames
+      // received in between still get ordered correctly.
+      state.nextExpectedSeq = seq;
+    }
+  }
+
+  /**
    * Resets the entire buffer state.
    */
   reset(): void {

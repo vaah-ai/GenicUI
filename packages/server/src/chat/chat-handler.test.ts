@@ -39,6 +39,13 @@ class RecordingMultiplexer {
     this.frames.push(frame);
     return { channel: (frame as { channel?: string }).channel ?? '', frames: [frame] };
   }
+  // F43 follow-up: bridge uses the new dispatchServerFrame() path
+  // (server-initiated frames seed the FrameBuffer so they flush
+  // immediately rather than getting held against seq 0).
+  dispatchServerFrame(frame: { type?: string }): { channel: string; frames: unknown[] } | null {
+    this.frames.push(frame);
+    return { channel: (frame as { channel?: string }).channel ?? '', frames: [frame] };
+  }
   registerChannel(): null { return null; }
   hasChannel(): boolean { return true; }
   getChannels(): string[] { return []; }
@@ -262,6 +269,65 @@ describe('chat-handler', () => {
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
       expect(payload['initialState']).toEqual({ rows: [{ id: '2', name: 'Bob' }] });
+    });
+
+    it('bridges an MCP-prefixed render_component tool_call (mcp__<server>__render_component)', () => {
+      // Regression: Claude Code wraps MCP tool names as
+      // `mcp__<server>__<tool>`. Before the isRenderComponentCall()
+      // helper, the bridge compared against the bare `render_component`
+      // string and silently dropped MCP-wrapped calls, leaving the
+      // playground with no mounted component despite a successful
+      // `find_ui_component` + `render_component` round-trip.
+      const session = createMockSession();
+
+      const line = JSON.stringify({
+        type: 'assistant',
+        message: {
+          content: [
+            {
+              type: 'tool_use',
+              id: 'toolu_mcp_1',
+              name: 'mcp__genicui__render_component',
+              input: {
+                componentName: 'DataTable',
+                props: { rows: [{ id: '3', name: 'Carol' }] },
+              },
+            },
+          ],
+        },
+      });
+
+      __test_handleParsedLine(session, line, 'claude-code');
+
+      const mounted = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'COMPONENT_MOUNTED');
+      expect(mounted).toBeDefined();
+      const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['initialState']).toEqual({ rows: [{ id: '3', name: 'Carol' }] });
+    });
+
+    it('bridges an MCP-prefixed render_component in compact (top-level tool_use) form', () => {
+      const session = createMockSession();
+
+      const line = JSON.stringify({
+        type: 'tool_use',
+        id: 'toolu_mcp_2',
+        name: 'mcp__genicui__render_component',
+        input: {
+          componentName: 'DataTable',
+          props: { rows: [{ id: '4', name: 'Dan' }] },
+        },
+      });
+
+      __test_handleParsedLine(session, line, 'claude-code');
+
+      const mounted = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'COMPONENT_MOUNTED');
+      expect(mounted).toBeDefined();
+      const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['initialState']).toEqual({ rows: [{ id: '4', name: 'Dan' }] });
     });
 
     it('does not bridge non-render_component tool calls', () => {

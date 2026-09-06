@@ -329,8 +329,13 @@ function handleParsedLine(
     // mount with the same args is safe (the componentStore.register()
     // call replaces the existing record with identical props).
     //
-    // ev.data shape (from claude-code.ts parser): { id, name: 'render_component', args: { componentName, props, ... } }
-    if (ev.type === 'tool_call' && ev.data['name'] === 'render_component') {
+    // ev.data shape (from claude-code.ts parser): { id, name, args }.
+    // The `name` field is the bare tool name when the agent calls
+    // `render_component` directly, but Claude Code's MCP wrapper
+    // prefixes it as `mcp__<server>__<tool>` (e.g.
+    // `mcp__genicui__render_component`). Accept either form so the
+    // bridge fires regardless of whether the call came through MCP.
+    if (ev.type === 'tool_call' && isRenderComponentCall(ev.data['name'])) {
       const args = (ev.data['args'] && typeof ev.data['args'] === 'object')
         ? (ev.data['args'] as Record<string, unknown>)
         : {};
@@ -349,6 +354,21 @@ function handleParsedLine(
   }
   // parsed.kind === 'stderr' is reserved for adaptors that want to
   // surface raw stderr lines; claude-code doesn't use it.
+}
+/**
+ * Detect whether a tool-call name refers to `render_component`,
+ * accepting both the bare tool name and the MCP-prefixed form
+ * (`mcp__<server>__render_component`) that Claude Code emits when the
+ * call is routed through its MCP wrapper.
+ */
+function isRenderComponentCall(name: unknown): boolean {
+  if (typeof name !== 'string' || name.length === 0) return false;
+  if (name === 'render_component') return true;
+  // MCP namespacing: `mcp__<server>__<tool>`. The server segment can
+  // contain dashes (e.g. `genicui-prod`), so allow any non-empty
+  // server name. Tail match avoids false positives like
+  // `not_render_component`.
+  return /^mcp__[^_]+(?:_[^_]+)*__render_component$/.test(name);
 }
 
 /**
@@ -416,7 +436,7 @@ function bridgeRenderComponent(
     seq: session.seqGenerator.next(),
   };
 
-  const dispatch = session.multiplexer.dispatch(frame);
+  const dispatch = session.multiplexer.dispatchServerFrame(frame);
   if (dispatch === null) {
     console.error(
       `[chat] bridge render_component: channel limit exceeded for session ${session.sessionId}`,

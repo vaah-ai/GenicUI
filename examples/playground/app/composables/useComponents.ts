@@ -47,12 +47,24 @@ export function useComponents() {
    * @param frame — The frame envelope.
    */
   function handleMounted(frame: unknown): void {
-    const payload = frame as {
+    // `frame` is a FrameEnvelope: { v, channel, type, payload, seq }.
+    // The componentId / channel / schema / initialState fields live under
+    // `frame.payload` per F11/F16 wire contract — older versions of this
+    // composable accidentally read them from the envelope root, which
+    // silently no-op'd the mount when the bridge started delivering real
+    // frames (the bridge fires after the F43 follow-up mux fix that
+    // allowed server-initiated frames to flush).
+    const payload = (frame as { payload?: unknown }).payload as {
       componentId: string;
       channel: string;
-      schema: Record<string, unknown>;
+      schema?: Record<string, unknown>;
       initialState: Record<string, unknown>;
-    };
+    } | undefined;
+
+    if (!payload) {
+      console.warn('[useComponents] COMPONENT_MOUNTED frame missing payload');
+      return;
+    }
 
     // Check if component already exists (idempotent mount)
     const existing = findComponent(payload.componentId);
@@ -63,8 +75,9 @@ export function useComponents() {
     }
 
     // Extract component name from schema metadata or use generic name
+    const schema = payload.schema ?? {};
     const name =
-      (payload.schema['x-genicui-name'] as string) ?? 'Component';
+      (schema['x-genicui-name'] as string) ?? 'Component';
 
     components.value.push({
       componentId: payload.componentId,
