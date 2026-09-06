@@ -2,10 +2,10 @@
   "mcpServers": {
     "genicui": {
       "type": "stdio",
-      "command": "npx",
+      "command": "bun",
       "args": [
-        "mcp-remote",
-        "http://localhost:3041/mcp"
+        "run",
+        "/Users/pk/Projects/GenicUI/packages/server/bin/mcp-stdio.ts"
       ],
       "alwaysLoad": true
     }
