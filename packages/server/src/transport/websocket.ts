@@ -45,6 +45,21 @@ import { handleChatMessage } from '../chat/chat-handler.js';
 const SERVER_VERSION = '0.1.0';
 
 /**
+ * Per-WebSocket session registry.
+ *
+ * Elysia re-creates `ws.data` on each handler invocation with the route
+ * context, so we cannot rely on `ws.data = session` persisting between
+ * `open()` and `message()`. Instead we store sessions in this WeakMap
+ * keyed by the underlying ServerWebSocket, and look it up on every
+ * `message()`/`close()`/`pong()`. The WeakMap lets the entry be GC'd
+ * when the socket closes and drops out of Elysia's tracker.
+ *
+ * Tests bypass this by injecting a mock `ws.data` directly; production
+ * uses `ws.raw` (the raw ServerWebSocket).
+ */
+const SESSION_REGISTRY = new WeakMap<object, WsSession>();
+
+/**
  * Elysia upgrade context — the object passed to the `upgrade` callback.
  * Has `.request` (the Request object) and `.headers` (Record<string, string|undefined>).
  * We read from the underlying `Request` object via `.request`.
@@ -264,17 +279,22 @@ export function createWsHandler(): {
         });
       }
 
-      // Check API key (F10-AC2)
+      // Check API key (F10-AC2). In dev mode (no API key store configured),
+      // an apiKey is optional — the WS upgrade proceeds anonymously. In
+      // production, or when a key store is configured, the apiKey is
+      // required and must validate.
+      const store = wsApiKeyStore.get();
+      const requireKey = isProd || (store !== null && store !== undefined && store.size > 0);
       const apiKey = extractApiKey(ctx);
-      if (!apiKey) {
+      if (requireKey && !apiKey) {
         throw new Response('Unauthorized', {
           status: 401,
           headers: { 'WWW-Authenticate': 'Bearer' },
         });
       }
 
-      // Validate key format
-      if (!validateApiKeyFormat(apiKey)) {
+      // Validate key format (only when a key was provided)
+      if (apiKey && !validateApiKeyFormat(apiKey)) {
         throw new Response('Unauthorized', {
           status: 401,
           headers: { 'WWW-Authenticate': 'Bearer' },
@@ -287,7 +307,6 @@ export function createWsHandler(): {
       }
 
       // If API key store is configured (not dev mode), validate against stored hashes
-      const store = wsApiKeyStore.get();
       if (store && store.size > 0) {
         try {
           validateKey(apiKey, store, isProd);
@@ -375,6 +394,14 @@ export function createWsHandler(): {
 
       // Store session state on ws.data (Elysia uses ws.data for context)
       ws.data = session;
+      // ALSO register the session in the WeakMap keyed by the raw WS
+      // (and the wrapper itself, as a fallback for tests).
+      // Elysia creates a NEW wrapper object per handler invocation,
+      // so `ws.data = session` does NOT persist between open() and
+      // message(). The underlying `ws.raw` is the Bun ServerWebSocket
+      // which IS stable for the lifetime of the connection.
+      SESSION_REGISTRY.set(ws as unknown as object, session);
+      if (ws.raw) SESSION_REGISTRY.set(ws.raw as object, session);
 
       // Start heartbeat
       startHeartbeat(session);
@@ -408,7 +435,7 @@ export function createWsHandler(): {
      * @see {F11-AC4} — Malformed frame -> WS close 1003
      */
     message(ws, message) {
-      const session = ws.data as WsSession | undefined;
+      const session = resolveSession(ws);
       if (!session) return;
 
       // Reset pong counter on any inbound message
@@ -428,9 +455,39 @@ export function createWsHandler(): {
       // F43: Handle chat messages on the __chat__ channel
       if (frame.channel === '__chat__' && frame.type === 'chat.message') {
         const chatPayload = frame.payload as Record<string, unknown>;
-        handleChatMessage(session, {
+        // Extract the optional provider wire payload (Sub-task B/C of M5-T6).
+        // The shape is { id: string, config: Record<string, string> } —
+        // pass it through verbatim so the handler can route to the right
+        // provider adaptor. We omit the field entirely (rather than passing
+        // `undefined`) to satisfy exactOptionalPropertyTypes.
+        const providerRaw = chatPayload.provider;
+        const message: {
+          prompt: string;
+          registry: string | undefined;
+          provider?: { id: string; config: Record<string, string> };
+        } = {
           prompt: (chatPayload.prompt as string) ?? '',
           registry: chatPayload.registry as string | undefined,
+        };
+        if (
+          providerRaw &&
+          typeof providerRaw === 'object' &&
+          !Array.isArray(providerRaw)
+        ) {
+          const obj = providerRaw as Record<string, unknown>;
+          message.provider = {
+            id: typeof obj['id'] === 'string' ? (obj['id'] as string) : '',
+            config:
+              obj['config'] && typeof obj['config'] === 'object'
+                ? (obj['config'] as Record<string, string>)
+                : {},
+          };
+        }
+        handleChatMessage(session, message).catch((err: unknown) => {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.error(
+            `[chat] Session ${session.sessionId} handler error: ${errMsg}`,
+          );
         });
         return;
       }
@@ -467,7 +524,7 @@ export function createWsHandler(): {
      * F33: Store the message buffer for potential replay on reconnect.
      */
     close(ws, _code, _reason) {
-      const session = ws.data as WsSession | undefined;
+      const session = resolveSession(ws);
       if (!session) return;
 
       session.destroyed = true;
@@ -494,10 +551,37 @@ export function createWsHandler(): {
      * Handle pong response — reset missed pong counter.
      */
     pong(ws) {
-      const session = ws.data as WsSession | undefined;
+      const session = resolveSession(ws);
       if (session) {
         onPong(session);
       }
     },
   };
+}
+
+/**
+ * Resolve the per-socket WsSession.
+ *
+ * Elysia creates a new wrapper object per handler invocation, so we
+ * cannot key on the wrapper. The underlying `ws.raw` (Bun
+ * ServerWebSocket) is stable for the connection's lifetime, so we
+ * key on that. The wrapper itself is also registered as a fallback
+ * for tests that don't set `ws.raw`.
+ */
+function resolveSession(ws: ElysiaWS): WsSession | undefined {
+  if (ws.raw) {
+    const fromRaw = SESSION_REGISTRY.get(ws.raw as object);
+    if (fromRaw) return fromRaw;
+  }
+  const fromWrapper = SESSION_REGISTRY.get(ws as unknown as object);
+  if (fromWrapper) return fromWrapper;
+  // Last-ditch fallback: trust ws.data if it looks like a real session
+  // (used by tests that inject `ws.data` directly without going through
+  // open()).
+  const fromData = ws.data as WsSession | undefined;
+  if (fromData && fromData.sessionId && fromData.seqGenerator) {
+    SESSION_REGISTRY.set(ws as unknown as object, fromData);
+    return fromData;
+  }
+  return undefined;
 }

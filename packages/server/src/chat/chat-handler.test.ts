@@ -8,8 +8,9 @@
 import { describe, it, expect, beforeEach } from 'bun:test';
 import { SequenceGenerator } from '@genicui/core';
 
-import { handleChatMessage } from './chat-handler.js';
+import { handleChatMessage, __test_handleParsedLine } from './chat-handler.js';
 import type { WsSession } from '../transport/types.js';
+import { componentStore } from '../mcp/component-store.js';
 
 /**
  * Mock Elysia WebSocket for testing.
@@ -27,6 +28,24 @@ class MockElysiaWs {
 }
 
 /**
+ * Recording channel multiplexer — captures every dispatched frame
+ * instead of forwarding through Elysia. Used to assert that the
+ * render_component bridge produced a COMPONENT_MOUNTED frame.
+ */
+class RecordingMultiplexer {
+  frames: unknown[] = [];
+  destroy(): void {}
+  dispatch(frame: { type?: string }): { channel: string; frames: unknown[] } | null {
+    this.frames.push(frame);
+    return { channel: (frame as { channel?: string }).channel ?? '', frames: [frame] };
+  }
+  registerChannel(): null { return null; }
+  hasChannel(): boolean { return true; }
+  getChannels(): string[] { return []; }
+  get channelCount(): number { return 0; }
+}
+
+/**
  * Create a mock WsSession for testing.
  */
 function createMockSession(): WsSession & { ws: MockElysiaWs } {
@@ -40,10 +59,7 @@ function createMockSession(): WsSession & { ws: MockElysiaWs } {
     pongTimeout: null,
     missedPongs: 0,
     destroyed: false,
-    multiplexer: {
-      dispatch: () => ({ channel: 'test', frames: [] }),
-      destroy: () => {},
-    } as never,
+    multiplexer: new RecordingMultiplexer() as never,
     seqGenerator,
     eventBus: {
       emit: () => {},
@@ -151,6 +167,125 @@ describe('chat-handler', () => {
 
       // seq is a bigint (serialized as string in JSON)
       expect(Number(frame2.seq)).toBeGreaterThan(Number(frame1.seq));
+    });
+
+    it('emits chat.error for an unknown provider id', async () => {
+      const session = createMockSession();
+
+      await handleChatMessage(session, {
+        prompt: 'Show me a data table',
+        registry: undefined,
+        provider: { id: 'definitely-not-a-provider', config: {} },
+      });
+
+      // Give the async runChatTurn path a chance to settle. Unknown
+      // providers short-circuit BEFORE spawn, so we don't actually
+      // wait for any subprocess — the error fires synchronously.
+      expect(session.ws.sentMessages).toHaveLength(1);
+      const frame = JSON.parse(session.ws.sentMessages[0]) as Record<string, unknown>;
+      expect(frame.channel).toBe('__chat__');
+      expect(frame.type).toBe('chat.error');
+      const payload = frame.payload as Record<string, string>;
+      expect(payload.error).toContain('Unknown provider');
+    });
+
+    it('echoes back a chat.response when provider is omitted (legacy path)', () => {
+      const session = createMockSession();
+
+      handleChatMessage(session, {
+        prompt: 'No provider set',
+        registry: undefined,
+      });
+
+      expect(session.ws.sentMessages).toHaveLength(1);
+      const frame = JSON.parse(session.ws.sentMessages[0]) as Record<string, unknown>;
+      expect(frame.type).toBe('chat.response');
+      const payload = frame.payload as Record<string, string>;
+      expect(payload.prompt).toBe('No provider set');
+      expect(payload.response).toContain('No provider set');
+    });
+  });
+
+  describe('render_component bridge (M5-T6 follow-up)', () => {
+    beforeEach(() => {
+      componentStore.clear();
+    });
+
+    it('bridges a render_component tool_call to a COMPONENT_MOUNTED frame', () => {
+      const session = createMockSession();
+
+      // Mimic a stream-json line from Claude Code calling render_component.
+      // DataTable is the only stub component in the MVP catalog, with a
+      // schema requiring `rows: Array<Record<string, unknown>>`.
+      const line = JSON.stringify({
+        type: 'tool_use',
+        id: 'toolu_test_1',
+        name: 'render_component',
+        input: {
+          componentName: 'DataTable',
+          props: { rows: [{ id: '1', name: 'Alice' }] },
+        },
+      });
+
+      __test_handleParsedLine(session, line, 'claude-code');
+
+      // Should have produced two WS frames: a chat.event (tool_call)
+      // and a COMPONENT_MOUNTED on the new component's channel.
+      const mounted = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'COMPONENT_MOUNTED');
+      expect(mounted).toBeDefined();
+      expect(mounted!.channel).toMatch(/^da-/);
+      const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['componentId']).toBe(mounted!.channel);
+      expect(payload['initialState']).toEqual({ rows: [{ id: '1', name: 'Alice' }] });
+    });
+
+    it('bridges a render_component tool_call using legacy `name` arg shape', () => {
+      const session = createMockSession();
+
+      const line = JSON.stringify({
+        type: 'tool_use',
+        id: 'toolu_test_2',
+        name: 'render_component',
+        input: {
+          name: 'DataTable',
+          props: { rows: [{ id: '2', name: 'Bob' }] },
+        },
+      });
+
+      __test_handleParsedLine(session, line, 'claude-code');
+
+      const mounted = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'COMPONENT_MOUNTED');
+      expect(mounted).toBeDefined();
+      const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['initialState']).toEqual({ rows: [{ id: '2', name: 'Bob' }] });
+    });
+
+    it('does not bridge non-render_component tool calls', () => {
+      const session = createMockSession();
+
+      const line = JSON.stringify({
+        type: 'tool_use',
+        id: 'toolu_test_3',
+        name: 'find_ui_component',
+        input: { intent: 'cart' },
+      });
+
+      __test_handleParsedLine(session, line, 'claude-code');
+
+      const mounted = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'COMPONENT_MOUNTED');
+      expect(mounted).toBeUndefined();
+
+      // Tool call should still surface as chat.event for the chat panel.
+      const toolEvent = session.ws.sentMessages
+        .map((m) => JSON.parse(m) as Record<string, unknown>)
+        .find((f) => f.type === 'chat.event');
+      expect(toolEvent).toBeDefined();
     });
   });
 });
