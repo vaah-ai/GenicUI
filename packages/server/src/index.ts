@@ -31,8 +31,8 @@ interface HealthResponse {
   status: 'ok';
 }
 
-const PORT = 3040;
-const HOSTNAME = '0.0.0.0';
+const PORT = Number(process.env.GENICUI_PORT) || 3040;
+const HOSTNAME = process.env.GENICUI_HOSTNAME ?? '0.0.0.0';
 
 /**
  * Pre-computed hash store for API key validation.
@@ -173,6 +173,21 @@ export function createServer() {
 
   // Main app with open health endpoint, WebSocket, and MCP routes
   const app = new Elysia()
+    // Permissive CORS for dev (playground on :3040, PoC on :8080). The
+    // production deployment should restrict this to known origins.
+    .onRequest(({ set, request }) => {
+      const origin = request.headers.get('origin');
+      if (origin) {
+        set.headers['Access-Control-Allow-Origin'] = origin;
+        set.headers['Access-Control-Allow-Credentials'] = 'true';
+        set.headers['Vary'] = 'Origin';
+      }
+      set.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS';
+      set.headers['Access-Control-Allow-Headers'] =
+        'Content-Type, Authorization, X-Requested-With, Mcp-Session-Id, Last-Event-Id';
+      set.headers['Access-Control-Max-Age'] = '86400';
+    })
+    .options('/*', () => new Response(null, { status: 204 }))
     .get('/health', (): HealthResponse => ({
       status: 'ok',
     }))

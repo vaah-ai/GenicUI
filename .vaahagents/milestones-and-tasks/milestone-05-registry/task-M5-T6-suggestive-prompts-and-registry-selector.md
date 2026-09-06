@@ -367,3 +367,226 @@ Each registry's `registry.json` includes an `examplePrompts` array of human-writ
   meta-bracket styling
 - `examples/playground/app/composables/__tests__/chat.test.ts` —
   5 new tests, 2 updated
+
+---
+
+## Follow-up — `.mcp.json` port fix (2026-09-07)
+
+> **Trigger:** User feedback "it was working in POP but not in playground, if
+> we can replicate similar behaviour genic UI is of no use" + user question
+> "how to register genic ui mcp server?"
+>
+> **Scope:** Fix `.mcp.json` so Claude Code (when invoked by the server's
+> claude-code adaptor) actually reaches the GenicUI MCP endpoint and sees
+> `render_component` in its toolset.
+
+### Root cause
+
+The GenicUI server runs on **port 3041** (per `start.sh`'s
+`SERVER_PORT=3041` override). Port 3040 is the Nuxt playground HTTP
+server — different process entirely. The repo's `.mcp.json` was
+pointing at `http://localhost:3040/mcp` so:
+
+1. `mcp-remote` (the stdio→HTTP bridge Claude Code spawns) tried to
+   open an HTTP connection to port 3040.
+2. Port 3040 is the Nuxt HTML server; it returned a 200 with the
+   playground's HTML page, not JSON-RPC.
+3. The MCP handshake failed silently. Claude Code never saw
+   `render_component` in its toolset.
+4. Even when the registry was selected and the primevue
+   `examplePrompts` were loaded, Claude Code defaulted to emitting
+   markdown tables because that was the only rendering option
+   visible to it.
+
+### Fix
+
+`.mcp.json` (project root) now points at port 3041:
+
+```json
+{
+  "mcpServers": {
+    "genicui": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["mcp-remote", "http://localhost:3041/mcp"],
+      "alwaysLoad": true
+    }
+  }
+}
+```
+
+The server's claude-code adaptor already passes this path to the
+spawned claude subprocess via `--mcp-config <path>`. No code change
+needed.
+
+### Verification
+
+```
+$ curl -sS -X POST http://localhost:3041/mcp \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json, text/event-stream" \
+    -d '{"jsonrpc":"2.0","id":1,"method":"initialize", ...}'
+
+{"result":{"protocolVersion":"2024-11-05","capabilities":{"tools":
+{"listChanged":true}},"serverInfo":{"name":"genicui","version":"0.1.0"}}, ...}
+
+$ curl -sS -X POST http://localhost:3041/mcp \
+    -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+
+{"result":{"tools":[
+  {"name":"find_ui_component", ...},
+  {"name":"render_component", ...},
+  {"name":"update_component", ...},
+  {"name":"subscribe_to_events", ...}
+]}, ...}
+```
+
+All 4 public tools are advertised. Claude Code subprocesses spawned
+by the playground's chat handler will now load `render_component`
+into their toolset via `--mcp-config .mcp.json`.
+
+### Files modified
+
+- `.mcp.json` — port 3040 → 3041
+
+### Committed
+
+- `1e29e335` `[MCP] Point .mcp.json at GenicUI server port 3041`
+
+### Open follow-up (low priority)
+
+`packages/server/src/index.ts:34` still has
+`const PORT = Number(process.env.GENICUI_PORT) || 3040;` as the
+default. Standalone `bun --cwd packages/server run dev` would still
+collide with the Nuxt playground. Either bump the default to 3041
+or rename Nuxt's default to avoid the trap. Not blocking — `start.sh`
+already handles it.
+
+---
+
+## Follow-up — Stdio MCP entry point (2026-09-07)
+
+> **Trigger:** User observed Claude Code responding "I'll produce a
+> self-contained PrimeVue `DataTable`..." and writing Vue component
+> files instead of calling `render_component`. Investigation showed
+> `mcp-remote` (Claude Code's default stdio→HTTP bridge) refused to
+> connect to the GenicUI MCP HTTP endpoint.
+>
+> **Scope:** Serve the GenicUI MCP server directly on stdio so
+> Claude Code sees `render_component` as a registered tool without
+> needing an HTTP bridge.
+
+### Root cause
+
+`mcp-remote` (the standard stdio-to-HTTP bridge Claude Code uses
+when an MCP server is only reachable over HTTP) **insists on
+OAuth 2.0 by default**. On connect it probes for:
+
+- `/.well-known/oauth-protected-resource`
+- `/.well-known/oauth-authorization-server`
+- `/.well-known/openid-configuration`
+
+The GenicUI server implements none of these — returns 404 for all
+of them — so `mcp-remote` aborts the connection with `Failed to
+connect: genicui`. Claude Code never sees `render_component` in
+its toolset, even when the HTTP endpoint is healthy and
+`curl /mcp -d tools/list` returns all 4 tools.
+
+The previous port fix (`1e29e335`) made the server reachable but
+the bridge still refused to talk without OAuth metadata.
+
+The failure is silent in MCP status (`pending` → `Failed to
+connect`) which made it easy to misdiagnose as a port or health
+issue. Direct Claude Code debugging with `WaitForMcpServers` and
+`mcp-remote --debug` revealed the OAuth probing chain.
+
+### Fix
+
+Serve MCP over stdio directly. The GenicUI server already had
+`startStdioMcpServer()` in `packages/server/src/mcp/server.ts` —
+just lacked an entry script.
+
+**New file: `packages/server/bin/mcp-stdio.ts`**
+
+```ts
+import { startStdioMcpServer } from '../src/mcp/server.js';
+
+const server = await startStdioMcpServer();
+
+const keepAlive = new Promise<void>((resolve) => {
+  process.stdin.on('close', () => resolve());
+  process.stdin.on('end', () => resolve());
+});
+
+await keepAlive;
+await server.close();
+```
+
+Writes ONLY to stderr (stdout is the MCP wire). Keeps process
+alive until stdin closes.
+
+**Updated `.mcp.json`** (and `~/.claude.json`):
+
+```json
+{
+  "mcpServers": {
+    "genicui": {
+      "type": "stdio",
+      "command": "bun",
+      "args": [
+        "run",
+        "/Users/pk/Projects/GenicUI/packages/server/bin/mcp-stdio.ts"
+      ],
+      "alwaysLoad": true
+    }
+  }
+}
+```
+
+### Verification (end-to-end)
+
+```
+$ printf '%s\n' '{...initialize...}' '{...notifications/initialized}' \
+    '{...tools/list...}' \
+  | bun packages/server/bin/mcp-stdio.ts
+-> initialize response with protocolVersion=2024-11-05
+-> tools/list response with 4 tools
+
+$ claude --mcp-config .mcp.json --print 'Use render_component...'
+-> system/init: genicui status=connected, 4 tools registered
+-> assistant tool_use: mcp__genicui__render_component
+   input={name: 'DataTable', props: {rows: [...]}}
+-> tool_result: componentId=da-b476b95a-TT7AGJN4G903CCY42V78EX4W74
+```
+
+### Files modified
+
+- `packages/server/bin/mcp-stdio.ts` (new) — stdio entry point
+- `.mcp.json` — switch from `mcp-remote http://...` to
+  `bun packages/server/bin/mcp-stdio.ts`
+- `~/.claude.json` — same change in global config
+
+### Committed
+
+- `fc49c2e` `[MCP] Run GenicUI MCP server on stdio, drop mcp-remote OAuth bridge`
+
+### Follow-up to consider (not blocking)
+
+- `packages/server/package.json` could add a `"mcp"` script
+  (`bun run packages/server/bin/mcp-stdio.ts`) so `.mcp.json` can
+  reference the script name instead of an absolute path. Requires
+  `bun run --cwd packages/server mcp` to work from any directory.
+- The HTTP `/mcp` endpoint stays for non-Claude Code clients.
+  Document this in `packages/server/src/mcp/server.ts` so future
+  contributors don't delete one path thinking it's redundant.
+
+### Lesson
+
+When debugging "Claude Code doesn't see my MCP tool":
+
+1. Check `mcp-remote --debug` output for OAuth metadata probing
+   before assuming port/health/auth issues.
+2. If your MCP server doesn't do OAuth, run it on stdio directly
+   instead of routing through `mcp-remote`.
+3. The MCP spec requires OAuth for streamable HTTP servers;
+   stdio is the simpler contract.
