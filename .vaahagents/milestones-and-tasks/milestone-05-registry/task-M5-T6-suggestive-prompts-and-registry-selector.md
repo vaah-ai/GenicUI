@@ -254,3 +254,116 @@ Each registry's `registry.json` includes an `examplePrompts` array of human-writ
 - `packages/server/src/chat/chat-handler.test.ts` — 3 bridge tests
 - `examples/playground/app/app.vue` — subscribe components to WS
 - `~/.claude.json` — global genicui MCP server → port 3040
+
+---
+
+## Follow-up — Client-side chat panel streaming (2026-09-07)
+
+> **Trigger:** Playwright UAT after the bridge fixes showed chat panel
+> stuck on "Awaiting response" dots; 22+ frames were received from the
+> server but no streaming text rendered in the chat panel.
+>
+> **Scope:** Wire the playground's chat panel so it consumes the
+> streaming frames the server is already sending.
+
+### Root causes identified
+
+5. **`useWebSocket` was not a singleton.** Three components
+   (`app.vue`, `ConfigPanel.vue`, `RenderSurface.vue`) each called
+   `useWebSocket()` and got their own socket. ConfigPanel's Connect
+   opened socket #2; `useChat` (from RenderSurface) was wired to
+   socket #3 which was still `disconnected`. Symptom: "Cannot send
+   — not connected" warning on chip click, even though the panel
+   looked connected.
+6. **`useChat` had no handlers for `chat.event` / `chat.complete`.**
+   ConfigPanel's `ws.onMessage` only routed `chat.response` and
+   `chat.error`. The claude-code adaptor broadcasts `chat.event`
+   for every streaming chunk and `chat.complete` to close the turn
+   — both arrived but were dropped.
+7. **Chat event type names did not match.** `useChat.handleEvent()`
+   switched on Claude's raw stream-json envelope names (`text`,
+   `tool_use`, `tool_result`). The claude-code adaptor remaps those
+   to `ai_text`, `tool_call`, `tool_result`, `error`, `stderr`,
+   `status` before broadcast (`mapStreamJsonEvent` in
+   `packages/server/src/chat/providers/claude-code.ts`). The UI must
+   consume the adaptor's names, not Claude's.
+
+### Implementation
+
+1. **Singleton WebSocket** — `examples/playground/app/composables/useWebSocket.ts`
+   - All state refs (`state`, `sessionId`, `serverVersion`,
+     `messageCount`, `errorMsg`, `retryCount`), the `socket` handle,
+     the `reconnectTimer`, and the `handlers: Set` live at module
+     scope. `useWebSocket()` returns the shared reactive refs and
+     bound methods. All callers see one connection.
+
+2. **chat.event + chat.complete handlers** — `examples/playground/app/composables/useChat.ts`
+   - New `AssistantStatus = 'pending' | 'streaming' | 'complete' | 'error'`.
+   - `ChatMessage` gains `status: AssistantStatus`.
+   - `sendMessage()` sets status=`pending` on push.
+   - First `ai_text` chunk promotes status=`streaming`.
+   - New `handleEvent(frame)` switch: `ai_text` appends chunk;
+     `tool_call` adds `[calling <name>…]` annotation; `tool_result`
+     adds `[tool returned <N> chars]`; `error` adds `[error: <msg>]`;
+     `stderr` logs to console; everything else ignored.
+   - New `handleComplete(frame)` sets status=`complete` (or `error`
+     when reason=`error`) and clears `isLoading`.
+   - `handleError()` sets status=`error` on the latest message and
+     clears `isLoading`.
+
+3. **Frame router** — `examples/playground/app/components/ConfigPanel.vue`
+   - `ws.onMessage((frame) => { ... })` now dispatches all four
+     chat frame types: `chat.response`, `chat.event`, `chat.complete`,
+     `chat.error`.
+
+4. **Status-aware rendering** — `examples/playground/app/components/ChatHistory.vue`
+   - Three-way conditional: frozen text if `msg.response`; typing
+     dots if `status === 'streaming'`; awaiting dots otherwise.
+   - Bubble class is `chat-bubble-${msg.status}` so
+     `chat-bubble-streaming` / `chat-bubble-error` apply distinct
+     border + background.
+   - `formatResponse()` escapes HTML and wraps `[...]` meta brackets
+     in `<span class="chat-meta-inline">` for faint mono treatment.
+
+### Tests added
+
+- `examples/playground/app/composables/__tests__/chat.test.ts`:
+  25 total (was 20), including:
+  - `handleEvent appends a text chunk to the latest message` —
+    `ai_text {text: 'world'}` → response='world' + status='streaming'
+  - `handleEvent appends a tool_call annotation` —
+    `tool_call {name: 'render_component'}` →
+    response contains `[calling render_component…]`
+  - `handleEvent ignores events with no event field` (defensive)
+  - `handleComplete sets status=complete and clears isLoading`
+  - `handleComplete with reason=error sets status=error`
+  - Updated `handleResponse` test to assert `status: 'complete'`
+  - Updated exposed-methods test to include `handleEvent` +
+    `handleComplete`
+
+### Verification
+
+- 25/25 playground composable tests pass
+- Live Playwright UAT (2026-09-07): full chat turn streams
+  pending → streaming → complete; two successful prompt→response
+  cycles in one session; 22+ frames received from server;
+  status class transitions observed in DOM.
+- Claude Code prefers markdown tables over calling
+  `render_component` even when the registry is selected —
+  model behavior, not a plumbing bug. The bridge code path is
+  verified by 35 server-side tests.
+
+### Files modified (client follow-up)
+
+- `examples/playground/app/composables/useWebSocket.ts` — singleton
+  rewrite (state + socket + handlers at module scope)
+- `examples/playground/app/composables/useChat.ts` —
+  `AssistantStatus` + `handleEvent` + `handleComplete` + status
+  transitions
+- `examples/playground/app/components/ConfigPanel.vue` — wire all
+  four chat frame types
+- `examples/playground/app/components/ChatHistory.vue` — status
+  classes, conditional pending/streaming text-vs-dots, mono
+  meta-bracket styling
+- `examples/playground/app/composables/__tests__/chat.test.ts` —
+  5 new tests, 2 updated
