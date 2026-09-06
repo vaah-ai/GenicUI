@@ -26,6 +26,8 @@ export interface RenderResult {
   readonly componentId: string;
   /** The channel associated with this component. */
   readonly channel: string;
+  /** The component name as the caller requested it (e.g. "DataTable"). */
+  readonly name: string;
   /** The component's props schema (JSON Schema). */
   readonly schema: Readonly<Record<string, unknown>>;
   /** The events this component can emit. */
@@ -114,6 +116,7 @@ export function renderComponent(
     return {
       componentId: '',
       channel: '',
+      name: input.name,
       schema: {},
       events: [],
       initialState: {},
@@ -133,6 +136,7 @@ export function renderComponent(
     return {
       componentId: '',
       channel: '',
+      name: input.name,
       schema: {},
       events: [],
       initialState: {},
@@ -155,6 +159,7 @@ export function renderComponent(
         return {
           componentId: existing.componentId,
           channel: existing.channel,
+          name: existing.name,
           schema: entry.propsJsonSchema,
           events: entry.events,
           initialState: input.props,
@@ -182,6 +187,7 @@ export function renderComponent(
   return {
     componentId,
     channel,
+    name: input.name,
     schema: entry.propsJsonSchema,
     events: entry.events,
     initialState: input.props,

@@ -590,3 +590,329 @@ When debugging "Claude Code doesn't see my MCP tool":
    instead of routing through `mcp-remote`.
 3. The MCP spec requires OAuth for streamable HTTP servers;
    stdio is the simpler contract.
+
+---
+
+## Follow-up — Bridge breaks after stdio MCP move (2026-09-07)
+
+> **Trigger:** After switching `genicui` MCP to stdio (previous follow-up),
+> Playwright UAT showed `Messages received: 11` (frames flowing)
+> but `Components count: 0`. The earlier "render_component bridge"
+> follow-up had landed the bridge code, but the MCP-wrapped tool name
+> + server-init seq seed + payload-path read combined to silently
+> drop every COMPONENT_MOUNTED frame on the floor.
+>
+> **Scope:** Restore the bridge path through three stacked bug fixes
+> so `render_component` (via MCP) produces a mounted component in the
+> playground sidebar.
+
+### Root causes identified
+
+6. **MCP-prefixed tool name.** Claude Code's MCP wrapper emits
+   `tool_use.name` as `mcp__genicui__render_component`, but the bridge
+   compared against the bare string `render_component`. Every MCP-wrapped
+   call silently no-op'd; the playground never even saw the bridge try.
+7. **Server-init frames held against seq 0.** `ChannelMultiplexer`
+   uses a shared `session.seqGenerator` — so the first outgoing
+   frame on a brand-new channel (e.g. `da-cba7c15d-…`) typically
+   arrives with `seq = 12n` or higher, not `0n`. The `FrameBuffer`
+   starts `nextExpectedSeq = 0n` per channel and only flushes from
+   the expected seq upward, so server-init frames were buffered
+   indefinitely (no client frame with seq 0 was ever going to fill
+   the gap). The bridge logs `[chat] bridged render_component -> …`
+   but no WS frame ever reached the client.
+8. **Schema read from envelope root, not payload.** Bridge writes
+   `{ componentId, channel, schema, initialState }` under
+   `frame.payload` per F11/F16 wire contract, but the playground's
+   `useComponents.handleMounted()` read them from `frame.*`. Schema
+   was `undefined`, so `x-genicui-name` threw and the new component
+   silently fell back to the generic "Component" name (and would
+   have failed entirely once the schema started carrying required
+   shape metadata).
+
+### Implementation
+
+1. **`isRenderComponentCall(name: unknown)` helper** — `packages/server/src/chat/chat-handler.ts`
+   - Accepts both `render_component` (bare) and
+     `mcp__<server>__render_component` (MCP-prefixed).
+   - Regex `^mcp__[^_]+(?:_[^_]+)*__render_component$` allows dashes
+     in the server segment and tail-matches so `not_render_component`
+     etc. don't false-positive.
+
+2. **`ChannelMultiplexer.dispatchServerFrame()` + `FrameBuffer.primeForServerInit()`** —
+   `packages/server/src/transport/channel-multiplexer.ts` + `packages/core/src/protocol/buffer.ts`
+   - New `dispatchServerFrame()` parallels `dispatch()` but calls
+     `state.buffer.primeForServerInit(channel, frame.seq)` first.
+   - `primeForServerInit()` seeds `nextExpectedSeq = seq` ONLY when
+     it is still `0n` (i.e. this is the first frame on this channel);
+     subsequent server-init frames continue to flow through `add()`
+     normally so any interleaved client frames still order correctly.
+   - Server bridge switched from `session.multiplexer.dispatch(frame)`
+     to `session.multiplexer.dispatchServerFrame(frame)`.
+
+3. **Payload-path schema read** — `examples/playground/app/composables/useComponents.ts`
+   - `handleMounted()` now reads `componentId`, `channel`, `schema`,
+     `initialState` from `frame.payload.*`, not the envelope root.
+   - `schema ?? {}` defensive default; logs and returns early when
+     payload is missing entirely instead of throwing.
+
+### Tests added
+
+- `packages/core/src/protocol/protocol.test.ts` — 3 new tests in
+  `F3-AC2: FrameBuffer` describe block (now 24 total in protocol suite):
+  - `primeForServerInit() seeds nextExpectedSeq so server-initiated
+    frames flush immediately`
+  - `primeForServerInit() is a no-op once the channel has already advanced`
+  - `primeForServerInit() is a no-op on a different channel`
+- `packages/server/src/chat/chat-handler.test.ts` — 2 new MCP-prefix
+  regression tests (now 12 total):
+  - `bridges an MCP-prefixed render_component tool_call
+    (mcp__<server>__render_component)` — assistant envelope with
+    embedded tool_use
+  - `bridges an MCP-prefixed render_component in compact
+    (top-level tool_use) form`
+  - `RecordingMultiplexer` mock updated with a `dispatchServerFrame()`
+    method to match the new bridge path.
+
+### Verification
+
+- `bun test packages/core/src/protocol` → 24 pass / 0 fail
+- `bun test packages/server/src/chat/chat-handler.test.ts` → 12 pass / 0 fail
+- End-to-end Playwright UAT (click "Show me a data table with orders"
+  prompt, server spawns Claude Code via stdio MCP, render_component
+  MCP tool bridges to COMPONENT_MOUNTED, playground `useComponents`
+  flips from 0 → 1 component, sidebar shows
+  `Component da-cba7c15d-…`). Center column still showed "Pick a
+  prompt to render" because the bridge schema's `x-genicui-name`
+  is empty (component is rendered with the generic "Component"
+  name and `RenderSurface` only auto-renders known registry names)
+  — see "Open follow-up" below.
+
+### Files modified (follow-up)
+
+- `packages/server/src/chat/chat-handler.ts` —
+  `isRenderComponentCall()` helper + bridge name match + switch to
+  `dispatchServerFrame()` in `bridgeRenderComponent()`.
+- `packages/server/src/chat/chat-handler.test.ts` — 2 MCP-prefix
+  regression tests + `RecordingMultiplexer.dispatchServerFrame()`
+  mock.
+- `packages/core/src/protocol/buffer.ts` — `primeForServerInit()`
+  method with docblock explaining the global-seq-vs-per-channel-seq
+  hazard.
+- `packages/core/src/protocol/protocol.test.ts` — 3
+  `primeForServerInit` tests.
+- `packages/server/src/transport/channel-multiplexer.ts` —
+  `dispatchServerFrame()` parallel to `dispatch()`.
+- `examples/playground/app/composables/useComponents.ts` —
+  `handleMounted()` reads `frame.payload.*` per F11/F16.
+
+### Committed
+
+- `ffd5973` `feat(F43): [M5-T6] Providers dropdown + dedicated Socket connection button`
+- `d33359b` `fix(F43): Bridge render_component through MCP-prefixed names + server-init seq seed`
+
+### Open follow-up (low priority)
+
+- `bridgeRenderComponent()` doesn't populate the schema's
+  `x-genicui-name` from the registry catalog lookup, so mounted
+  components arrive at the playground with the generic name
+  "Component" rather than "DataTable" etc. The sidebar works
+  (component is registered) but the center render surface — which
+  routes by registry component name — doesn't auto-pick the
+  component up. Two options to land in a follow-up task:
+  1. Bridge populates `schema['x-genicui-name']` from the
+     `componentStore.get(name)?.displayName` before dispatching.
+  2. `RenderSurface` falls back to rendering any mounted component
+     whose `channel` is unknown, using a generic
+     `<DynamicRegistry>` slot.
+- `FrameBuffer.add()` does not warn when a server-init prime is
+  overridden by an in-flight client frame; harmless today because
+  `primeForServerInit()` short-circuits when `nextExpectedSeq` is
+  already non-zero, but worth a defensive log if the channel ever
+  serves both directions simultaneously.
+
+### Lesson
+
+When adding server-init dispatch to a frame protocol that assumed
+client-init sequencing:
+
+1. **Don't share a per-session seq counter across channels and
+   protocols.** Fresh channels rarely start at the global counter
+   floor. Either (a) per-channel sequence generators, or (b)
+   explicitly seed expected seq on the first server frame — we
+   chose (b) so existing test ergonomics and wire-level reasoning
+   stay simple.
+2. **Wire contract + client reader must agree on field placement.**
+   `frame.payload` vs `frame` root is a one-line typo that silently
+   no-ops the whole feature. Either use a discriminated union for
+   every frame in shared protocol types, or write a contract test
+   that round-trips a sample COMPONENT_MOUNTED through the
+   playground decoder.
+3. **MCP wrappers mangle tool names.** Any tool-call bridge code
+   needs to accept both bare names and `mcp__<server>__<name>`
+   forms; this is a Claude Code invariant, not a GenicUI quirk.
+
+---
+
+## Follow-up — Claude Code–style chat panel + prompt input bar (2026-09-07)
+
+> **Trigger:** Post-F43 UAT feedback. The chat panel only ever showed
+> optimistic state + legacy echo (no free-text input bar existed; chips
+> were the only trigger). The assistant bubble flattened tool calls to
+> inline `[calling render_component…]` text, which hides the bridge
+> payload and makes MCP-prefixed tool names impossible to inspect.
+>
+> **Scope:** Convert the playground chat into a Claude Code–style UI
+> with a real prompt input bar, structured tool-call accordions, and
+> chips that fill-and-auto-submit through the input.
+
+### Root causes identified
+
+9. **`useChat` was never subscribed to the WebSocket.** `app.vue`
+   wired `useComponents` to `ws.onMessage` but never `useChat`.
+   Frames on the `__chat__` channel (`chat.event`, `chat.complete`,
+   `chat.error`) were silently dropped — the chat panel only ever
+   displayed the optimistic pending state and (when no provider was
+   configured) the legacy `chat.response` echo. With a provider
+   configured (the default M5-T6 state) every free-text prompt sent
+   by a future input bar would also be invisible.
+10. **Tool calls flattened to inline text.** `useChat.handleEvent`
+    appended `[calling <name>…]` / `[tool returned N chars]` to a
+    single `response` string. The Claude Code CLI shows each tool
+    invocation as a collapsible accordion with raw input + result,
+    which is essential for debugging the `render_component` bridge.
+    The current text flattening also loses MCP-prefixed tool names
+    (`mcp__genicui__render_component` was rendered as just
+    "render_component").
+11. **No free-text input existed.** The center "Pick a prompt to
+    render" hero was the only way to fire a prompt. This blocks any
+    free-form testing ("explain what just happened") and made the
+    chat panel feel decorative — the user wanted chips to become
+    quick-starts that fill the input AND auto-submit.
+
+### Implementation
+
+1. **`useChat` subscribed in `app.vue`** — the load-bearing fix.
+   - Single `ws.onMessage` subscription filters on
+     `frame.channel === '__chat__'` and dispatches
+     `chat.response` / `chat.event` / `chat.complete` / `chat.error`
+     to the matching `useChat` handler. Unsubscribe on unmount.
+
+2. **`ChatMessage` carries a structured `toolCalls: ToolCallEntry[]`**
+   in `useChat.ts`. `handleEvent` rewrite:
+   - `ai_text` → append to `response` (unchanged).
+   - `tool_call` → push `{ id, name, input, status: 'running',
+     startedAt }` to `toolCalls`. Falls back to matching by most
+     recent running entry if `id` is absent (provider field-name
+     variance).
+   - `tool_result` → find entry by `id` (or last running), set
+     `result`, flip status to `'done'`.
+   - `error` (tool-level) → set `toolCalls[i].error`, flip status to
+     `'error'`. Prose-level `error` events still append to `response`.
+
+3. **`ChatHistory.vue` reskin** — user bubble right-aligned on
+   `--gp-accent-subtle`, assistant bubble left-aligned on
+   `--gp-surface`. Role badges + timestamps retained. Each entry in
+   `toolCalls` renders a `<ToolCallAccordion>` below the prose.
+
+4. **`ToolCallAccordion.vue`** (new) — single-purpose stateless
+   component. Renders `<details>` mirroring the
+   `component-card-props` pattern (`RenderSurface.vue` lines 83-102):
+   chevron rotates 180° on `[open]`, two `<pre>` blocks (input +
+   result) in `--gp-font-mono`, status pill (running = `--gp-accent`,
+   done = `--gp-text-muted`, error = faint red border).
+
+5. **`ChatInput.vue`** (new) — native `<textarea rows="1">` +
+   ghost-button send (mirrors `.chat-clear-btn` style). Disabled
+   when `ws.state !== 'connected'`. Enter submits, Shift+Enter
+   inserts newline, auto-grows up to 5 rows via `scrollHeight` after
+   `nextTick`. `prefers-reduced-motion` block kills height
+   transitions. Focus-ring convention matches the rest of the
+   playground.
+
+6. **`useChatInput` composable** (new) — module-level singleton
+   mirroring `useChat` / `useProviders` / `useRegistries`. Carries
+   `draft`, `submitRequested`, `fillAndSubmit(prompt)`, `clear()`.
+   Lets the chip click (in `RenderSurface`) and the input bar (in
+   `ChatPanel`) share state without prop drilling.
+
+7. **`RenderSurface` chips → `input.fillAndSubmit(prompt)`** —
+   chips become quick-starts that fill the input bar AND
+   auto-submit. `ChatInput` watches `submitRequested`, fires
+   `handleSubmit()`, then `input.clear()` so the next chip click
+   works again.
+
+8. **`ChatPanel.vue` layout** — `chat-panel-body` becomes a flex
+   column with `ChatHistory` (`flex: 1 1 auto, overflow-y: auto`)
+   on top and `ChatInput` (`flex: 0 0 auto`) at the bottom. Submit
+   handler reads `registries.selected()` + `providers.getWirePayload()`
+   and calls `chat.sendMessage(prompt, ws, reg?.id, payload)` —
+   verbatim copy of the existing `RenderSurface.handlePromptSelect`
+   pattern.
+
+### Acceptance criteria
+
+- [ ] Enter in chat input submits (Shift+Enter inserts newline)
+- [ ] Input bar disabled until WS is `connected`
+- [ ] Chip click fills input bar AND auto-submits
+- [ ] Free-text input uses currently selected registry
+- [ ] Each `tool_call` event renders as a collapsible accordion
+- [ ] Accordion input/result shown as JSON in `--gp-font-mono`
+- [ ] `tool_result` flips status from `running` → `done`
+- [ ] MCP-prefixed tool names (`mcp__<genicui>__render_component`)
+      rendered correctly in the accordion header
+- [ ] Empty chat state copy: "Send a prompt or click a chip below."
+- [ ] Focus rings on input + send button (2px `--gp-accent`)
+- [ ] `prefers-reduced-motion` kills input-resize transitions
+- [ ] `bun test examples/playground` exits green
+
+### Verification (end-to-end)
+
+1. Open `http://localhost:3040/` after `bash examples/playground/start.sh`.
+2. Type "What is a data table?" → Enter → assistant bubble streams.
+3. Click a registry prompt chip → input bar fills AND auto-submits.
+4. Send a render-component prompt ("Show me a data table with orders")
+   → MCP-prefixed `mcp__genicui__render_component` accordion appears
+   under the assistant bubble → expand → see raw `{ componentName,
+   props }` JSON → component card appears in `RenderSurface`.
+5. Disconnect WS → input bar disables + send button greys out.
+6. Tab from input → focus lands on send button → Enter submits.
+
+### Files to modify (chat follow-up)
+
+- `examples/playground/app/composables/useChat.ts` — structured
+  `toolCalls`, `handleEvent` rewrite
+- `examples/playground/app/app.vue` — `useChat` WS subscription
+- `examples/playground/app/components/ChatPanel.vue` — add
+  `<ChatInput>`, wire submit handler
+- `examples/playground/app/components/ChatHistory.vue` — render
+  tool-call accordions, bubble reskin
+- `examples/playground/app/components/RenderSurface.vue` — chip
+  click → `input.fillAndSubmit(prompt)`
+- `examples/playground/app/composables/__tests__/chat.test.ts` —
+  update old `tool_call` assertion + add `tool_result`,
+  MCP-prefixed, `useChatInput` cases
+
+### Files to create (chat follow-up)
+
+- `examples/playground/app/components/ChatInput.vue`
+- `examples/playground/app/components/ToolCallAccordion.vue`
+- `examples/playground/app/composables/useChatInput.ts`
+- (optional) `examples/playground/app/components/__tests__/ChatInput.test.ts`
+
+### Committed
+
+- `9d3e58b` — feat(F43): [M5-T6] Claude Code–style chat panel + prompt input bar. 9 files (3 created: `ChatInput.vue`, `ToolCallAccordion.vue`, `useChatInput.ts`; 6 modified). 36 chat tests pass, 44 playground tests pass.
+- `ee64fd7` — fix(F43): [M5-T6] Make ChatInput `disabled`/`placeholder` reactive to WS state. Plain arrow functions in the template froze at setup-time, leaving the input stuck disabled even after the topbar showed green "Connected". Converted to `computed`. See [[genicui-f43-chat-panel-followup]].
+- *(pending)* — fix(F43): [M5-T6] Broadcast MCP `render_component` to connected WS sessions. Stateless `/mcp` handler now calls `broadcastComponentMountedAll()` on successful `tools/call` results, fixing the long-standing "MCP renders never reach the playground" bug. Side effects: `useComponents` hoisted to module-level singleton, `RenderResult` now carries `name`, `useComponents.handleMounted` reads `payload.name` instead of crashing on a missing `schema['x-genicui-name']`. See [[genicui-f43-mcp-broadcast]].
+
+### Lesson
+
+When wiring multiple reactive stores to a single WebSocket, every
+consumer must explicitly subscribe and filter — the protocol is
+broadcast-only. `app.vue` is the single subscription point for
+top-level stores (`useComponents` + now `useChat`); forgetting any
+one means that store silently never reacts to frames. A small
+`useFrameRouter` helper that exposes `chatFrames$, componentFrames$`
+observables would prevent this class of bug in future work.
+

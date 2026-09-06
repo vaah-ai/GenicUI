@@ -30,6 +30,7 @@
 
 import type { WsSession } from '../transport/types.js';
 import { serializeFrame } from '../transport/frame-handler.js';
+import { broadcastToAllSessions } from '../transport/websocket.js';
 import { getProviderAdaptor } from './providers/registry.js';
 import type { ProviderConfig, ChatEvent } from './providers/types.js';
 import {
@@ -38,7 +39,7 @@ import {
   getClaudeSession,
   setActiveSubprocess,
 } from './chat-session-registry.js';
-import { renderComponent } from '../mcp/render-handler.js';
+import { renderComponent, type RenderResult } from '../mcp/render-handler.js';
 
 /**
  * A chat message from the frontend.
@@ -430,6 +431,7 @@ function bridgeRenderComponent(
     payload: {
       componentId: result.componentId,
       channel: result.channel,
+      name: result.name,
       schema: result.schema,
       initialState: result.initialState,
     },
@@ -450,6 +452,49 @@ function bridgeRenderComponent(
   console.error(
     `[chat] bridged render_component -> ${name} componentId=${result.componentId} (channel=${result.channel})`,
   );
+}
+
+/**
+ * Broadcast a successful `renderComponent()` result to every connected
+ * WebSocket session.
+ *
+ * Used by the stateless `/mcp` HTTP endpoint in `index.ts`: an MCP
+ * client calling `render_component` directly gets the JSON-RPC
+ * response back, but no WS client would otherwise learn about the new
+ * component. This helper delivers a `COMPONENT_MOUNTED` frame to each
+ * live session's channel multiplexer (so ordering, session recovery,
+ * and the session buffer all see it — same path `bridgeRenderComponent`
+ * uses in the chat pipeline).
+ *
+ * Each session gets its own seq value pulled from that session's
+ * `seqGenerator`, so per-session sequence order is preserved even
+ * when broadcasting to many sockets at once.
+ *
+ * @param result — Render result from `renderComponent()`. Must be a
+ *   successful result (no `error` field).
+ * @returns Number of sessions the frame was delivered to.
+ */
+export function broadcastComponentMountedAll(result: RenderResult): number {
+  const delivered = broadcastToAllSessions((session) => ({
+    v: 1 as const,
+    channel: result.channel,
+    type: 'COMPONENT_MOUNTED',
+    payload: {
+      componentId: result.componentId,
+      channel: result.channel,
+      name: result.name,
+      schema: result.schema,
+      initialState: result.initialState,
+    },
+    seq: session.seqGenerator.next(),
+  }));
+  if (delivered > 0) {
+    console.error(
+      `[mcp] broadcast render_component -> ${result.name} componentId=${result.componentId} ` +
+        `(channel=${result.channel}, sessions=${delivered})`,
+    );
+  }
+  return delivered;
 }
 
 /**

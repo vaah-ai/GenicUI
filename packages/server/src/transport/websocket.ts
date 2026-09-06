@@ -13,6 +13,7 @@
 
 import type { ServerWebSocket } from 'bun';
 import { SequenceGenerator } from '@genicui/core';
+import type { FrameEnvelope } from '@genicui/core';
 import type { WsSession, ServerHelloPayload } from './types.js';
 import {
   GENICUI_SUBPROTOCOL,
@@ -58,6 +59,17 @@ const SERVER_VERSION = '0.1.0';
  * uses `ws.raw` (the raw ServerWebSocket).
  */
 const SESSION_REGISTRY = new WeakMap<object, WsSession>();
+
+/**
+ * Parallel set of all live WsSessions.
+ *
+ * WeakMap isn't iterable, so we need a second index to enumerate every
+ * connected session when a server-initiated frame needs to broadcast to
+ * all of them (e.g. a `render_component` MCP call hitting the
+ * stateless `/mcp` endpoint — see `index.ts`). Lifecycle mirrors
+ * SESSION_REGISTRY: added in `open()`, removed in `close()`.
+ */
+const SESSIONS = new Set<WsSession>();
 
 /**
  * Elysia upgrade context — the object passed to the `upgrade` callback.
@@ -402,6 +414,10 @@ export function createWsHandler(): {
       // which IS stable for the lifetime of the connection.
       SESSION_REGISTRY.set(ws as unknown as object, session);
       if (ws.raw) SESSION_REGISTRY.set(ws.raw as object, session);
+      // Also keep in the enumerable set so broadcastToAllSessions() can
+      // reach this session (WeakMap isn't iterable). Lifecycle is
+      // mirrored in the close() handler below.
+      SESSIONS.add(session);
 
       // Start heartbeat
       startHeartbeat(session);
@@ -540,6 +556,10 @@ export function createWsHandler(): {
       // Clean up event bus (F20)
       session.eventBus.dispose();
 
+      // Drop from the broadcast index. (WeakMap entries would be
+      // GC'd via the raw WS reference, but the Set holds strong refs.)
+      SESSIONS.delete(session);
+
       // Log disconnection
       const logMsg = scrubApiKey(
         `[F10] WebSocket closed: ${session.sessionId}`,
@@ -557,6 +577,61 @@ export function createWsHandler(): {
       }
     },
   };
+}
+
+/**
+ * Broadcast a server-initiated frame to every connected session.
+ *
+ * Used by the stateless `/mcp` HTTP endpoint in `index.ts`: when an
+ * MCP client calls `render_component` directly, the response goes back
+ * to the caller, but no WS client would otherwise learn about the new
+ * component. This helper delivers a frame to each session's channel
+ * multiplexer (so ordering, session recovery, and the session buffer
+ * all see it — same path `bridgeRenderComponent` uses in `chat-handler.ts`).
+ *
+ * Returns the number of sessions the frame was dispatched to. Useful
+ * for tests; the caller doesn't need the return value in production.
+ *
+ * Iterates over the `SESSIONS` set; sessions that are mid-close
+ * (`session.destroyed === true`) are skipped defensively.
+ *
+ * @param frame — Complete frame envelope to broadcast. The caller
+ *   pre-fills `seq` from a fresh generator per session so each one
+ *   sees its own monotonic sequence.
+ * @returns Count of sessions that received the frame.
+ */
+export function broadcastToAllSessions(
+  buildFrame: (session: WsSession) => FrameEnvelope,
+): number {
+  let delivered = 0;
+  for (const session of SESSIONS) {
+    if (session.destroyed) continue;
+    const frame = buildFrame(session);
+    const dispatch = session.multiplexer.dispatchServerFrame(frame);
+    if (dispatch === null) {
+      console.error(
+        `[F10] broadcastToAllSessions: channel limit exceeded for session ${session.sessionId}`,
+      );
+      continue;
+    }
+    for (const out of dispatch.frames) {
+      session.elysiaWs.send(serializeFrame(out));
+    }
+    delivered += 1;
+  }
+  return delivered;
+}
+
+/**
+ * Current count of live WebSocket sessions.
+ *
+ * Used by tests to verify broadcast reach without poking the Set
+ * directly (the Set is module-private).
+ *
+ * @returns Number of sessions currently registered.
+ */
+export function liveSessionCount(): number {
+  return SESSIONS.size;
 }
 
 /**

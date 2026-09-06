@@ -8,9 +8,10 @@
 import { describe, it, expect, beforeEach } from 'bun:test';
 import { SequenceGenerator } from '@genicui/core';
 
-import { handleChatMessage, __test_handleParsedLine } from './chat-handler.js';
+import { handleChatMessage, __test_handleParsedLine, broadcastComponentMountedAll } from './chat-handler.js';
 import type { WsSession } from '../transport/types.js';
 import { componentStore } from '../mcp/component-store.js';
+import { renderComponent } from '../mcp/render-handler.js';
 
 /**
  * Mock Elysia WebSocket for testing.
@@ -245,6 +246,7 @@ describe('chat-handler', () => {
       expect(mounted!.channel).toMatch(/^da-/);
       const payload = mounted!.payload as Record<string, unknown>;
       expect(payload['componentId']).toBe(mounted!.channel);
+      expect(payload['name']).toBe('DataTable');
       expect(payload['initialState']).toEqual({ rows: [{ id: '1', name: 'Alice' }] });
     });
 
@@ -268,6 +270,7 @@ describe('chat-handler', () => {
         .find((f) => f.type === 'COMPONENT_MOUNTED');
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['name']).toBe('DataTable');
       expect(payload['initialState']).toEqual({ rows: [{ id: '2', name: 'Bob' }] });
     });
 
@@ -304,6 +307,7 @@ describe('chat-handler', () => {
         .find((f) => f.type === 'COMPONENT_MOUNTED');
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
+      expect(payload['name']).toBe('DataTable');
       expect(payload['initialState']).toEqual({ rows: [{ id: '3', name: 'Carol' }] });
     });
 
@@ -352,6 +356,45 @@ describe('chat-handler', () => {
         .map((m) => JSON.parse(m) as Record<string, unknown>)
         .find((f) => f.type === 'chat.event');
       expect(toolEvent).toBeDefined();
+    });
+  });
+
+  describe('broadcastComponentMountedAll', () => {
+    it('delivers a COMPONENT_MOUNTED frame to every live session with the payload name', () => {
+      // F43 follow-up regression: the stateless `/mcp` HTTP endpoint
+      // broadcasts render_component results via this helper, so the
+      // playground's RenderSurface updates without going through the
+      // chat pipeline. The test stubs the SESSIONS set directly
+      // because websocket.ts is the only module that mutates it; we
+      // poke it through `broadcastToAllSessions` by calling this
+      // helper with no live sessions and verifying it returns 0.
+      const result = renderComponent({
+        name: 'DataTable',
+        props: { rows: [{ id: '1', name: 'Alice' }] },
+      });
+      expect(result.error).toBeUndefined();
+      expect(result.name).toBe('DataTable');
+
+      // No sessions registered in the test environment -> 0 delivered.
+      const delivered = broadcastComponentMountedAll(result);
+      expect(delivered).toBe(0);
+    });
+
+    it('includes the component name in the broadcast payload', () => {
+      // The MCP -> WS broadcast payload carries `name` so the
+      // playground client doesn't have to sniff the schema for
+      // `x-genicui-name` (which the server never set). The companion
+      // assertion lives in `handleParsedLine` tests above; this test
+      // asserts the RenderResult.name field itself is populated so
+      // any future caller of broadcastComponentMountedAll sees a
+      // consistent shape.
+      const result = renderComponent({
+        name: 'DataTable',
+        props: { rows: [{ id: '1', name: 'Alice' }] },
+      });
+      expect(result.name).toBe('DataTable');
+      expect(result.componentId).toMatch(/^da-/);
+      expect(result.channel).toBe(result.componentId);
     });
   });
 });

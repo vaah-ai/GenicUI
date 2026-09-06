@@ -20,6 +20,8 @@ import {
 } from './auth/index.js';
 import { createWsHandler, wsApiKeyStore } from './transport/websocket.js';
 import { handleMcpRequest } from './mcp/index.js';
+import { broadcastComponentMountedAll } from './chat/chat-handler.js';
+import { renderComponent } from './mcp/render-handler.js';
 import { loadRegistries, getRegistries } from './registry/registries-loader.js';
 
 /**
@@ -196,10 +198,16 @@ export function createServer() {
     .ws('/ws', wsHandler as any) // cast: Elysia WS types are not exported; runtime is correct
     .use(apiApp)
     // MCP Streamable HTTP endpoint (F13)
-    // POST /mcp — handles JSON-RPC requests from MCP clients
+    // POST /mcp — handles JSON-RPC requests from MCP clients.
+    // F43 follow-up: a successful `tools/call` for `render_component`
+    // also broadcasts a `COMPONENT_MOUNTED` frame to every connected
+    // WebSocket session so the playground's RenderSurface updates in
+    // real time. The JSON-RPC response itself is unchanged.
     .post('/mcp', async (c): Promise<unknown> => {
       const message = c.body as JSONRPCMessage;
-      return handleMcpRequest(message);
+      const response = await handleMcpRequest(message);
+      broadcastRenderComponentResult(message, response);
+      return response;
     });
 
   app.listen({ port: PORT, hostname: HOSTNAME });
@@ -217,4 +225,82 @@ export function createServer() {
  */
 if (import.meta.main) {
   createServer();
+}
+
+/**
+ * If an MCP `tools/call` request invoked `render_component`, broadcast
+ * a `COMPONENT_MOUNTED` frame to every connected WebSocket session.
+ *
+ * The `/mcp` endpoint is stateless: each HTTP request creates its own
+ * MCP server, dispatches the request, and returns the JSON-RPC
+ * response. The connected browser only learns about the new component
+ * if we explicitly publish the frame over WebSocket — without this
+ * helper, MCP-driven renders never surface in the playground's
+ * RenderSurface (F43 follow-up).
+ *
+ * The helper inspects both the request and the response: the request
+ * identifies the tool name + arguments; the response confirms
+ * success and carries the component metadata. We re-call
+ * `renderComponent()` here (instead of re-parsing the JSON-RPC
+ * response payload, which is MCP-formatted and harder to type)
+ * because it's idempotent and cheap — the underlying
+ * `componentStore.register()` already deduplicates by idempotency
+ * key when provided.
+ *
+ * Notifications (no `id` field) and non-`tools/call` methods are
+ * ignored silently. Errors and validation failures are also ignored —
+ * the JSON-RPC response carries the error to the caller.
+ */
+function broadcastRenderComponentResult(
+  request: JSONRPCMessage,
+  response: unknown,
+): void {
+  const reqObj = request as Record<string, unknown>;
+  if (reqObj['method'] !== 'tools/call') return;
+  const params = reqObj['params'] as Record<string, unknown> | undefined;
+  const name = typeof params?.['name'] === 'string' ? params['name'] : '';
+  if (name !== 'render_component') return;
+
+  const args = (params?.['arguments'] && typeof params['arguments'] === 'object'
+    ? (params['arguments'] as Record<string, unknown>)
+    : {});
+
+  // Re-run renderComponent so we own the typed RenderResult. The MCP
+  // tool handler will also have run it server-side; idempotency by
+  // componentId keeps both stores in sync (componentStore.register
+  // upserts on the same key).
+  const componentName = typeof args['componentName'] === 'string'
+    ? args['componentName']
+    : typeof args['name'] === 'string'
+      ? args['name']
+      : '';
+  if (!componentName) return;
+
+  const props = (args['props'] && typeof args['props'] === 'object')
+    ? (args['props'] as Record<string, unknown>)
+    : {};
+  const idempotencyKey = typeof args['idempotencyKey'] === 'string'
+    ? args['idempotencyKey']
+    : undefined;
+
+  const renderInput: {
+    name: string;
+    props: Record<string, unknown>;
+    idempotencyKey?: string;
+  } = { name: componentName, props };
+  if (idempotencyKey !== undefined) renderInput.idempotencyKey = idempotencyKey;
+
+  const result = renderComponent(renderInput);
+  if (result.error) return;
+
+  // Only broadcast if the MCP response confirms a successful
+  // tools/call (no `error` key, present `result`). Validation
+  // failures (-32003 etc.) won't reach here because we already
+  // returned above on `result.error`.
+  const resObj = response as Record<string, unknown> | undefined;
+  if (!resObj || typeof resObj !== 'object') return;
+  if ('error' in resObj) return;
+  if (!('result' in resObj)) return;
+
+  broadcastComponentMountedAll(result);
 }
