@@ -39,6 +39,7 @@ import {
   getClaudeSession,
   setActiveSubprocess,
   killActiveSubprocess,
+  consumeClickKill,
   setChatResumeContext,
   getChatResumeContext,
 } from './chat-session-registry.js';
@@ -306,6 +307,15 @@ export async function runChatTurn(
   }
 
   if (exitCode === 0) {
+    sendChatComplete(session, 'complete');
+  } else if (consumeClickKill(session.sessionId)) {
+    // F47: the subprocess was deliberately killed by
+    // `handleChatComponentEvent` to free the slot for a follow-up
+    // turn that resumes the same Claude session. The non-zero
+    // exit is *expected* — the user clicked a component inside the
+    // chat bubble. Finalize the killed turn cleanly (no `chat.error`
+    // banner in the UI) so the click flow feels intentional, not
+    // like the agent crashed.
     sendChatComplete(session, 'complete');
   } else {
     sendChatError(

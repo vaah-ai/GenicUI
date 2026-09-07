@@ -68,6 +68,19 @@ interface SessionEntry {
    *  `chat.component_event` can resume the same provider session with
    *  the same provider config. Null until the first turn spawns. */
   resumeContext: ResumedChatEntry | null;
+
+  /**
+   * F47: Marker set by `killActiveSubprocess()` when the subprocess
+   * was deliberately killed to free the slot for a follow-up turn
+   * (component click → resume). When `runChatTurn` sees this on exit,
+   * it suppresses the `chat.error` chatter that a non-zero exit code
+   * would otherwise produce — the user explicitly invoked the kill,
+   * they didn't crash the agent.
+   *
+   * Consumed (cleared) by `runChatTurn` after the substitution so
+   * subsequent real failures still surface as errors.
+   */
+  killByClick: boolean;
 }
 
 const SESSIONS = new Map<string, SessionEntry>();
@@ -78,6 +91,7 @@ export function createChatSession(sessionId: string): void {
       claudeSessionId: null,
       activeSubprocess: null,
       resumeContext: null,
+      killByClick: false,
     });
   }
 }
@@ -149,6 +163,12 @@ export async function killActiveSubprocess(sessionId: string): Promise<boolean> 
   if (!entry.activeSubprocess) return false;
   const proc = entry.activeSubprocess;
   entry.activeSubprocess = null;
+  // F47: mark this kill as a deliberate resume so the in-flight
+  // turn's `runChatTurn` doesn't surface the non-zero exit as a
+  // `chat.error` to the client. Only set when there's actually a
+  // proc to kill — clicking on a component while no turn is in
+  // flight must not poison the next real failure.
+  entry.killByClick = true;
   try {
     proc.kill();
   } catch {
@@ -162,6 +182,39 @@ export async function killActiveSubprocess(sessionId: string): Promise<boolean> 
     // to ignore here because we already detached the reference.
   }
   return true;
+}
+
+/**
+ * F47: consume the click-kill marker. Returns `true` if the most
+ * recent `killActiveSubprocess` was a deliberate click-driven kill
+ * (so `runChatTurn` should suppress the resulting non-zero-exit
+ * error chatter) and clears the flag in the same call so a later
+ * genuine failure still surfaces as `chat.error`.
+ *
+ * Returns `false` when no kill happened (or when a previous one
+ * was already consumed).
+ */
+export function consumeClickKill(sessionId: string): boolean {
+  const entry = SESSIONS.get(sessionId);
+  if (!entry) return false;
+  if (!entry.killByClick) return false;
+  entry.killByClick = false;
+  return true;
+}
+
+/**
+ * Test-only: explicitly set the click-kill marker on a session.
+ * Used by unit tests that want to exercise `consumeClickKill`'s
+ * round-trip semantics without spinning up a real subprocess.
+ * Production code path goes through `killActiveSubprocess` which
+ * sets the marker as a side effect of the kill.
+ *
+ * @internal
+ */
+export function __test_setClickKill(sessionId: string, value: boolean): void {
+  const entry = SESSIONS.get(sessionId);
+  if (!entry) return;
+  entry.killByClick = value;
 }
 
 /**
