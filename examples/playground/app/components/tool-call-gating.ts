@@ -60,3 +60,35 @@ export function shouldRenderToolError(
 ): boolean {
   return isErrorStatus && hasErrorMessage;
 }
+
+/**
+ * F47-AC7 (clean-view): when the chat column debug toggle is OFF,
+ * `ChatHistory` replaces every `ToolCallAccordion` with a compact
+ * one-line status pill. This function produces the visible label:
+ *   "→ render_component"     (running)
+ *   "✓ render_component"     (done)
+ *   "× render_component"     (error)
+ *
+ * Falls back to `"tool call"` when `name` is empty so the pill is
+ * never blank. Status is lowercased intentionally — the pill reads
+ * like inline prose, not a structured chip.
+ *
+ * @param name — Tool-call name (e.g. "render_component", or the
+ *              MCP-prefixed `mcp__<server>__render_component`).
+ * @param status — One of `'running' | 'done' | 'error'`.
+ */
+export function formatCleanToolLabel(
+  name: string,
+  status: 'running' | 'done' | 'error',
+): string {
+  const trimmed = name.trim();
+  const display = trimmed.length > 0 ? trimmed : 'tool call';
+  switch (status) {
+    case 'running':
+      return `→ ${display}`;
+    case 'done':
+      return `✓ ${display}`;
+    case 'error':
+      return `× ${display}`;
+  }
+}

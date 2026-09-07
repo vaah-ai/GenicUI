@@ -10,6 +10,11 @@
  * `showToolError` computed bindings — if you change the predicate
  * signatures, update both this file and the component.
  *
+ * Also covers `formatCleanToolLabel`, which `ChatHistory.vue` uses
+ * to render a compact one-line status pill in place of the full
+ * `ToolCallAccordion` when the debug toggle is OFF. The pill is the
+ * only thing the user sees in clean mode — it must read clearly.
+ *
  * @see {F47-AC7} — Chat column debug toggle (M5-T7-05)
  */
 
@@ -20,6 +25,7 @@ import {
   shouldRenderToolInput,
   shouldRenderToolResult,
   shouldRenderToolError,
+  formatCleanToolLabel,
 } from '../tool-call-gating.ts';
 
 describe('ToolCallAccordion gating', () => {
@@ -72,6 +78,42 @@ describe('ToolCallAccordion gating', () => {
 
     it('hides when neither status nor message indicates an error', () => {
       expect(shouldRenderToolError(false, false)).toBe(false);
+    });
+  });
+
+  describe('F47-AC7 (clean-view): formatCleanToolLabel for ChatHistory pills', () => {
+    it('renders a → arrow for running tool calls', () => {
+      expect(formatCleanToolLabel('render_component', 'running')).toBe(
+        '→ render_component',
+      );
+    });
+
+    it('renders a ✓ check for done tool calls', () => {
+      expect(formatCleanToolLabel('render_component', 'done')).toBe(
+        '✓ render_component',
+      );
+    });
+
+    it('renders a × cross for error tool calls', () => {
+      expect(formatCleanToolLabel('render_component', 'error')).toBe(
+        '× render_component',
+      );
+    });
+
+    it('passes through MCP-prefixed names verbatim', () => {
+      expect(
+        formatCleanToolLabel('mcp__genicui__render_component', 'done'),
+      ).toBe('✓ mcp__genicui__render_component');
+    });
+
+    it('passes through non-render tool names (Read, Bash, etc.)', () => {
+      expect(formatCleanToolLabel('Read', 'done')).toBe('✓ Read');
+      expect(formatCleanToolLabel('Bash', 'error')).toBe('× Bash');
+    });
+
+    it('falls back to "tool call" when name is empty', () => {
+      expect(formatCleanToolLabel('', 'done')).toBe('✓ tool call');
+      expect(formatCleanToolLabel('   ', 'done')).toBe('✓ tool call');
     });
   });
 });

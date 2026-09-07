@@ -68,13 +68,28 @@
           <span class="chat-pending-dot" />
         </div>
 
-        <!-- Tool calls (structured accordions) -->
-        <ToolCallAccordion
-          v-for="(call, callIdx) in msg.toolCalls"
-          :key="`${msg.timestamp}-tool-${callIdx}`"
-          class="chat-tool"
-          :entry="call"
-        />
+        <!--
+          F47-AC7: tool-call rendering switches between two surfaces
+          depending on the chat column debug toggle.
+            - Debug ON  → the full `<ToolCallAccordion>` (header +
+                          props / input / result / error blocks).
+            - Debug OFF → a compact one-line status pill (`✓ render_component`)
+                          so the chat reads as prose + interactive
+                          components only.
+          The rendered component preview (CityPicker / WeatherCard)
+          stays visible in both modes — it's NOT a tool-call card.
+        -->
+        <template v-for="(call, callIdx) in msg.toolCalls" :key="`${msg.timestamp}-tool-${callIdx}`">
+          <ToolCallAccordion v-if="isDebug" class="chat-tool" :entry="call" />
+          <div
+            v-else
+            class="chat-tool-pill"
+            :class="`chat-tool-pill-${call.status}`"
+            :aria-label="`Tool call ${call.name} (${call.status})`"
+          >
+            {{ formatCleanToolLabel(call.name, call.status) }}
+          </div>
+        </template>
 
         <!-- Error banner (when the assistant bubble ends in error state) -->
         <div v-if="msg.status === 'error'" class="chat-error-banner" role="status">
@@ -116,6 +131,8 @@ import PromptChips from './PromptChips.vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useRegistries } from '~/composables/useRegistries.ts';
 import { useChatInput } from '~/composables/useChatInput.ts';
+import { useDebugMode } from '~/composables/useDebugMode.ts';
+import { formatCleanToolLabel } from './tool-call-gating.ts';
 
 /**
  * Shape of a single chat message — mirrors `useChat().history.value`.
@@ -168,6 +185,15 @@ const hasPending = computed(() =>
  */
 const ws = useWebSocket();
 const isConnected = computed<boolean>(() => ws.state.value === 'connected');
+
+/**
+ * F47-AC7: chat column debug flag. Module-singleton so this view
+ * shares the same toggle as `ChatPanel` and `ToolCallAccordion`.
+ * When OFF, the full `<ToolCallAccordion>` is replaced by a
+ * compact one-line status pill so the chat reads as prose +
+ * interactive components only.
+ */
+const { isDebug } = useDebugMode();
 
 /**
  * Prompt chips derived from the currently selected registry. When no
@@ -373,6 +399,32 @@ function formatTime(isoString: string): string {
 }
 .chat-tool + .chat-tool {
   margin-top: var(--gp-space-1);
+}
+
+/*
+ * F47-AC7: compact one-line status pill rendered in clean mode
+ * (debug toggle OFF) instead of the full ToolCallAccordion. Reads
+ * as inline prose so the chat column looks like a chat, not a
+ * debug log.
+ */
+.chat-tool-pill {
+  margin-top: var(--gp-space-1);
+  font-family: var(--gp-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--gp-text-muted);
+  opacity: 0.85;
+}
+
+.chat-tool-pill-running {
+  color: var(--gp-accent);
+  opacity: 1;
+}
+
+.chat-tool-pill-error {
+  color: rgba(239, 68, 68, 0.95);
+  opacity: 1;
 }
 
 .chat-error-banner {
