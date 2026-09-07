@@ -241,6 +241,22 @@ export async function runChatTurn(
   let stdoutBuf = '';
   let stderrBuf = '';
 
+  /**
+   * F47 follow-up: distinguish "agent exited non-zero after
+   * successfully delivering content" from "agent actually failed."
+   * Claude Code's compact-mode `result` envelope signals success,
+   * but the subprocess can still return a non-zero exit code when
+   * the upstream MCP round-trip had a hiccup (e.g. tool result
+   * serialization noise). When that happens we used to fire a
+   * `chat.error` frame, which the client painted as a red banner
+   * under the assistant turn that *did* successfully render the
+   * CityPicker. Track whether any genuine error event was seen
+   * during the turn; if not, exit-code ≠ 0 is a warning, not a
+   * failure. The client still gets `chat.complete(reason='complete')`
+   * with a warning in stderr so power users can see it.
+   */
+  let sawErrorEvent = false;
+
   // When stdout/stderr is 'pipe', Bun.spawn returns a ReadableStream of
   // Uint8Array; the TypeScript union with `number` exists for the fd
   // shorthand form (`stdout: process.stdout.fd`). We always pass 'pipe'
@@ -264,7 +280,7 @@ export async function runChatTurn(
       while (nl !== -1) {
         const line = stdoutBuf.slice(0, nl);
         stdoutBuf = stdoutBuf.slice(nl + 1);
-        handleParsedLine(session, line, adaptor.id);
+        handleParsedLine(session, line, adaptor.id, onParsed);
         nl = stdoutBuf.indexOf('\n');
       }
     }
@@ -276,6 +292,13 @@ export async function runChatTurn(
       stderrBuf += stderrDecoder.decode(chunk, { stream: true });
     }
   })();
+
+  // Drain loop closure — captures `sawErrorEvent` so handleParsedLine
+  // can flip it when a genuine error event lands on stdout (e.g. a
+  // tool_use failure surfaces as `chat.event` with type=error).
+  const onParsed = () => {
+    sawErrorEvent = true;
+  };
 
   // Wait for both streams + the subprocess to exit.
   const [exitCode, ,] = await Promise.all([
@@ -290,7 +313,7 @@ export async function runChatTurn(
 
   // Flush any partial trailing stdout line.
   if (stdoutBuf.trim()) {
-    handleParsedLine(session, stdoutBuf, adaptor.id);
+    handleParsedLine(session, stdoutBuf, adaptor.id, onParsed);
   }
 
   if (stderrBuf.trim()) {
@@ -317,13 +340,29 @@ export async function runChatTurn(
     // banner in the UI) so the click flow feels intentional, not
     // like the agent crashed.
     sendChatComplete(session, 'complete');
-  } else {
+  } else if (sawErrorEvent) {
+    // Genuine stream-level error landed during the turn — surface it.
     sendChatError(
       session,
-      `${adaptor.label} exited with code ${exitCode}` +
+      `${adaptor.label} reported an error during the turn` +
         (stderrBuf.trim() ? `: ${stderrBuf.trim().slice(0, 500)}` : ''),
     );
     sendChatComplete(session, 'error');
+  } else {
+    // F47 follow-up: Claude Code exited non-zero but the turn
+    // delivered content cleanly (e.g. compact-mode `result`
+    // envelope arrived, render_component tool call completed, then
+    // the MCP round-trip hiccuped on the way out). Treat this as
+    // a warning, not a failure — log to server console + stderr
+    // for diagnostics, but finalize the turn as `complete` so the
+    // chat panel doesn't show a red error banner under a
+    // successful interaction.
+    console.warn(
+      `[chat] session ${session.sessionId} subprocess closed with code=${exitCode} ` +
+        `but no stream-level error was seen — finalizing as complete. ` +
+        `stderr=${stderrBuf.trim().slice(0, 200)}`,
+    );
+    sendChatComplete(session, 'complete');
   }
 
   console.error(
@@ -342,8 +381,9 @@ export function __test_handleParsedLine(
   session: WsSession,
   line: string,
   providerId: string,
+  onError?: () => void,
 ): void {
-  handleParsedLine(session, line, providerId);
+  handleParsedLine(session, line, providerId, onError);
 }
 
 /**
@@ -361,6 +401,7 @@ function handleParsedLine(
   session: WsSession,
   line: string,
   providerId: string,
+  onError?: () => void,
 ): void {
   const adaptor = getProviderAdaptor(providerId);
   if (!adaptor) return;
@@ -369,6 +410,12 @@ function handleParsedLine(
   if (parsed.kind === 'event') {
     // Capture the Claude session id for --resume next turn.
     const ev = parsed.event;
+    // F47 follow-up: a stream-level `error` event means the agent
+    // actually failed (tool rejection, upstream refusal, etc.) —
+    // not the same as a non-zero subprocess exit after success.
+    // Flip the parent turn's `sawErrorEvent` so the exit branch
+    // can decide whether to fire `chat.error`.
+    if (ev.type === 'error' && onError) onError();
     if (ev.type === 'status' && ev.data['status'] === 'init') {
       const sid = ev.data['sessionId'];
       if (typeof sid === 'string' && sid.length > 0) {

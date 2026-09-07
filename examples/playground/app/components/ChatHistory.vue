@@ -482,13 +482,17 @@ function formatTime(isoString: string): string {
  * OFF). This is the user-facing surface — the actual interactive
  * widget the agent mounted — so it stays visible in both modes.
  * Debug mode renders it inside the accordion body instead.
+ *
+ * F47 polish: removed the redundant border + padding wrapper.
+ * Each rendered component already brings its own chrome (PrimeVue
+ * Card, DataTable, Dropdown etc.) — wrapping it in another 1px
+ * box on top of the bubble's own border produced three nested
+ * rectangles around a single weather card. The wrapper now
+ * contributes only top spacing so the pill and the widget read
+ * as a single unit, not a stack of containers.
  */
 .chat-tool-component {
-  margin-top: var(--gp-space-1);
-  padding: var(--gp-space-2);
-  background: var(--gp-surface);
-  border: 1px solid var(--gp-border);
-  border-radius: var(--gp-radius-md);
+  margin-top: var(--gp-space-2);
 }
 
 .chat-error-banner {

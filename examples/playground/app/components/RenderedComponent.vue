@@ -146,8 +146,19 @@
       Tabular numbers keep the temperature digits from jittering
       during transitions. aria-live="polite" announces updates to
       screen-reader users without stealing focus.
+
+      F47 follow-up polish: dropped the PrimeVue `Card` wrapper in
+      favour of a custom layout. `Card` adds a 1px border + 1px
+      shadow + its own title slot, which on top of the chat bubble's
+      own border produced triple nested rectangles around the same
+      weather data. The custom surface now lives directly inside the
+      bubble — its only border is its own outline, which carries
+      the per-tone accent. Tones are still wired via scoped custom
+      properties (`--wx-accent`, `--wx-accent-bg`, `--wx-accent-tint`)
+      so light/dark theming continues to flow from the playground
+      tokens without raw hex in the markup.
     -->
-    <Card
+    <section
       v-else-if="isWeatherCard"
       class="rendered-component-weather-card"
       :class="`rendered-component-weather-card-${weatherTone}`"
@@ -155,7 +166,7 @@
       aria-live="polite"
       :aria-label="weatherAriaLabel"
     >
-      <template #title>
+      <div class="rendered-component-weather-card-inner">
         <header class="rendered-component-weather-card-header">
           <span class="rendered-component-weather-card-glyph" aria-hidden="true">
             <!--
@@ -171,8 +182,7 @@
             {{ weatherCity }}
           </span>
         </header>
-      </template>
-      <template #content>
+
         <!-- Loading: skeleton with stable height (no layout shift). -->
         <div v-if="weatherLoading" class="rendered-component-weather-card-skeleton" aria-hidden="true">
           <div class="rendered-component-weather-card-skeleton-hero" />
@@ -283,8 +293,8 @@
             </div>
           </dl>
         </div>
-      </template>
-    </Card>
+      </div>
+    </section>
 
     <div v-else class="rendered-component-unknown">
       <p>
@@ -1195,76 +1205,129 @@ const WeatherGlyphThunder = {
 
 /* ---------- WeatherCard (F47 polish) ---------- */
 /*
-  Layout intent (matches ui-ux-pro-max priorities):
-    - Hierarchy: temperature is the hero (size 2rem, bold), city
-      + glyph are the header strip, conditions + metrics are
-      secondary (≤0.8125rem, secondary text colour).
-    - Visual rhythm: 8dp spacing scale via var(--gp-space-*).
-    - Tone classes: warm / cool / cold / neutral drive the glyph
-      ring + accent via scoped CSS custom properties so the same
-      markup works in light or dark themes without hard-coded
-      hex anywhere in the component.
-    - Dark-mode contrast: primary text uses --gp-text (slate-50,
-      contrast >12:1 on slate-800 surface); secondary text uses
-      --gp-text-secondary (slate-400, ≥4.6:1 on surface).
-    - Reduced motion: shimmer + transitions gated by media query.
+  Design intent (ui-ux-pro-max priorities applied):
+
+    1. Visual hierarchy — temperature is the hero (2.25rem, weight
+       700, tabular-nums, line-height 1 so it owns the centre).
+       City + glyph form a quiet header. Conditions + metrics are
+       secondary (≤0.875rem, secondary text colour, smaller weight).
+    2. Themed gradients — each tone drives a subtle linear gradient
+       from surface to its accent tint, replacing the flat
+       `gp-surface` background. Glassmorphism hint via
+       `backdrop-filter` so the card sits softly on the chat
+       bubble without a hard rectangular edge.
+    3. Single border — one outer outline (driven by `--wx-accent` at
+       24% alpha) replaces the triple-nested border (chat bubble +
+       wrapper + Card) that wrapped the previous design.
+    4. Iconography — inline SVG glyphs only (no emoji), 1.75px
+       stroke, currentColor. The glyph sits in a tinted halo so
+       it has visual weight without dominating the hero number.
+    5. Responsive — fluid type via `clamp()` so the card scales
+       gracefully from narrow chat bubbles to wider panels.
+    6. Dark-mode pairings — amber/blue/cyan at 400/300 shades
+       for ≥4.5:1 contrast on slate-800 surface; tones drive
+       light variants via scoped CSS custom properties.
+    7. Reduced motion — shimmer + transitions gated by media
+       query, so prefers-reduced-motion users see a flat skeleton
+       instead of sweeping gradients.
 */
 
 .rendered-component-weather-card {
-  background: var(--gp-surface);
-  border: 1px solid var(--gp-border);
-  border-radius: var(--gp-radius-md);
-  overflow: hidden;
-  /* Per-tone accent. Defaults to neutral; warm/cool/cold override. */
+  /* Default (neutral) tone values — overridden per-tone below. */
   --wx-accent: var(--gp-text-secondary);
-  --wx-accent-soft: var(--gp-surface-hover);
+  --wx-accent-bg: linear-gradient(
+    135deg,
+    var(--gp-surface) 0%,
+    var(--gp-surface-hover) 100%
+  );
+  --wx-accent-tint: var(--gp-surface-hover);
+  --wx-accent-border: rgba(148, 163, 184, 0.18);
+
+  position: relative;
+  border-radius: var(--gp-radius-md);
+  /* Glassmorphism hint — only effective when something is rendered
+     behind the card; otherwise it just acts as a transparent panel
+     sitting on the bubble's surface. */
+  background: var(--wx-accent-bg);
+  border: 1px solid var(--wx-accent-border);
+  overflow: hidden;
+  /* Subtle ambient glow behind the card so the tone reads as
+     atmosphere, not just an icon colour. */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 24px -12px var(--wx-accent-tint);
+  backdrop-filter: blur(6px) saturate(1.1);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
 }
 
 .rendered-component-weather-card-warm {
-  --wx-accent: #fbbf24;        /* amber-400 — readable on slate-800 */
-  --wx-accent-soft: rgba(251, 191, 36, 0.14);
+  --wx-accent: #fbbf24;            /* amber-400 */
+  --wx-accent-bg: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.06) 0%,
+    rgba(251, 191, 36, 0.02) 60%,
+    transparent 100%
+  );
+  --wx-accent-tint: rgba(251, 191, 36, 0.35);
+  --wx-accent-border: rgba(251, 191, 36, 0.22);
 }
 .rendered-component-weather-card-cool {
-  --wx-accent: #60a5fa;        /* blue-400 */
-  --wx-accent-soft: rgba(96, 165, 250, 0.14);
+  --wx-accent: #60a5fa;            /* blue-400 */
+  --wx-accent-bg: linear-gradient(
+    135deg,
+    rgba(96, 165, 250, 0.08) 0%,
+    rgba(96, 165, 250, 0.02) 60%,
+    transparent 100%
+  );
+  --wx-accent-tint: rgba(96, 165, 250, 0.35);
+  --wx-accent-border: rgba(96, 165, 250, 0.22);
 }
 .rendered-component-weather-card-cold {
-  --wx-accent: #67e8f9;        /* cyan-300 */
-  --wx-accent-soft: rgba(103, 232, 249, 0.14);
-}
-.rendered-component-weather-card-neutral {
-  --wx-accent: var(--gp-text-secondary);
-  --wx-accent-soft: var(--gp-surface-hover);
-}
-
-.rendered-component-weather-card :deep(.p-card-title) {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--gp-text);
-  margin: 0;
+  --wx-accent: #67e8f9;            /* cyan-300 */
+  --wx-accent-bg: linear-gradient(
+    135deg,
+    rgba(103, 232, 249, 0.08) 0%,
+    rgba(103, 232, 249, 0.02) 60%,
+    transparent 100%
+  );
+  --wx-accent-tint: rgba(103, 232, 249, 0.35);
+  --wx-accent-border: rgba(103, 232, 249, 0.22);
 }
 
-.rendered-component-weather-card :deep(.p-card-content) {
-  padding-top: var(--gp-space-2);
+/* Inner padding wrapper — separates the border / gradient from the
+   content padding so we can stack the header + body without
+   fighting the outline. */
+.rendered-component-weather-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-3);
+  padding: var(--gp-space-3) var(--gp-space-4);
 }
 
 /* Header strip — glyph + city, side by side, vertically centred. */
 .rendered-component-weather-card-header {
   display: flex;
   align-items: center;
-  gap: var(--gp-space-2);
+  gap: var(--gp-space-3);
+  min-width: 0;
 }
 
 .rendered-component-weather-card-glyph {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
-  background: var(--wx-accent-soft);
+  background: var(--wx-accent-tint);
   color: var(--wx-accent);
   flex-shrink: 0;
+  /* Light ring so the halo reads as a distinct surface from the
+     gradient — uses accent at low alpha so it doesn't fight the
+     gradient. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 0 2px var(--wx-accent-border);
 }
 
 .rendered-component-weather-card-city {
@@ -1279,18 +1342,20 @@ const WeatherGlyphThunder = {
   min-width: 0;
 }
 
-/* Hero block — big temperature + conditions line. */
+/* Hero block — big temperature + conditions line. The temperature
+   is the single largest element on the card so the user reads
+   the number first, the description second. */
 .rendered-component-weather-card-hero {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   flex-wrap: wrap;
   gap: var(--gp-space-3);
-  padding: var(--gp-space-2) 0;
+  padding: var(--gp-space-1) 0 0;
 }
 
 .rendered-component-weather-card-temperature {
   display: inline-flex;
-  align-items: baseline;
+  align-items: flex-start;
   /* Tabular figures so the digits don't jitter across reloads. */
   font-variant-numeric: tabular-nums;
   color: var(--gp-text);
@@ -1298,43 +1363,52 @@ const WeatherGlyphThunder = {
 }
 
 .rendered-component-weather-card-temperature-value {
-  font-size: 2rem;
+  font-size: clamp(2rem, 4vw, 2.25rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  color: var(--gp-text);
 }
 
 .rendered-component-weather-card-temperature-unit {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--wx-accent);
-  margin-left: 2px;
+  margin-left: 4px;
+  margin-top: 4px;
+  letter-spacing: 0.01em;
 }
 
 .rendered-component-weather-card-conditions {
-  margin: 0;
+  margin: 0 0 4px;
   font-size: 0.875rem;
   color: var(--gp-text-secondary);
   font-weight: 500;
 }
 
 /* Secondary metrics — definition list for proper screen-reader
-   semantics + tabular alignment. */
+   semantics + tabular alignment. The grid sits on the gradient
+   background without its own border so the card reads as one
+   continuous surface. */
 .rendered-component-weather-card-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--gp-space-2);
   margin: 0;
-  padding: var(--gp-space-2) 0 0;
-  border-top: 1px solid var(--gp-border);
+  padding: 0;
 }
 
 .rendered-component-weather-card-metric {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--gp-space-1) var(--gp-space-2);
-  background: var(--gp-surface-hover);
+  gap: 4px;
+  padding: var(--gp-space-2) var(--gp-space-3);
+  /* Frosted tile — uses the surface-hover tone at low alpha so
+     it sits inside the gradient instead of stacking another
+     border on top. */
+  background: rgba(15, 23, 42, 0.35);
   border-radius: var(--gp-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  min-width: 0;
 }
 
 .rendered-component-weather-card-metric-key {
@@ -1352,7 +1426,7 @@ const WeatherGlyphThunder = {
 .rendered-component-weather-card-metric-val {
   margin: 0;
   font-family: var(--gp-font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--gp-text);
   /* Keep numbers aligned as they change. */
   font-variant-numeric: tabular-nums;
@@ -1363,14 +1437,14 @@ const WeatherGlyphThunder = {
   display: flex;
   flex-direction: column;
   gap: var(--gp-space-2);
-  padding: var(--gp-space-3) 0;
+  padding: var(--gp-space-1) 0;
   /* Reserve the same height as the loaded body so the card doesn't
      jump when the data lands (avoids CLS). */
   min-height: 96px;
 }
 
 .rendered-component-weather-card-skeleton-hero {
-  height: 36px;
+  height: 38px;
   width: 60%;
   border-radius: var(--gp-radius-sm);
 }
@@ -1389,7 +1463,7 @@ const WeatherGlyphThunder = {
   background: linear-gradient(
     90deg,
     var(--gp-surface-hover) 0%,
-    var(--gp-surface-active) 50%,
+    var(--wx-accent-tint) 50%,
     var(--gp-surface-hover) 100%
   );
   background-size: 200% 100%;
@@ -1405,7 +1479,7 @@ const WeatherGlyphThunder = {
 .rendered-component-weather-card-error {
   display: flex;
   align-items: flex-start;
-  gap: var(--gp-space-2);
+  gap: var(--gp-space-3);
   padding: var(--gp-space-2) 0;
   color: var(--gp-error-text);
 }
@@ -1441,7 +1515,7 @@ const WeatherGlyphThunder = {
   letter-spacing: 0.02em;
   border-radius: var(--gp-radius);
   border: 1px solid var(--gp-border-light);
-  background: var(--gp-surface-hover);
+  background: rgba(15, 23, 42, 0.35);
   color: var(--gp-text);
   cursor: pointer;
   transition:
@@ -1451,12 +1525,12 @@ const WeatherGlyphThunder = {
 }
 
 .rendered-component-weather-card-retry:hover {
-  background: var(--gp-surface-active);
-  border-color: var(--gp-accent);
+  background: rgba(15, 23, 42, 0.55);
+  border-color: var(--wx-accent);
 }
 
 .rendered-component-weather-card-retry:focus-visible {
-  outline: 2px solid var(--gp-accent);
+  outline: 2px solid var(--wx-accent);
   outline-offset: 2px;
 }
 
@@ -1476,6 +1550,10 @@ const WeatherGlyphThunder = {
   .rendered-component-weather-card-skeleton-row {
     animation: none !important;
     background: var(--gp-surface-hover);
+  }
+  .rendered-component-weather-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 </style>
