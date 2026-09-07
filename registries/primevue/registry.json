@@ -312,7 +312,8 @@
       "tags": ["card", "weather", "display", "interactive"],
       "events": [],
       "examplePrompts": [
-        "Show me today's weather"
+        "Weather forecast for Paris",
+        "What's the weather in Tokyo right now"
       ],
       "examples": [
         {
