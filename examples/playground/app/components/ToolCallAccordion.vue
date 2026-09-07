@@ -99,7 +99,19 @@
             :component-id="mountedComponent.componentId"
           />
         </div>
-        <details class="tool-call-component-props">
+        <!--
+          F47-AC7: per-component Props accordion is a diagnostic
+          surface (raw prop values). Hidden when the chat column
+          debug toggle is OFF so the chat reads as prose + interactive
+          components only. The component preview above stays visible
+          in both modes. Predicate imported from
+          `./tool-call-gating.ts` so the gating logic is unit-tested
+          without a DOM.
+        -->
+        <details
+          v-if="showComponentProps"
+          class="tool-call-component-props"
+        >
           <summary class="tool-call-component-props-toggle">
             <span>Props</span>
             <svg
@@ -131,15 +143,24 @@
         </span>
       </div>
 
-      <div class="tool-call-block">
+      <!--
+        F47-AC7: Input / Result blocks are diagnostic surfaces
+        (raw tool input + tool result). Hidden when the chat column
+        debug toggle is OFF. Error block below stays unconditional
+        so failures remain visible in demos — silent failure is worse
+        than visual noise. Predicates imported from
+        `./tool-call-gating.ts` so the gating logic is unit-tested
+        without a DOM.
+      -->
+      <div v-if="showToolInput" class="tool-call-block">
         <div class="tool-call-block-label">Input</div>
         <pre class="tool-call-block-pre">{{ formatJson(entry.input) }}</pre>
       </div>
-      <div v-if="entry.result !== undefined && !isRenderComponentCall" class="tool-call-block">
+      <div v-if="showToolResult" class="tool-call-block">
         <div class="tool-call-block-label">Result</div>
         <pre class="tool-call-block-pre">{{ formatJson(entry.result) }}</pre>
       </div>
-      <div v-if="entry.status === 'error' && entry.error" class="tool-call-block tool-call-block-error" role="alert">
+      <div v-if="showToolError" class="tool-call-block tool-call-block-error" role="alert">
         <div class="tool-call-block-label">Error</div>
         <pre class="tool-call-block-pre">{{ entry.error }}</pre>
       </div>
@@ -150,6 +171,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useComponents } from '~/composables/useComponents.ts';
+import { useDebugMode } from '~/composables/useDebugMode.ts';
+import {
+  shouldRenderComponentProps,
+  shouldRenderToolInput,
+  shouldRenderToolResult,
+  shouldRenderToolError,
+} from './tool-call-gating.ts';
 import type { ToolCallEntry } from '~/composables/useChat.ts';
 import RenderedComponent from './RenderedComponent.vue';
 
@@ -188,6 +216,15 @@ const props = defineProps<{
 const { components, findComponent } = useComponents();
 
 /**
+ * F47-AC7: read the chat column debug flag. Module-singleton, so
+ * every `ToolCallAccordion` instance sees the same value as the
+ * toggle in `ChatPanel`. When `false`, the diagnostic blocks
+ * (per-component Props, tool Input, tool Result) are hidden so the
+ * chat column shows a clean view.
+ */
+const { isDebug } = useDebugMode();
+
+/**
  * Human-readable status label for the pill.
  */
 const statusLabel = computed<string>(() => {
@@ -213,6 +250,32 @@ const isRenderComponentCall = computed<boolean>(() => {
   if (name === 'render_component') return true;
   return /^mcp__[^_]+(?:_[^_]+)*__render_component$/.test(name);
 });
+
+/**
+ * F47-AC7: gate predicates for the four diagnostic / status blocks
+ * rendered inside the accordion body. Pure-function imports so the
+ * logic is unit-testable in `ToolCallAccordion.test.ts` without a
+ * DOM harness.
+ */
+const showComponentProps = computed<boolean>(() =>
+  shouldRenderComponentProps(isDebug.value),
+);
+const showToolInput = computed<boolean>(() =>
+  shouldRenderToolInput(isDebug.value),
+);
+const showToolResult = computed<boolean>(() =>
+  shouldRenderToolResult(
+    isDebug.value,
+    props.entry.result !== undefined,
+    isRenderComponentCall.value,
+  ),
+);
+const showToolError = computed<boolean>(() =>
+  shouldRenderToolError(
+    props.entry.status === 'error',
+    typeof props.entry.error === 'string' && props.entry.error.length > 0,
+  ),
+);
 
 /**
  * Auto-expand the accordion when it's a `render_component` call AND
