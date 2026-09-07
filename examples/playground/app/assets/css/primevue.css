@@ -76,6 +76,7 @@
 
   /* Zone widths */
   --gp-zoneleft-width: 240px;
+  --gp-zonecenter-width: 280px;
   --gp-zoneright-width: 56%;
   --gp-render-min: 360px;
   --gp-topbar-height: 56px;
@@ -179,17 +180,18 @@ pre {
   font-size: 0.75rem;
 }
 
-/* ---------- Main grid (2 zones — F43: chat is the sole render surface) ---------- */
+/* ---------- Main grid (3 zones — sidebar | prompts | chat) ---------- */
 .main-grid {
   grid-area: main;
   display: grid;
-  grid-template-columns: var(--gp-zoneleft-width) 1fr;
-  grid-template-areas: "config chat";
+  grid-template-columns: var(--gp-zoneleft-width) var(--gp-zonecenter-width) 1fr;
+  grid-template-areas: "config prompts chat";
   min-height: 0;
   overflow: hidden;
 }
 
 .config-panel { grid-area: config; }
+.prompts-panel { grid-area: prompts; }
 .chat-panel { grid-area: chat; }
 
 /* ============================================================
@@ -732,17 +734,21 @@ pre {
 /* ============================================================
    Responsive — collapse to single column on small screens
    ============================================================ */
-@media (max-width: 1024px) {
-  /* F43: chat is the sole render surface — keep sidebar + chat on
-     tablet; chat remains dominant. */
+@media (max-width: 1200px) {
+  /* Tablet: hide the persistent prompts panel, keep sidebar + chat.
+     The prompts are still discoverable via the chips inside the chat
+     empty state. */
   .main-grid {
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: var(--gp-zoneleft-width) 1fr;
     grid-template-areas: "config chat";
+  }
+
+  .prompts-panel {
+    display: none;
   }
 
   .chat-panel {
     border-left: none;
-    border-top: 1px solid var(--gp-border);
   }
 }
 

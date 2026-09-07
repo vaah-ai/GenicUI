@@ -60,9 +60,10 @@
       </div>
     </header>
 
-    <!-- 2-zone main content (F43: chat is the sole render surface) -->
+    <!-- 3-zone main content (F43: chat is the sole render surface) -->
     <main class="main-grid">
       <ConfigPanel />
+      <PromptsPanel />
       <ChatPanel panel-id="chat-panel-main" />
     </main>
   </div>
@@ -70,11 +71,15 @@
 
 <script setup lang="ts">
 /**
- * GenicUI Playground root layout — 2-zone.
+ * GenicUI Playground root layout — 3-zone.
  *
  * Zones:
  * - Topbar: brand + connection status (global, persistent)
  * - Left:   ConfigPanel — connection config, registry, components count pill
+ * - Center: PromptsPanel — persistent vertical list of registry example
+ *           prompts (clickable rows; each row fills the chat input and
+ *           submits, mirroring the empty-state chip flow but always
+ *           visible throughout the session)
  * - Right:  ChatPanel — chat history + input bar + all rendered components
  *           (chat is the sole render surface; components mount inside
  *           tool-call accordions and stay interactive across turns)
@@ -82,8 +87,10 @@
  * F43 dropped the third center column (the old `RenderSurface`): the
  * chat panel already renders every `render_component` tool call as an
  * interactive accordion, so duplicating them in a center column was
- * noise. The sidebar keeps a count pill for at-a-glance awareness of
- * how many components are mounted in the chat.
+ * noise. The PromptsPanel replaces the old center column with quick
+ * access to the registry's example prompts so users can fire one of
+ * them even mid-conversation. The sidebar keeps a count pill for
+ * at-a-glance awareness of how many components are mounted in the chat.
  */
 import { computed, onBeforeUnmount } from 'vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
