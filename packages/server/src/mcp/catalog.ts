@@ -92,6 +92,11 @@ const DataTablePropsSchema: TSchema = Type.Object({
   ),
 }, { additionalProperties: false });
 
+/** TypeBox schema for Calculator props. Stateless at the wire layer;
+ *  the client maintains its own display/operand state and emits
+ *  `keystroke` events when the user presses a key. */
+const CalculatorPropsSchema: TSchema = Type.Object({}, { additionalProperties: false });
+
 const CATALOG: CatalogEntry[] = [
   /**
    * PrimeVue DataTable — the only component in the MVP catalog.
@@ -128,6 +133,41 @@ const CATALOG: CatalogEntry[] = [
         pageSize: 10,
       },
     ],
+  },
+
+  /**
+   * Calculator — 4-function calculator with keyboard support.
+   *
+   * The component is fully client-stateful (display, accumulator,
+   * pending operator). It emits `keystroke` events so a backing
+   * agent can observe user input if desired, but no server-side
+   * state is required to render it.
+   *
+   * @see {F43} — interactive GenicUI components in the chat panel
+   */
+  {
+    name: 'Calculator',
+    version: '0.1.0',
+    registryId: 'genicui@core',
+    description: 'Four-function calculator with +, −, ×, ÷ and keyboard input.',
+    whenToUse:
+      'When the user asks for a calculator, a quick arithmetic helper, ' +
+      'or any numeric scratchpad that needs +, -, *, /.',
+    tags: [
+      'calculator',
+      'math',
+      'arithmetic',
+      'add',
+      'subtract',
+      'multiply',
+      'divide',
+      'sum',
+      'numbers',
+    ],
+    propsSchema: CalculatorPropsSchema,
+    propsJsonSchema: CalculatorPropsSchema as unknown as Record<string, unknown>,
+    events: ['keystroke'],
+    examples: [{}],
   },
 ];
 

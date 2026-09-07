@@ -335,12 +335,12 @@ describe('chat bridge round-trip (F43b-AC5)', () => {
 // F43b-AC6 — MCP-direct trust boundary is unchanged
 // ---------------------------------------------------------------------------
 
-describe('MCP-direct trust boundary (F43b-AC6)', () => {
-  it('rejects MCP-wrapped rows with -32003 props_invalid (sanitizer does NOT run here)', () => {
-    // The MCP-direct path calls renderComponent() directly without
-    // sanitizeBridgeProps. Wire the exact failing shape and confirm
-    // the validator still rejects it — this is the load-bearing
-    // trust boundary from F16/F46.
+describe('MCP-direct trust boundary (F43 follow-up)', () => {
+  it('unwraps MCP-wrapped rows and accepts the render', () => {
+    // F43 follow-up: renderComponent now applies the same
+    // `unwrapMcpArrayProps` normalizer the chat-bridge uses, so an MCP
+    // client that sends `{ item: [...] }` for an array prop mounts
+    // successfully instead of failing with -32003.
     const result = renderComponent({
       name: 'DataTable',
       props: {
@@ -348,14 +348,18 @@ describe('MCP-direct trust boundary (F43b-AC6)', () => {
         rows: { item: [{ id: 'r1', name: 'Alice' }] },
       },
     });
-    expect(result.error).toBeDefined();
-    expect(result.error!.code).toBe(-32003);
+    expect(result.error).toBeUndefined();
+    expect(result.initialState).toEqual({
+      pageSize: 10,
+      rows: [{ id: 'r1', name: 'Alice' }],
+    });
   });
 
-  it('rejects quoted scalar pageSize with -32003 props_invalid on MCP-direct path', () => {
-    // Same trust-boundary guarantee: even if the agent only quoted
-    // the pageSize (not wrapping the rows), the MCP-direct path
-    // still rejects — proving sanitization is bridge-only.
+  it('coerces quoted scalar pageSize on MCP-direct path (F43 follow-up)', () => {
+    // The MCP-direct path now runs the same `unwrapMcpArrayProps`
+    // sanitizer the chat-bridge uses, so `pageSize: '10'` is coerced
+    // to `10` and the component mounts. The MCP-array unwrap step is
+    // no longer bridge-only — both surfaces share one normalizer.
     const result = renderComponent({
       name: 'DataTable',
       props: {
@@ -363,8 +367,11 @@ describe('MCP-direct trust boundary (F43b-AC6)', () => {
         rows: [{ id: 'r1', name: 'Alice' }],
       },
     });
-    expect(result.error).toBeDefined();
-    expect(result.error!.code).toBe(-32003);
+    expect(result.error).toBeUndefined();
+    expect(result.initialState).toEqual({
+      pageSize: 10,
+      rows: [{ id: 'r1', name: 'Alice' }],
+    });
   });
 
   it('accepts sanitized props when MCP-direct caller sends them already-flat', () => {

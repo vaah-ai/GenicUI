@@ -109,6 +109,9 @@
       </template>
     </Card>
 
+    <!-- Calculator — fully client-stateful 4-function calculator -->
+    <Calculator v-else-if="isCalculator" />
+
     <div v-else class="rendered-component-unknown">
       <p>
         Component <code>{{ name }}</code> isn't rendered live yet; here's
@@ -128,6 +131,7 @@
  *  - `DataTable`     (F40) → PrimeVue DataTable with sortable columns
  *  - `InputPair`     (F43) → two numeric inputs + Submit (interactive)
  *  - `ResultCard`    (F43) → display-only card with the computed result
+ *  - `Calculator`    (F43) → 4-function calculator with keyboard support
  *  - everything else       → fallback JSON view
  *
  * @see {F40} — PrimeVue DataTable registry
@@ -140,6 +144,8 @@ import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
+
+import Calculator from './Calculator.vue';
 
 import { useComponents } from '~/composables/useComponents.ts';
 import { on as busOn, off as busOff } from '~/composables/component-event-bus.ts';
@@ -167,6 +173,7 @@ const ariaLabel = computed<string>(() => `${props.name} component preview`);
 const isDataTable = computed<boolean>(() => props.name === 'DataTable');
 const isInputPair = computed<boolean>(() => props.name === 'InputPair');
 const isResultCard = computed<boolean>(() => props.name === 'ResultCard');
+const isCalculator = computed<boolean>(() => props.name === 'Calculator');
 
 // ---------------------------------------------------------------------------
 // DataTable (F40)

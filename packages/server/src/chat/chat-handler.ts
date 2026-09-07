@@ -43,6 +43,10 @@ import {
   getChatResumeContext,
 } from './chat-session-registry.js';
 import { renderComponent, type RenderResult } from '../mcp/render-handler.js';
+import {
+  unwrapMcpArrays,
+  unwrapMcpArrayProps,
+} from '../validation/unwrap-mcp-arrays.js';
 
 /**
  * A chat message from the frontend.
@@ -413,56 +417,15 @@ function handleParsedLine(
  *    quotes integer-looking values that the schema expects as numbers.
  *    We coerce numeric strings back to numbers when the value parses.
  *
- * Sanitization is intentionally conservative: we only unwrap when the
- * shape is unambiguously the MCP-array envelope (single-key object
- * with array value), and we only coerce strings whose trimmed content
- * is a finite number. Anything else is passed through untouched so
- * the schema validator can still reject genuinely malformed input.
+ * The implementation lives in `validation/unwrap-mcp-arrays.ts` so the
+ * direct `render_component` MCP tool can apply the same normalization.
+ * We keep the local `sanitizeBridge{Props,Value}` aliases so existing
+ * call sites and the `__test_sanitizeBridge` re-export stay stable.
  *
  * @see {F43} — MCP Permissions + Prop Shape
  */
-function sanitizeBridgeProps(
-  props: Record<string, unknown>,
-): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(props)) {
-    out[k] = sanitizeBridgeValue(v);
-  }
-  return out;
-}
-
-function sanitizeBridgeValue(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.map((item) => sanitizeBridgeValue(item));
-  }
-  if (value && typeof value === 'object') {
-    const obj = value as Record<string, unknown>;
-    const keys = Object.keys(obj);
-    // MCP-wrapped array: { item: [...] } → unwrap to the inner array.
-    if (keys.length === 1 && keys[0] === 'item' && Array.isArray(obj['item'])) {
-      return (obj['item'] as unknown[]).map((item) => sanitizeBridgeValue(item));
-    }
-    // Nested object: recurse.
-    const nested: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(obj)) {
-      nested[k] = sanitizeBridgeValue(v);
-    }
-    return nested;
-  }
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (trimmed.length > 0 && trimmed.length <= 16) {
-      // Finite-number coercion only for short, all-digit/numeric strings.
-      // Avoid coercing arbitrary long strings, version-like strings, etc.
-      const asNumber = Number(trimmed);
-      if (Number.isFinite(asNumber) && /^-?\d+(?:\.\d+)?$/.test(trimmed)) {
-        return asNumber;
-      }
-    }
-    return value;
-  }
-  return value;
-}
+const sanitizeBridgeProps = unwrapMcpArrayProps;
+const sanitizeBridgeValue = unwrapMcpArrays;
 
 /**
  * Test-only export — the sanitizer's two entry points. Lets
