@@ -6,25 +6,29 @@
     aria-live="polite"
     aria-label="Chat conversation history"
   >
-    <div
-      v-if="messages.length === 0 && !loading"
-      class="chat-history-empty"
-    >
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-      <span>Send a prompt or click a chip below.</span>
-    </div>
+    <!--
+      Empty state when no messages have been exchanged yet.
+      Three sub-states:
+        1. Prompt chips available (a registry is loaded) → show chips so
+           the user can click-and-send one of the registry's example
+           prompts. Disabled while disconnected so the WS layer rejects
+           would-be sends cleanly.
+        2. Otherwise → show the generic `EmptyState` placeholder, which
+           nudges the user to start the server and connect.
+      Chip click routes through `useChatInput().fillAndSubmit()` so the
+      input bar's watcher picks it up, fires submit, and clears the
+      singleton (see `useChatInput.ts`).
+    -->
+    <template v-if="messages.length === 0 && !loading">
+      <PromptChips
+        v-if="promptChips.length > 0"
+        class="chat-history-chips"
+        :prompts="promptChips"
+        :disabled="!isConnected"
+        @select="handleChipSelect"
+      />
+      <EmptyState v-else class="chat-history-empty-state" />
+    </template>
 
     <article
       v-for="(msg, index) in messages"
@@ -107,6 +111,11 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
 import ToolCallAccordion from './ToolCallAccordion.vue';
+import EmptyState from './EmptyState.vue';
+import PromptChips from './PromptChips.vue';
+import { useWebSocket } from '~/composables/useWebSocket.ts';
+import { useRegistries } from '~/composables/useRegistries.ts';
+import { useChatInput } from '~/composables/useChatInput.ts';
 
 /**
  * Shape of a single chat message — mirrors `useChat().history.value`.
@@ -149,6 +158,34 @@ const containerRef = ref<HTMLElement | null>(null);
 const hasPending = computed(() =>
   props.messages.some((m) => !m.response || m.status === 'pending' || m.status === 'streaming'),
 );
+
+/**
+ * WS connection state — drives the chips' `disabled` prop so the user
+ * can't fire a prompt into a dead session.
+ *
+ * Mirrors `ChatInput.disabled` so the chips and the input bar present
+ * the same affordance state.
+ */
+const ws = useWebSocket();
+const isConnected = computed<boolean>(() => ws.state.value === 'connected');
+
+/**
+ * Prompt chips derived from the currently selected registry. When no
+ * registry is selected (or it has no examplePrompts) the chips list is
+ * empty and `EmptyState` is rendered instead.
+ */
+const registries = useRegistries();
+const chatInput = useChatInput();
+const promptChips = computed<string[]>(() => registries.examplePrompts());
+
+/**
+ * Forward a chip click into the singleton input bar so the existing
+ * `useChatInput().submitRequested` watcher in `ChatInput` fires the
+ * submit handler. No duplication of the submit pipeline.
+ */
+function handleChipSelect(prompt: string): void {
+  chatInput.fillAndSubmit(prompt);
+}
 
 /**
  * Map an assistant status to a bubble class.
@@ -215,6 +252,17 @@ function formatTime(isoString: string): string {
   font-size: 0.8125rem;
   color: var(--gp-text-muted);
   text-align: center;
+}
+
+/* Wrapper for the EmptyState placeholder inside the chat history. */
+.chat-history-empty-state {
+  margin-top: var(--gp-space-4);
+}
+
+/* Wrapper for the registry prompt chips in the empty-state slot. */
+.chat-history-chips {
+  margin: var(--gp-space-4) auto;
+  max-width: 480px;
 }
 
 /* ----- Bubbles ----- */
