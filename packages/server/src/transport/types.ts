@@ -64,6 +64,32 @@ export interface ElysiaWS {
 }
 
 /**
+ * Payload of a `chat.component_event` frame the client sends when a
+ * user interacts with a chat-embedded GenicUI component (F43).
+ *
+ * The wire shape mirrors what `useComponents.sendComponentEvent()`
+ * produces on the playground side:
+ *   { componentId, name, action, payload }
+ *
+ * - `componentId` identifies which mounted component the event came
+ *   from. Required.
+ * - `name` is the registered component name (e.g. "InputPair"). Optional
+ *   — the server can resolve it from the component store if the client
+ *   omits it.
+ * - `action` is the event name (e.g. "submit"). Required.
+ * - `payload` is the component-specific event detail, JSON-serializable.
+ *   Optional.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+export interface ChatComponentEventPayload {
+  componentId: string;
+  name?: string;
+  action: string;
+  payload?: Record<string, unknown>;
+}
+
+/**
  * State tracked per WebSocket connection.
  */
 export interface WsSession {

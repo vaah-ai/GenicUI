@@ -31,8 +31,8 @@ describe('renderComponent', () => {
         name: 'DataTable',
         props: {
           rows: [
-            { id: '1', name: 'Alice' },
-            { id: '2', name: 'Bob' },
+            { id: 'r1', name: 'Alice' },
+            { id: 'r2', name: 'Bob' },
           ],
           pageSize: 10,
         },
@@ -48,8 +48,8 @@ describe('renderComponent', () => {
       expect(Array.isArray(result.events)).toBe(true);
       expect(result.initialState).toEqual({
         rows: [
-          { id: '1', name: 'Alice' },
-          { id: '2', name: 'Bob' },
+          { id: 'r1', name: 'Alice' },
+          { id: 'r2', name: 'Bob' },
         ],
         pageSize: 10,
       });
@@ -58,7 +58,7 @@ describe('renderComponent', () => {
     it('componentId follows the correct format', () => {
       const result = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }] },
+        props: { rows: [{ id: 'r1' }] },
       });
 
       expect(result.error).toBeUndefined();
@@ -73,7 +73,7 @@ describe('renderComponent', () => {
     it('returns correct events for DataTable', () => {
       const result = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
       });
 
       expect(result.error).toBeUndefined();
@@ -86,7 +86,7 @@ describe('renderComponent', () => {
     it('returns correct schema for DataTable', () => {
       const result = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
       });
 
       expect(result.error).toBeUndefined();
@@ -126,7 +126,7 @@ describe('renderComponent', () => {
       const result = renderComponent({
         name: 'DataTable',
         props: {
-          rows: [{ id: '1' }],
+          rows: [{ id: 'r1' }],
           unknownProp: 'value',
         },
       });
@@ -148,6 +148,72 @@ describe('renderComponent', () => {
   });
 
   // -----------------------------------------------------------------------
+  // F43: MCP-array unwrapping — direct render_component accepts the
+  // { item: [...] } shape that Claude Code's MCP client emits and the
+  // numeric-string scalars it sometimes quotes.
+  // -----------------------------------------------------------------------
+
+  describe('F43: MCP-array prop normalization', () => {
+    it('unwraps { item: [...] } rows into a flat array', () => {
+      const result = renderComponent({
+        name: 'DataTable',
+        props: {
+          rows: { item: [{ id: 'r1', name: 'Alice' }] },
+          pageSize: 10,
+        },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.initialState).toEqual({
+        rows: [{ id: 'r1', name: 'Alice' }],
+        pageSize: 10,
+      });
+    });
+
+    it('coerces numeric string scalars (pageSize "10" → 10)', () => {
+      const result = renderComponent({
+        name: 'DataTable',
+        props: {
+          rows: [{ id: 'r1' }],
+          pageSize: '10',
+        },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect((result.initialState as { pageSize: unknown }).pageSize).toBe(10);
+    });
+
+    it('leaves long numeric-looking strings alone (e.g. version pins)', () => {
+      const longString = '12345678901234567890';
+      const result = renderComponent({
+        name: 'DataTable',
+        props: {
+          rows: [{ id: 'r1', version: longString }],
+          pageSize: 10,
+        },
+      });
+
+      expect(result.error).toBeUndefined();
+      const initial = result.initialState as {
+        rows: Array<{ id: string; version: string }>;
+      };
+      expect(initial.rows[0]!.version).toBe(longString);
+    });
+
+    it('still rejects genuinely malformed input after unwrapping', () => {
+      const result = renderComponent({
+        name: 'DataTable',
+        props: {
+          rows: { item: 'not-an-array' },
+        },
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result!.error!.code).toBe(GENICUI_ERROR_CODES.props_invalid);
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // F16-AC3: Idempotency — same key returns same componentId
   // -----------------------------------------------------------------------
 
@@ -157,7 +223,7 @@ describe('renderComponent', () => {
 
       const first = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
         idempotencyKey,
       });
 
@@ -165,7 +231,7 @@ describe('renderComponent', () => {
 
       const second = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
         idempotencyKey,
       });
 
@@ -177,13 +243,13 @@ describe('renderComponent', () => {
     it('different idempotencyKeys produce different componentIds', () => {
       const first = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
         idempotencyKey: 'key-a',
       });
 
       const second = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
         idempotencyKey: 'key-b',
       });
 
@@ -195,12 +261,12 @@ describe('renderComponent', () => {
     it('no idempotencyKey produces different componentIds each time', () => {
       const first = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
       });
 
       const second = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 10 },
+        props: { rows: [{ id: 'r1' }], pageSize: 10 },
       });
 
       expect(first.error).toBeUndefined();
@@ -228,7 +294,7 @@ describe('renderComponent', () => {
     it('returns component_not_found for typo in component name', () => {
       const result = renderComponent({
         name: 'DataTabl',
-        props: { rows: [{ id: '1' }] },
+        props: { rows: [{ id: 'r1' }] },
       });
 
       expect(result.error).toBeDefined();
@@ -265,7 +331,7 @@ describe('renderComponent', () => {
     it('renders with pageSize in valid range', () => {
       const result = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 100 },
+        props: { rows: [{ id: 'r1' }], pageSize: 100 },
       });
 
       expect(result.error).toBeUndefined();
@@ -274,7 +340,7 @@ describe('renderComponent', () => {
     it('rejects pageSize out of range', () => {
       const result = renderComponent({
         name: 'DataTable',
-        props: { rows: [{ id: '1' }], pageSize: 0 },
+        props: { rows: [{ id: 'r1' }], pageSize: 0 },
       });
 
       expect(result.error).toBeDefined();

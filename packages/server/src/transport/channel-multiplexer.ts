@@ -126,6 +126,43 @@ export class ChannelMultiplexer {
 	}
 
 	/**
+	 * Dispatch a server-initiated frame (e.g. `COMPONENT_MOUNTED`
+	 * emitted from `bridgeRenderComponent` in `chat-handler.ts`).
+	 *
+	 * For these frames we KNOW there's nothing to reorder — the server
+	 * is the only producer of frames on this channel. The
+	 * FrameBuffer's per-channel `nextExpectedSeq` starts at `0n` for
+	 * fresh channels, but the server's `session.seqGenerator` is a
+	 * single monotonic counter shared across every channel, so the
+	 * outgoing `seq` is almost never `0`. Without seeding, the buffer
+	 * would hold the frame forever (no frame with seq `0` will ever
+	 * arrive on a server-initiated channel) and the bridge would
+	 * silently never reach the client.
+	 *
+	 * We seed `nextExpectedSeq` to `frame.seq + 1n` BEFORE the buffer
+	 * sees the frame, so `add()` flushes the frame immediately.
+	 *
+	 * @param frame — Server-initiated frame to publish.
+	 * @returns Same shape as `dispatch()` — frames flushed in order.
+	 */
+	dispatchServerFrame(frame: FrameEnvelope): DispatchResult | null {
+		const channel = frame.channel;
+
+		if (!this.#channels.has(channel)) {
+			const error = this.registerChannel(channel);
+			if (error !== null) {
+				return null;
+			}
+		}
+
+		const state = this.#channels.get(channel)!;
+		state.buffer.primeForServerInit(channel, frame.seq);
+
+		const frames = state.buffer.add(frame);
+		return { channel, frames };
+	}
+
+	/**
 	 * Check if a channel is registered.
 	 *
 	 * @param channel - The channel name to check.

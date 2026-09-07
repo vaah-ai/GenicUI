@@ -15,6 +15,7 @@ import {
 } from './component-store.js';
 import { GENICUI_ERROR_CODES } from './tool-registry.js';
 import { validateToolInput } from '../validation/schema-validation.js';
+import { unwrapMcpArrayProps } from '../validation/unwrap-mcp-arrays.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -26,6 +27,8 @@ export interface RenderResult {
   readonly componentId: string;
   /** The channel associated with this component. */
   readonly channel: string;
+  /** The component name as the caller requested it (e.g. "DataTable"). */
+  readonly name: string;
   /** The component's props schema (JSON Schema). */
   readonly schema: Readonly<Record<string, unknown>>;
   /** The events this component can emit. */
@@ -108,12 +111,20 @@ export function renderComponent(
     readonly idempotencyKey?: string;
   },
 ): RenderResult {
+  // F43: Normalize MCP-wrapped arrays ({ item: [...] }) and numeric
+  // strings before the catalog schema validator runs. Direct MCP
+  // clients (e.g. Claude Code) sometimes emit array-valued props in
+  // the single-key envelope form even when the component schema
+  // expects a flat array.
+  const props = unwrapMcpArrayProps(input.props);
+
   // Step 1: Resolve component name
   const entry = resolveComponent(input.name);
   if (!entry) {
     return {
       componentId: '',
       channel: '',
+      name: input.name,
       schema: {},
       events: [],
       initialState: {},
@@ -126,13 +137,14 @@ export function renderComponent(
 
   // Step 2: Validate props against catalog schema
   const { valid, errors: validationErrors } = validateProps(
-    input.props,
+    props,
     entry.propsSchema,
   );
   if (!valid) {
     return {
       componentId: '',
       channel: '',
+      name: input.name,
       schema: {},
       events: [],
       initialState: {},
@@ -155,9 +167,10 @@ export function renderComponent(
         return {
           componentId: existing.componentId,
           channel: existing.channel,
+          name: existing.name,
           schema: entry.propsJsonSchema,
           events: entry.events,
-          initialState: input.props,
+          initialState: props,
         };
       }
     }
@@ -172,7 +185,7 @@ export function renderComponent(
     componentId,
     name: input.name,
     channel,
-    props: input.props,
+    props,
     mountedAt: new Date().toISOString(),
   };
 
@@ -182,8 +195,9 @@ export function renderComponent(
   return {
     componentId,
     channel,
+    name: input.name,
     schema: entry.propsJsonSchema,
     events: entry.events,
-    initialState: input.props,
+    initialState: props,
   };
 }

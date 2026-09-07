@@ -600,6 +600,26 @@
       "sourceDoc": "docs/specs/features/feature-040-primevue-registry.md"
     },
     {
+      "id": "F43b",
+      "title": "Chat-bridge prop sanitization",
+      "phase": "Tool Surface",
+      "week": 10,
+      "effort": "S",
+      "dependsOn": ["F16", "F40", "F46"],
+      "writer": "chat-bridge-agent",
+      "verifier": "bridge-latency-uat",
+      "verifiedAt": "2026-09-07",
+      "acceptanceCriteria": [
+        { "id": "F43b-AC1", "statement": "Unwrap MCP-wrapped {item:[..]} arrays in bridge props", "testId": "packages/server/src/chat/__tests__/chat-bridge.test.ts:F43b-AC1" },
+        { "id": "F43b-AC2", "statement": "Coerce finite-number strings to numbers in bridge props", "testId": "packages/server/src/chat/__tests__/chat-bridge.test.ts:F43b-AC2" },
+        { "id": "F43b-AC3", "statement": "Preserve nested shape when already a flat array", "testId": "packages/server/src/chat/__tests__/chat-bridge.test.ts:F43b-AC3" },
+        { "id": "F43b-AC4", "statement": "Pass-through non-numeric strings unchanged", "testId": "packages/server/src/chat/__tests__/chat-bridge.test.ts:F43b-AC4" },
+        { "id": "F43b-AC5", "statement": "Single-attempt bridge render for sanitizer-compatible input", "testId": "packages/server/src/chat/__tests__/chat-handler.test.ts:F43b-AC5" },
+        { "id": "F43b-AC6", "statement": "MCP-direct trust boundary unchanged (still strict)", "testId": "packages/server/src/chat/__tests__/chat-handler.test.ts:F43b-AC6" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-043-chat-bridge-prop-sanitization.md"
+    },
+    {
       "id": "F46",
       "title": "API key auth (`gnc_live_<32>` Bearer)",
       "phase": "Security",

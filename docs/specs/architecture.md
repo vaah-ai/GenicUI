@@ -106,6 +106,26 @@ Browser: GenicClient receives COMPONENT_MOUNTED
 Server: returns { componentId: "dt-sess9f8e-01HK9X", channel, schema, initialState }
 ```
 
+### Phase 2b: Chat-Bridge Render (Claude Code / Codex streams)
+
+When the agent reaches the playground via the chat bridge (instead of the MCP-direct trust boundary), the wire shape differs slightly because Claude Code's MCP wrapper encodes array parameters as `{ item: [...] }` envelopes and may quote integer-looking scalars as strings. The chat-bridge sanitizer (`sanitizeBridgeProps` in `packages/server/src/chat/chat-handler.ts`) normalizes those shapes before validation:
+
+```
+Agent (Claude Code stream-json): tool_call { name: "render_component",
+                                              args: { name: "DataTable",
+                                                      props: { pageSize: "10",
+                                                               rows: { item: [...] } } } }
+Bridge: sanitizeBridgeProps()
+        → unwrap rows: { item: [...] }  →  rows: [...]
+        → coerce pageSize: "10"        →  pageSize: 10
+        → renderComponent(...)         →  ok, bridge COMPONENT_MOUNTED
+Browser: tool_call accordion expands, embeds <RenderedComponent> → PrimeVue DataTable
+```
+
+The MCP-direct trust boundary stays strict (see [State Management §Trust Boundary](#trust-boundary) and [F16](../specs/features/feature-016-render-component-tool.md)). The sanitizer runs **only inside the chat bridge**, which is internal — the only caller is our own Claude Code / Codex adaptor.
+
+**Why the sanitizer exists:** without it, a schema-shape mismatch (e.g. an MCP-wrapped array the schema rejects) returns `-32003 props_invalid`, and Claude Code's MCP wrapper retries the same bad payload up to ~25 times before giving up. From the user's perspective the chat panel shows 25 running-accordions for ~30 seconds while the table never mounts. With the sanitizer, the same prompt renders in one bridge call. Diagnostic signature: a fast render logs `bridged render_component -> …` once; a slow render logs `bridge render_component failed (-32003)` N times before either a retry or the subprocess closing.
+
 ### Phase 3: Update
 
 ```

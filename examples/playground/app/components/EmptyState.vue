@@ -25,7 +25,7 @@
         components here in real time.
       </p>
       <code class="empty-state-code">
-        ws://localhost:3040/ws
+        ws://localhost:3041/ws
       </code>
     </div>
   </div>

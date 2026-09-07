@@ -8,6 +8,12 @@
 // F14-AC1: Prototype pollution defense
 export { stripProtoKeys, hasProtoKeys } from './strip-proto-keys.js';
 
+// F43: MCP-array unwrapping for component props
+export {
+  unwrapMcpArrays,
+  unwrapMcpArrayProps,
+} from './unwrap-mcp-arrays.js';
+
 // F14-AC2: Schema validation with field-level details
 export {
   validateToolInput,

@@ -20,6 +20,9 @@ import {
 } from './auth/index.js';
 import { createWsHandler, wsApiKeyStore } from './transport/websocket.js';
 import { handleMcpRequest } from './mcp/index.js';
+import { broadcastComponentMountedAll } from './chat/chat-handler.js';
+import { renderComponent } from './mcp/render-handler.js';
+import { loadRegistries, getRegistries } from './registry/registries-loader.js';
 
 /**
  * Health check response shape.
@@ -30,8 +33,8 @@ interface HealthResponse {
   status: 'ok';
 }
 
-const PORT = 3040;
-const HOSTNAME = '0.0.0.0';
+const PORT = Number(process.env.GENICUI_PORT) || 3040;
+const HOSTNAME = process.env.GENICUI_HOSTNAME ?? '0.0.0.0';
 
 /**
  * Pre-computed hash store for API key validation.
@@ -79,6 +82,33 @@ interface ApiStatusResponse {
 }
 
 /**
+ * A single component in a registry listing response.
+ */
+interface RegistryComponentListing {
+  name: string;
+  version: string;
+  tags: string[];
+  examplePrompts: string[] | undefined;
+}
+
+/**
+ * A registry entry in the listing response.
+ */
+interface RegistryListing {
+  id: string;
+  version: string;
+  framework: string;
+  components: RegistryComponentListing[];
+}
+
+/**
+ * Response for GET /api/registries.
+ */
+interface ApiRegistriesResponse {
+  registries: RegistryListing[];
+}
+
+/**
  * Create and start the GenicUI HTTP + WebSocket server.
  *
  * Listens on port 3040, hostname 0.0.0.0 by default.
@@ -91,6 +121,12 @@ interface ApiStatusResponse {
 export function createServer() {
   // Initialise API key store from environment
   initApiKeys();
+
+  // Load component registries from the registries/ directory (F43)
+  const registriesDir = process.env.GENICUI_REGISTRIES_DIR ?? '';
+  if (registriesDir) {
+    loadRegistries(registriesDir);
+  }
 
   // Authenticated API app — guard applies only to /api/* routes
   const apiApp = new Elysia({ prefix: '/api' })
@@ -120,6 +156,18 @@ export function createServer() {
         c.set.status = 401;
         throw new AuthError('Unauthorized', 401);
       }
+    })
+    // F43: List available component registries for the playground frontend
+    .get('/registries', (): ApiRegistriesResponse => {
+      const regs = getRegistries();
+      return {
+        registries: regs.map((reg) => ({
+          id: reg.id,
+          version: reg.version,
+          framework: reg.framework,
+          components: reg.components,
+        })),
+      };
     });
 
   // WebSocket transport handler
@@ -127,6 +175,21 @@ export function createServer() {
 
   // Main app with open health endpoint, WebSocket, and MCP routes
   const app = new Elysia()
+    // Permissive CORS for dev (playground on :3040, PoC on :8080). The
+    // production deployment should restrict this to known origins.
+    .onRequest(({ set, request }) => {
+      const origin = request.headers.get('origin');
+      if (origin) {
+        set.headers['Access-Control-Allow-Origin'] = origin;
+        set.headers['Access-Control-Allow-Credentials'] = 'true';
+        set.headers['Vary'] = 'Origin';
+      }
+      set.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS';
+      set.headers['Access-Control-Allow-Headers'] =
+        'Content-Type, Authorization, X-Requested-With, Mcp-Session-Id, Last-Event-Id';
+      set.headers['Access-Control-Max-Age'] = '86400';
+    })
+    .options('/*', () => new Response(null, { status: 204 }))
     .get('/health', (): HealthResponse => ({
       status: 'ok',
     }))
@@ -135,10 +198,16 @@ export function createServer() {
     .ws('/ws', wsHandler as any) // cast: Elysia WS types are not exported; runtime is correct
     .use(apiApp)
     // MCP Streamable HTTP endpoint (F13)
-    // POST /mcp — handles JSON-RPC requests from MCP clients
+    // POST /mcp — handles JSON-RPC requests from MCP clients.
+    // F43 follow-up: a successful `tools/call` for `render_component`
+    // also broadcasts a `COMPONENT_MOUNTED` frame to every connected
+    // WebSocket session so the playground's `useComponents` store
+    // updates in real time. The JSON-RPC response itself is unchanged.
     .post('/mcp', async (c): Promise<unknown> => {
       const message = c.body as JSONRPCMessage;
-      return handleMcpRequest(message);
+      const response = await handleMcpRequest(message);
+      broadcastRenderComponentResult(message, response);
+      return response;
     });
 
   app.listen({ port: PORT, hostname: HOSTNAME });
@@ -156,4 +225,83 @@ export function createServer() {
  */
 if (import.meta.main) {
   createServer();
+}
+
+/**
+ * If an MCP `tools/call` request invoked `render_component`, broadcast
+ * a `COMPONENT_MOUNTED` frame to every connected WebSocket session.
+ *
+ * The `/mcp` endpoint is stateless: each HTTP request creates its own
+ * MCP server, dispatches the request, and returns the JSON-RPC
+ * response. The connected browser only learns about the new component
+ * if we explicitly publish the frame over WebSocket — without this
+ * helper, MCP-driven renders never surface in the playground's
+ * `useComponents` store, so chat bubbles that embed the component
+ * never see it (F43 follow-up).
+ *
+ * The helper inspects both the request and the response: the request
+ * identifies the tool name + arguments; the response confirms
+ * success and carries the component metadata. We re-call
+ * `renderComponent()` here (instead of re-parsing the JSON-RPC
+ * response payload, which is MCP-formatted and harder to type)
+ * because it's idempotent and cheap — the underlying
+ * `componentStore.register()` already deduplicates by idempotency
+ * key when provided.
+ *
+ * Notifications (no `id` field) and non-`tools/call` methods are
+ * ignored silently. Errors and validation failures are also ignored —
+ * the JSON-RPC response carries the error to the caller.
+ */
+function broadcastRenderComponentResult(
+  request: JSONRPCMessage,
+  response: unknown,
+): void {
+  const reqObj = request as Record<string, unknown>;
+  if (reqObj['method'] !== 'tools/call') return;
+  const params = reqObj['params'] as Record<string, unknown> | undefined;
+  const name = typeof params?.['name'] === 'string' ? params['name'] : '';
+  if (name !== 'render_component') return;
+
+  const args = (params?.['arguments'] && typeof params['arguments'] === 'object'
+    ? (params['arguments'] as Record<string, unknown>)
+    : {});
+
+  // Re-run renderComponent so we own the typed RenderResult. The MCP
+  // tool handler will also have run it server-side; idempotency by
+  // componentId keeps both stores in sync (componentStore.register
+  // upserts on the same key).
+  const componentName = typeof args['componentName'] === 'string'
+    ? args['componentName']
+    : typeof args['name'] === 'string'
+      ? args['name']
+      : '';
+  if (!componentName) return;
+
+  const props = (args['props'] && typeof args['props'] === 'object')
+    ? (args['props'] as Record<string, unknown>)
+    : {};
+  const idempotencyKey = typeof args['idempotencyKey'] === 'string'
+    ? args['idempotencyKey']
+    : undefined;
+
+  const renderInput: {
+    name: string;
+    props: Record<string, unknown>;
+    idempotencyKey?: string;
+  } = { name: componentName, props };
+  if (idempotencyKey !== undefined) renderInput.idempotencyKey = idempotencyKey;
+
+  const result = renderComponent(renderInput);
+  if (result.error) return;
+
+  // Only broadcast if the MCP response confirms a successful
+  // tools/call (no `error` key, present `result`). Validation
+  // failures (-32003 etc.) won't reach here because we already
+  // returned above on `result.error`.
+  const resObj = response as Record<string, unknown> | undefined;
+  if (!resObj || typeof resObj !== 'object') return;
+  if ('error' in resObj) return;
+  if (!('result' in resObj)) return;
+
+  broadcastComponentMountedAll(result);
 }

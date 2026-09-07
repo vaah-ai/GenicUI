@@ -9,7 +9,7 @@ export default defineNuxtConfig({
 
   // Dev server
   devServer: {
-    port: 3000,
+    port: 3040,
   },
 
   // Disable SSR for WS client — the playground is a client-side demo

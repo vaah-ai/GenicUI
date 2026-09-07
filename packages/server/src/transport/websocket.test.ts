@@ -12,8 +12,9 @@
  * @see {F10-AC5} — 2 missed pongs -> WS close 1011
  */
 
-import { describe, it, expect, beforeEach } from 'bun:test';
-import { createWsHandler } from './websocket.js';
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import { createWsHandler, wsApiKeyStore } from './websocket.js';
+import { hashApiKey } from '../auth/index.js';
 import {
   GENICUI_SUBPROTOCOL,
   HEARTBEAT_MS,
@@ -146,6 +147,15 @@ describe('F10-AC2: Invalid key -> HTTP 401', () => {
 
   beforeEach(() => {
     handler = createWsHandler();
+    // F43: configure a key store so the upgrade handler runs in enforcement
+    // mode (otherwise dev mode accepts anonymous connections).
+    const store = new Map<string, { keyId: string; keyType: 'live' | 'test' }>();
+    store.set(hashApiKey(DEV_API_KEY), { keyId: 'key_dev', keyType: 'test' });
+    wsApiKeyStore.set(store);
+  });
+
+  afterEach(() => {
+    wsApiKeyStore.set(null as never);
   });
 
   it('rejects connection with missing API key', () => {
@@ -190,6 +200,33 @@ describe('F10-AC2: Invalid key -> HTTP 401', () => {
     });
 
     expect(() => handler.upgrade(ctx as never)).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// F43: Dev-mode anonymous upgrade (no key store configured)
+// ---------------------------------------------------------------------------
+
+describe('F43: Dev mode accepts anonymous upgrade', () => {
+  let handler: ReturnType<typeof createWsHandler>;
+
+  beforeEach(() => {
+    handler = createWsHandler();
+    // Explicitly clear the store so dev mode applies.
+    wsApiKeyStore.set(null as never);
+  });
+
+  afterEach(() => {
+    wsApiKeyStore.set(null as never);
+  });
+
+  it('accepts subprotocol-only upgrade when no key store is configured', () => {
+    const ctx = createMockContext({
+      'sec-websocket-protocol': GENICUI_SUBPROTOCOL,
+    });
+
+    const result = handler.upgrade(ctx as never);
+    expect(result).toBe(GENICUI_SUBPROTOCOL);
   });
 });
 
