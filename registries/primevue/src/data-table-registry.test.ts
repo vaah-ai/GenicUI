@@ -721,18 +721,18 @@ describe('Registry export', () => {
   });
 
   it('has correct version', () => {
-    expect(registry.version).toBe('0.1.0');
+    expect(registry.version).toBe('0.2.0');
   });
 
   it('has correct framework', () => {
     expect(registry.framework).toBe('primevue');
   });
 
-  it('has exactly 1 component', () => {
-    expect(registry.components.length).toBe(1);
+  it('has exactly 3 components (DataTable + InputPair + ResultCard)', () => {
+    expect(registry.components.length).toBe(3);
   });
 
-  it('component is the DataTable', () => {
+  it('first component is the DataTable', () => {
     expect(registry.components[0]!.name).toBe('data-table');
   });
 });

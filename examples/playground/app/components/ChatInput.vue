@@ -145,9 +145,10 @@ function handleKeydown(ev: KeyboardEvent): void {
 }
 
 /**
- * Watch the singleton `submitRequested` flag. Chip click in
- * RenderSurface flips it to true; we fire the submit and clear the
- * flag so the next chip click works.
+ * Watch the singleton `submitRequested` flag. A chip click in the
+ * chat's empty state (or in any other consumer of `useChatInput`)
+ * flips it to true; we fire the submit and clear the flag so the
+ * next chip click works.
  */
 watch(
   () => inputState.submitRequested.value,

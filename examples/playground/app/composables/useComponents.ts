@@ -8,10 +8,10 @@
  * `useWebSocket`) — every caller shares the same reactive `components`
  * array. The first version of this composable scoped `ref<MountedComponent[]>`
  * to the function body, which meant `app.vue`'s subscriber updated its own
- * private ref while `RenderSurface` and the sidebar each held a different
- * private ref. The sidebar showed the count but the center never rendered
- * the cards — they were in a different reactive instance. Hoisting the ref
- * + handlers to module scope fixes that class of bug (F43 follow-up).
+ * private ref while the sidebar held a different private ref. The sidebar
+ * showed the count but the components in chat never saw updates — they
+ * were in a different reactive instance. Hoisting the ref + handlers to
+ * module scope fixes that class of bug (F43 follow-up).
  *
  * @see {F41} — Playground demo app
  */
@@ -33,8 +33,9 @@ interface MountedComponent {
 /**
  * Shared component registry.
  *
- * Module-level so `app.vue`'s WS subscription, `RenderSurface`, and the
- * sidebar `Components` list all see the same `components` array.
+ * Module-level so `app.vue`'s WS subscription, `ToolCallAccordion`
+ * (which renders each component inside a chat bubble), and the sidebar
+ * `Components` count pill all see the same `components` array.
  */
 const components = ref<MountedComponent[]>([]);
 
@@ -214,10 +215,57 @@ export function useComponents() {
     components.value = [];
   }
 
+  /**
+   * Send a component event to the server as a `chat.component_event`
+   * frame on the `__chat__` channel.
+   *
+   * The server forwards the event to the active Claude Code subprocess
+   * as a synthetic follow-up prompt, so the agent can react and render
+   * a follow-up component.
+   *
+   * @param ws — WebSocket-like send target (matches useChat's signature).
+   * @param componentId — The mounted component's id.
+   * @param name — Optional component display name; auto-resolved from the
+   *               local registry when omitted.
+   * @param action — Event name (e.g. 'submit').
+   * @param payload — Event payload (JSON-serializable).
+   */
+  function sendComponentEvent(
+    ws: { send: (data: Record<string, unknown>) => void },
+    componentId: string,
+    name: string | undefined,
+    action: string,
+    payload?: Record<string, unknown>,
+  ): void {
+    const resolvedName = name ?? findComponent(componentId)?.name;
+    ws.send({
+      v: 1,
+      channel: '__chat__',
+      type: 'chat.component_event',
+      seq: 0,
+      payload: {
+        componentId,
+        name: resolvedName,
+        action,
+        payload,
+      },
+    });
+  }
+
+  /**
+   * Look up the display name for a mounted component by id.
+   * Returns undefined when the id is unknown.
+   */
+  function nameFor(componentId: string): string | undefined {
+    return findComponent(componentId)?.name;
+  }
+
   return {
     components: readonly(components),
     findComponent,
+    nameFor,
     subscribe,
     clear,
+    sendComponentEvent,
   };
 }

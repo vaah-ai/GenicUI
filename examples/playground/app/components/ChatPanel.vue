@@ -1,5 +1,5 @@
 <template>
-  <aside class="chat-panel" aria-label="Chat history">
+  <aside :id="panelId" class="chat-panel" aria-label="Chat history">
     <div class="chat-panel-header">
       <div class="chat-panel-title">
         <svg
@@ -60,6 +60,17 @@ import { useRegistries } from '~/composables/useRegistries.ts';
 import { useProviders } from '~/composables/useProviders.ts';
 import ChatHistory from './ChatHistory.vue';
 import ChatInput from './ChatInput.vue';
+
+/**
+ * F43: `panelId` is the DOM id for the skip-link target. Defaults
+ * to `'chat-panel'`; the playground passes `'chat-panel-main'` from
+ * `app.vue` so its skip-to-content link points at the live chat
+ * surface (previously this pointed at the removed `RenderSurface`).
+ */
+const props = withDefaults(
+  defineProps<{ panelId?: string }>(),
+  { panelId: 'chat-panel' },
+);
 
 const { history, isLoading, clear, sendMessage } = useChat();
 const ws = useWebSocket();

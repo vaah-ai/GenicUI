@@ -372,11 +372,12 @@ describe('chat-handler', () => {
     it('delivers a COMPONENT_MOUNTED frame to every live session with the payload name', () => {
       // F43 follow-up regression: the stateless `/mcp` HTTP endpoint
       // broadcasts render_component results via this helper, so the
-      // playground's RenderSurface updates without going through the
-      // chat pipeline. The test stubs the SESSIONS set directly
-      // because websocket.ts is the only module that mutates it; we
-      // poke it through `broadcastToAllSessions` by calling this
-      // helper with no live sessions and verifying it returns 0.
+      // playground's `useComponents` store updates without going
+      // through the chat pipeline. The test stubs the SESSIONS set
+      // directly because websocket.ts is the only module that
+      // mutates it; we poke it through `broadcastToAllSessions` by
+      // calling this helper with no live sessions and verifying it
+      // returns 0.
       const result = renderComponent({
         name: 'DataTable',
         props: { rows: [{ id: '1', name: 'Alice' }] },

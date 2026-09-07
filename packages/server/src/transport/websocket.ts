@@ -40,7 +40,7 @@ import {
   retrieveSessionBuffer,
   removeSessionBuffer,
 } from '../session-recovery/index.js';
-import { handleChatMessage } from '../chat/chat-handler.js';
+import { handleChatMessage, handleChatComponentEvent } from '../chat/chat-handler.js';
 
 /** Server version string sent in server.hello. */
 const SERVER_VERSION = '0.1.0';
@@ -503,6 +503,23 @@ export function createWsHandler(): {
           const errMsg = err instanceof Error ? err.message : String(err);
           console.error(
             `[chat] Session ${session.sessionId} handler error: ${errMsg}`,
+          );
+        });
+        return;
+      }
+
+      // F43: Inbound component event from a chat-embedded widget.
+      // The client fires this when a user interacts with a mounted
+      // component (e.g. clicks Submit on an InputPair). The server
+      // kills any active subprocess, broadcasts a synthetic user
+      // bubble, and resumes the Claude session with a follow-up
+      // turn that reacts to the event.
+      if (frame.channel === '__chat__' && frame.type === 'chat.component_event') {
+        const eventPayload = frame.payload as Record<string, unknown>;
+        handleChatComponentEvent(session, eventPayload).catch((err: unknown) => {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.error(
+            `[chat] Session ${session.sessionId} component_event handler error: ${errMsg}`,
           );
         });
         return;

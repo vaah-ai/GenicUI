@@ -2,12 +2,16 @@
  * Chat composable — singleton state shared across the playground app.
  *
  * Uses module-level state so any component calling useChat() shares the
- * same reactive history (RenderSurface → ChatPanel stay in sync).
+ * same reactive history (ChatHistory, ChatInput, and ToolCallAccordion
+ * all stay in sync).
  *
  * @see {F43} — Suggestive prompts + registry selector
  * @see {F43 follow-up} — Claude Code–style chat panel with structured
  *                        tool-call array (replaces inline `[calling …]`
  *                        text annotations)
+ * @see {F43 chat-as-render-surface} — Chat is the only render surface;
+ *                                     the old `RenderSurface` center
+ *                                     column was removed.
  */
 
 import { ref, readonly } from 'vue';
@@ -187,6 +191,9 @@ export function useChat() {
    *  - `error`       — non-fatal error event; tool-level → set `toolCalls[i].error`,
    *                    prose-level → append to `response`
    *  - `stderr`      — provider stderr (logged to console)
+   *  - `user_event`  — F43: synthetic user bubble after a component
+   *                    interaction (e.g. clicked Submit on InputPair).
+   *                    Pushed as a new entry with status `complete`.
    *
    * Anything else is ignored so the chat stays focused on the user-facing
    * assistant response.
@@ -196,11 +203,11 @@ export function useChat() {
     if (!evt || typeof evt.type !== 'string') return;
 
     const lastIdx = history.value.length - 1;
-    if (lastIdx < 0) return;
-    const last = history.value[lastIdx]!;
 
     switch (evt.type) {
       case 'ai_text': {
+        if (lastIdx < 0) return;
+        const last = history.value[lastIdx]!;
         const chunk = typeof evt.data?.['text'] === 'string' ? evt.data['text'] : '';
         if (chunk) {
           history.value[lastIdx] = {
@@ -212,6 +219,8 @@ export function useChat() {
         break;
       }
       case 'tool_call': {
+        if (lastIdx < 0) return;
+        const last = history.value[lastIdx]!;
         const entry = makeToolCallEntry(evt.data ?? {});
         history.value[lastIdx] = {
           ...last,
@@ -221,6 +230,8 @@ export function useChat() {
         break;
       }
       case 'tool_result': {
+        if (lastIdx < 0) return;
+        const last = history.value[lastIdx]!;
         const resultId = typeof evt.data?.['id'] === 'string' ? evt.data['id'] : null;
         const resultPayload = evt.data?.['result'];
         const toolCalls = upsertToolCallResult(last.toolCalls, resultId, resultPayload);
@@ -232,6 +243,8 @@ export function useChat() {
         break;
       }
       case 'error': {
+        if (lastIdx < 0) return;
+        const last = history.value[lastIdx]!;
         const msg = typeof evt.data?.['error'] === 'string'
           ? evt.data['error']
           : typeof evt.data?.['message'] === 'string'
@@ -259,6 +272,46 @@ export function useChat() {
         if (text) {
           console.warn('[chat] stderr from provider:', text.slice(0, 200));
         }
+        break;
+      }
+      case 'user_event': {
+        // F43: a chat-embedded component fired an event. The server
+        // synthesizes a follow-up turn, but FIRST it sends this
+        // `user_event` so the chat history shows a click bubble
+        // before the next assistant response lands.
+        //
+        // We push a synthetic user entry with a click-description
+        // prompt. ChatPanel.vue renders user entries (status
+        // `complete` + empty response) as the user bubble; we want
+        // this to look like a click event so we prefix the prompt
+        // with `[click]`. The actual UI distinguishes user entries
+        // from assistant entries via the `prompt`-only shape (no
+        // `toolCalls`, `response` empty, status complete).
+        //
+        // This case is append-only and runs even when history is
+        // empty so the synthetic bubble still appears if the user
+        // clicked a component before sending any prompt.
+        const componentId = typeof evt.data?.['componentId'] === 'string'
+          ? (evt.data['componentId'] as string)
+          : '?';
+        const name = typeof evt.data?.['name'] === 'string'
+          ? (evt.data['name'] as string)
+          : null;
+        const action = typeof evt.data?.['action'] === 'string'
+          ? (evt.data['action'] as string)
+          : '?';
+        const detail = evt.data?.['payload'] as Record<string, unknown> | undefined;
+
+        const prompt = `[click] ${action} on ${name ?? componentId}` +
+          (detail ? ` ${JSON.stringify(detail)}` : '');
+
+        history.value.push({
+          prompt,
+          response: '',
+          timestamp: new Date().toISOString(),
+          status: 'complete',
+          toolCalls: [],
+        });
         break;
       }
       // 'status', 'tool_use' verb-only, and anything else: ignore.

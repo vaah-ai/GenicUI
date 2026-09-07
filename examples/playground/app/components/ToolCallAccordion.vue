@@ -51,12 +51,13 @@
         channel, useComponents tracks it under a componentId. We
         resolve the componentId from the tool input (idempotencyKey
         or auto-generated) so the rendered component shows up *inside
-        the chat bubble* — not just in the center RenderSurface.
+        the chat bubble*. This is the only place rendered components
+        live — F43 dropped the old center `RenderSurface` column so
+        users see the same artifact right next to the tool call.
 
         This mirrors the POC's chat-bubble behaviour: tool_result
         surfaces a card, but render_component specifically surfaces
-        a visible representation of the rendered component so the
-        user sees the same artifact they'd see in the center column.
+        a visible representation of the rendered component.
       -->
       <div
         v-if="isRenderComponentCall && mountedComponent"
@@ -85,6 +86,18 @@
           </span>
           <span class="tool-call-component-id">{{ mountedComponent.componentId }}</span>
         </header>
+        <!-- Live interactive UI (POC parity): the chat bubble embeds
+             the actual rendered component (PrimeVue DataTable for
+             the F43 catalog). F43 follow-up: this is the "make the
+             chat show the component UI" surface — the only surface
+             after the old center column was removed. -->
+        <div class="tool-call-component-body">
+          <RenderedComponent
+            :name="mountedComponent.name"
+            :props="mountedComponent.props"
+            :component-id="mountedComponent.componentId"
+          />
+        </div>
         <details class="tool-call-component-props">
           <summary class="tool-call-component-props-toggle">
             <span>Props</span>
@@ -137,14 +150,15 @@
 import { computed } from 'vue';
 import { useComponents } from '~/composables/useComponents.ts';
 import type { ToolCallEntry } from '~/composables/useChat.ts';
+import RenderedComponent from './RenderedComponent.vue';
 
 /**
  * ToolCallAccordion — collapsible disclosure for one tool invocation
  * by the agent.
  *
- * Mirrors the `<details>` + chevron pattern from `RenderSurface.vue`'s
- * `component-card-props` so the chat panel uses the same affordance
- * vocabulary as the rest of the playground.
+ * Mirrors the `<details>` + chevron pattern from the now-removed
+ * `RenderSurface.vue`'s `component-card-props` so the chat panel uses
+ * the same affordance vocabulary as the rest of the playground.
  *
  * Status pill:
  *  - `running` — `--gp-accent` text, animated dot
@@ -162,8 +176,8 @@ import type { ToolCallEntry } from '~/composables/useChat.ts';
  * preview card (name + componentId + collapsible props) directly
  * in the accordion body. This is what makes the rendered component
  * UI visible inside the chat bubble — matching the user's
- * "visible in the chat" requirement — rather than only in the
- * center RenderSurface column.
+ * "visible in the chat" requirement — and the only place rendered
+ * components surface after F43 dropped the center column.
  */
 const props = defineProps<{
   /** The structured tool call entry. */
@@ -481,6 +495,16 @@ function formatJson(value: unknown): string {
   white-space: pre;
   max-height: 320px;
   overflow-y: auto;
+}
+
+.tool-call-component-body {
+  background: var(--gp-surface);
+  padding: var(--gp-space-2) var(--gp-space-3);
+  border-bottom: 1px solid var(--gp-border);
+}
+
+.tool-call-component-body :deep(.p-datatable-table) {
+  font-size: 0.75rem;
 }
 
 /* ---------- Raw input / result / error blocks ---------- */

@@ -477,15 +477,141 @@ describe('useChatInput (singleton)', () => {
   });
 
   it('fillAndSubmit is idempotent across repeated calls', () => {
-    // Chip clicks in RenderSurface may fire while a previous fill is
-    // still pending; the singleton state must always reflect the
-    // most recent fill so the input bar submits the latest prompt.
+    // Chip clicks (e.g. in the chat's empty state) may fire while a
+    // previous fill is still pending; the singleton state must always
+    // reflect the most recent fill so the input bar submits the latest
+    // prompt.
     const input = useChatInput();
     input.fillAndSubmit('first');
     input.fillAndSubmit('second');
 
     expect(input.draft.value).toBe('second');
     expect(input.submitRequested.value).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// F43: synthetic user bubble from chat.component_event
+// ---------------------------------------------------------------------------
+describe('useChat user_event (F43)', () => {
+  beforeEach(() => {
+    useChat().clear();
+    useChatInput().clear();
+  });
+
+  it('pushes a synthetic user entry on user_event with all fields', () => {
+    const chat = useChat();
+
+    chat.handleEvent({
+      payload: {
+        event: {
+          type: 'user_event',
+          data: {
+            componentId: 'cp-1',
+            name: 'InputPair',
+            action: 'submit',
+            payload: { input1: 5, input2: 3 },
+          },
+        },
+      },
+    });
+
+    expect(chat.history.value).toHaveLength(1);
+    const entry = chat.history.value[0]!;
+    expect(entry.prompt).toContain('[click]');
+    expect(entry.prompt).toContain('submit');
+    expect(entry.prompt).toContain('InputPair');
+    expect(entry.prompt).toContain('"input1":5');
+    expect(entry.prompt).toContain('"input2":3');
+    // Synthetic click bubble has no response, no tool calls, complete status.
+    expect(entry.response).toBe('');
+    expect(entry.toolCalls).toEqual([]);
+    expect(entry.status).toBe('complete');
+  });
+
+  it('falls back to componentId when name is missing', () => {
+    const chat = useChat();
+
+    chat.handleEvent({
+      payload: {
+        event: {
+          type: 'user_event',
+          data: { componentId: 'cp-unknown', action: 'tap' },
+        },
+      },
+    });
+
+    expect(chat.history.value).toHaveLength(1);
+    const entry = chat.history.value[0]!;
+    expect(entry.prompt).toContain('cp-unknown');
+    expect(entry.prompt).not.toContain('undefined');
+    expect(entry.prompt).not.toContain('null');
+  });
+
+  it('omits payload suffix when no detail was provided', () => {
+    const chat = useChat();
+
+    chat.handleEvent({
+      payload: {
+        event: {
+          type: 'user_event',
+          data: { componentId: 'cp-1', name: 'X', action: 'click' },
+        },
+      },
+    });
+
+    const entry = chat.history.value[0]!;
+    expect(entry.prompt).not.toContain('undefined');
+    expect(entry.prompt).not.toContain('null');
+    // No `payload` keyword appears in the prompt because no detail was provided.
+    expect(entry.prompt).not.toMatch(/\{\}/);
+  });
+
+  it('appends the user_event entry AFTER existing history (chronological)', () => {
+    const chat = useChat();
+    chat.sendMessage('give me a calculator', { send: () => {} });
+    chat.handleEvent({
+      payload: { event: { type: 'ai_text', data: { text: 'Sure, here is one' } } },
+    });
+
+    chat.handleEvent({
+      payload: {
+        event: {
+          type: 'user_event',
+          data: { componentId: 'cp-1', name: 'InputPair', action: 'submit' },
+        },
+      },
+    });
+
+    expect(chat.history.value).toHaveLength(2);
+    // Existing assistant bubble still at index 0 (untouched).
+    expect(chat.history.value[0]!.prompt).toBe('give me a calculator');
+    expect(chat.history.value[0]!.response).toBe('Sure, here is one');
+    // Synthetic click bubble is the new last entry.
+    expect(chat.history.value[1]!.prompt).toContain('[click]');
+  });
+
+  it('appends a synthetic bubble even when data field is missing (client is forgiving)', () => {
+    // The server's handleChatComponentEvent validates componentId +
+    // action before broadcasting, so a malformed user_event should
+    // not arrive in practice. But the client-side handler is
+    // defensive: it pushes a bubble with the `'?'` fallback instead
+    // of silently dropping the event (so the user sees feedback
+    // even if a future server bug leaks an empty frame).
+    const chat = useChat();
+    chat.sendMessage('hello', { send: () => {} });
+
+    chat.handleEvent({
+      payload: { event: { type: 'user_event' } },
+    });
+
+    expect(chat.history.value).toHaveLength(2);
+    // Existing user prompt is preserved at index 0.
+    expect(chat.history.value[0]!.prompt).toBe('hello');
+    // Synthetic click bubble uses the '?' fallback for both componentId
+    // and action since `data` was missing.
+    expect(chat.history.value[1]!.prompt).toContain('[click]');
+    expect(chat.history.value[1]!.prompt).toContain('? on ?');
   });
 });
 

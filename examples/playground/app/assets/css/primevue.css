@@ -179,18 +179,17 @@ pre {
   font-size: 0.75rem;
 }
 
-/* ---------- Main grid (3 zones) ---------- */
+/* ---------- Main grid (2 zones — F43: chat is the sole render surface) ---------- */
 .main-grid {
   grid-area: main;
   display: grid;
-  grid-template-columns: var(--gp-zoneleft-width) minmax(var(--gp-render-min), 1fr) var(--gp-zoneright-width);
-  grid-template-areas: "config render chat";
+  grid-template-columns: var(--gp-zoneleft-width) 1fr;
+  grid-template-areas: "config chat";
   min-height: 0;
   overflow: hidden;
 }
 
 .config-panel { grid-area: config; }
-.render-surface { grid-area: render; }
 .chat-panel { grid-area: chat; }
 
 /* ============================================================
@@ -324,30 +323,10 @@ pre {
 }
 
 /* ============================================================
-   Render Surface (center — focal area)
+   Render Surface — REMOVED in F43 (chat is the sole render surface)
+   The old `.render-surface` rules are gone; rendered components
+   now live inside chat tool-call accordions instead.
    ============================================================ */
-.render-surface {
-  padding: var(--gp-space-6) var(--gp-space-8);
-  background: var(--gp-bg);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gp-space-4);
-  min-width: 0;
-}
-
-.render-surface::-webkit-scrollbar {
-  width: 8px;
-}
-
-.render-surface::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.render-surface::-webkit-scrollbar-thumb {
-  background: var(--gp-border);
-  border-radius: 4px;
-}
 
 /* Hero state — when no components rendered yet, the center shows
    a focused prompt-call-to-action that fills the visual stage. */
@@ -754,13 +733,11 @@ pre {
    Responsive — collapse to single column on small screens
    ============================================================ */
 @media (max-width: 1024px) {
-  /* Chat moves below center on tablet, kept dominant */
+  /* F43: chat is the sole render surface — keep sidebar + chat on
+     tablet; chat remains dominant. */
   .main-grid {
     grid-template-columns: 220px 1fr;
-    grid-template-rows: 1fr 60%;
-    grid-template-areas:
-      "config render"
-      "chat   chat";
+    grid-template-areas: "config chat";
   }
 
   .chat-panel {
@@ -784,10 +761,9 @@ pre {
 
   .main-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
       "config"
-      "render"
       "chat";
   }
 
@@ -795,10 +771,6 @@ pre {
     max-height: 30vh;
     border-right: none;
     border-bottom: 1px solid var(--gp-border);
-  }
-
-  .render-surface {
-    padding: var(--gp-space-4);
   }
 
   .chat-panel {

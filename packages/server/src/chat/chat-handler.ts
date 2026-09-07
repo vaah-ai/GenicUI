@@ -38,6 +38,9 @@ import {
   rememberClaudeSession,
   getClaudeSession,
   setActiveSubprocess,
+  killActiveSubprocess,
+  setChatResumeContext,
+  getChatResumeContext,
 } from './chat-session-registry.js';
 import { renderComponent, type RenderResult } from '../mcp/render-handler.js';
 
@@ -138,6 +141,14 @@ function sendLegacyEcho(session: WsSession, message: ChatMessage): void {
 }
 
 /**
+ * Tag identifying the source of a turn for log diagnostics. Not part
+ * of the wire protocol — purely so server-side logs can tell a fresh
+ * user-typed turn from a synthetic follow-up triggered by a
+ * component event.
+ */
+export type TurnSource = 'chat.message' | 'component_event';
+
+/**
  * Run a single chat turn: spawn the provider's CLI, stream parsed
  * events back, close with chat.complete or chat.error on exit.
  *
@@ -148,25 +159,56 @@ function sendLegacyEcho(session: WsSession, message: ChatMessage): void {
  *     transport here).
  *   - Resume id is sourced from `chat-session-registry`, not from an
  *     EventEmitter map.
+ *
+ * Exported so `handleChatComponentEvent` can resume the Claude
+ * session with a synthesized follow-up prompt (F43). When
+ * `overridePrompt` is supplied, it takes precedence over the
+ * `message.prompt` so the component-event path can describe the
+ * click without needing a real user-typed prompt in the registry.
+ *
+ * `source` is log-only; the wire protocol is identical regardless.
  */
-async function runChatTurn(
+export async function runChatTurn(
   session: WsSession,
   message: ChatMessage,
   adaptor: ReturnType<typeof getProviderAdaptor> & object,
+  options: {
+    overridePrompt?: string;
+    source?: TurnSource;
+  } = {},
 ): Promise<void> {
   // Make sure the session is registered before the subprocess emits
   // anything (otherwise the first `status/init` event can't be linked
   // to the session for --resume on the next turn).
   createChatSession(session.sessionId);
 
+  // F43: snapshot the provider/prompt context so a subsequent
+  // `chat.component_event` can resume this session with the same
+  // provider config. Stored per-session and overwritten on every
+  // turn so the latest user prompt wins.
+  if (message.provider) {
+    setChatResumeContext(session.sessionId, {
+      providerId: adaptor.id,
+      provider: message.provider,
+      registry: message.registry,
+      lastUserPrompt: message.prompt,
+    });
+  }
+
   const binary = adaptor.resolveBinary(message.provider!.config);
   const resumeId = getClaudeSession(session.sessionId);
-  const args = [...adaptor.buildArgs({ resumeId }), '--', message.prompt];
+  // F43: `overridePrompt` lets `handleChatComponentEvent` inject a
+  // synthesized follow-up prompt describing the click instead of
+  // re-running the user's original prompt. Falls back to the
+  // chat.message payload otherwise.
+  const effectivePrompt = options.overridePrompt ?? message.prompt;
+  const args = [...adaptor.buildArgs({ resumeId }), '--', effectivePrompt];
 
   console.error(
     `[chat] spawning ${adaptor.id} for session ${session.sessionId}` +
       (resumeId ? ` (resume ${resumeId})` : '') +
-      ` prompt=${JSON.stringify(message.prompt).slice(0, 80)}…`,
+      ` source=${options.source ?? 'chat.message'} ` +
+      `prompt=${JSON.stringify(effectivePrompt).slice(0, 80)}…`,
   );
 
   // Spawn. Bun.spawn is the only platform API here — the server runs
@@ -639,3 +681,268 @@ function sendChatError(session: WsSession, error: string): void {
   };
   session.elysiaWs.send(serializeFrame(frame));
 }
+
+/**
+ * Send a `chat.event` frame whose payload `event.type` is `user_event`.
+ *
+ * This is the server-side analog of the synthetic user bubble the
+ * chat client renders when an embedded component fires
+ * `chat.component_event`. We emit it BEFORE the follow-up turn's
+ * `chat.complete`/`chat.error` so the user sees the click reflection
+ * before the agent's response.
+ *
+ * The `event.data` shape mirrors what the playground's `useChat`
+ * composable expects: `{ componentId, name, action, payload }`. The
+ * summary line is precomputed here so the client can render the
+ * bubble without inspecting `data` directly.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+function sendChatUserEvent(
+  session: WsSession,
+  payload: {
+    componentId: string;
+    name?: string;
+    action: string;
+    payload?: Record<string, unknown>;
+  },
+): void {
+  // F43 exactOptionalPropertyTypes: build the data object
+  // conditionally so `undefined` fields are stripped (rather than
+  // serialized as the explicit string "undefined").
+  const data: Record<string, unknown> = {
+    componentId: payload.componentId,
+    action: payload.action,
+  };
+  if (payload.name !== undefined) data['name'] = payload.name;
+  if (payload.payload !== undefined) data['payload'] = payload.payload;
+
+  const frame = {
+    v: 1 as const,
+    channel: '__chat__',
+    type: 'chat.event',
+    payload: { event: { type: 'user_event', data } },
+    seq: session.seqGenerator.next(),
+  };
+  session.elysiaWs.send(serializeFrame(frame));
+}
+
+/**
+ * Build the synthetic prompt we send to Claude when the user
+ * interacts with a chat-embedded component. The prompt is structured
+ * so the agent can reason about it without needing to inspect prior
+ * chat history: it names the component, the action, and includes the
+ * payload as JSON so numeric / structural details are preserved.
+ *
+ * Example output:
+ *   [component_event] user triggered "submit" on component
+ *   "InputPair" (id=cp-1) with payload {"input1":5,"input2":3}.
+ *   The previous component is still mounted in the chat. Continue
+ *   the conversation by rendering a follow-up component or responding
+ *   to the user.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+function synthesizeComponentEventPrompt(
+  componentId: string,
+  name: string | undefined,
+  action: string,
+  detail: Record<string, unknown> | undefined,
+): string {
+  const componentLabel = name && name.length > 0 ? `"${name}"` : '(unnamed)';
+  const idLabel = `(id=${componentId})`;
+  const payloadStr =
+    detail && Object.keys(detail).length > 0 ? JSON.stringify(detail) : '{}';
+  return (
+    `[component_event] user triggered "${action}" on component ${componentLabel} ` +
+    `${idLabel} with payload ${payloadStr}. ` +
+    `The previous component is still mounted in the chat. ` +
+    `Continue the conversation by rendering a follow-up component or ` +
+    `responding to the user.`
+  );
+}
+
+/**
+ * The synchronous portion of `handleChatComponentEvent`: given the
+ * resume context for the session, produce the follow-up ChatMessage
+ * + the synthesized prompt string that `runChatTurn` will use.
+ *
+ * Exported as a `__test_*` helper so unit tests can verify the
+ * prompt structure without having to spawn a real CLI subprocess.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+export function __test_buildFollowUpContext(
+  resumeContext: ResumedChatEntry,
+  componentId: string,
+  name: string | undefined,
+  action: string,
+  detail: Record<string, unknown> | undefined,
+): { followUp: ChatMessage; synthesizedPrompt: string } {
+  const followUp: ChatMessage = {
+    prompt: resumeContext.lastUserPrompt,
+    registry: resumeContext.registry,
+    provider: resumeContext.provider,
+  };
+  return {
+    followUp,
+    synthesizedPrompt: synthesizeComponentEventPrompt(
+      componentId,
+      name,
+      action,
+      detail,
+    ),
+  };
+}
+
+/**
+ * Build the user_event `chat.event` payload that mirrors what the
+ * playground's `useChat.user_event` handler expects. Exposed as a
+ * test helper so unit tests can assert the wire shape without
+ * depending on the send-side effects of `sendChatUserEvent`.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+export function __test_buildUserEventData(
+  componentId: string,
+  name: string | undefined,
+  action: string,
+  detail: Record<string, unknown> | undefined,
+): Record<string, unknown> {
+  const data: Record<string, unknown> = { componentId, action };
+  if (name !== undefined) data['name'] = name;
+  if (detail !== undefined) data['payload'] = detail;
+  return data;
+}
+
+/**
+ * Handle a `chat.component_event` frame from the client. The user
+ * just interacted with a mounted component inside the chat bubble
+ * (e.g. clicked Submit on an InputPair).
+ *
+ * Flow:
+ *   1. Validate the payload — must have `componentId` and `action`.
+ *   2. Require an existing Claude session id (`--resume <id>`). If the
+ *      client hasn't sent a `chat.message` yet, there's no Claude
+ *      session to resume — reply with `chat.error`.
+ *   3. Kill any in-flight subprocess so we can resume the same
+ *      Claude session with a synthetic follow-up prompt.
+ *   4. Broadcast a `user_event` chat event so the client renders the
+ *      synthetic user bubble BEFORE the next turn's events land.
+ *   5. Reuse the previously-sent provider config to spawn the next
+ *      turn with the synthesized prompt and `--resume <id>`.
+ *
+ * @see {F43} — Chat as the sole render surface (interactive components)
+ */
+export async function handleChatComponentEvent(
+  session: WsSession,
+  rawPayload: Record<string, unknown> | unknown,
+): Promise<void> {
+  // Defensive: tolerate any payload shape the client sends. We only
+  // pull out the documented fields and discard the rest.
+  const payloadObj = (rawPayload && typeof rawPayload === 'object')
+    ? (rawPayload as Record<string, unknown>)
+    : {};
+
+  const componentId =
+    typeof payloadObj['componentId'] === 'string' && payloadObj['componentId'].length > 0
+      ? (payloadObj['componentId'] as string)
+      : '';
+  const action =
+    typeof payloadObj['action'] === 'string' && payloadObj['action'].length > 0
+      ? (payloadObj['action'] as string)
+      : '';
+  const name =
+    typeof payloadObj['name'] === 'string' && payloadObj['name'].length > 0
+      ? (payloadObj['name'] as string)
+      : undefined;
+  const detail =
+    payloadObj['payload'] && typeof payloadObj['payload'] === 'object'
+      ? (payloadObj['payload'] as Record<string, unknown>)
+      : undefined;
+
+  if (!componentId) {
+    sendChatError(session, 'component_event: missing componentId');
+    return;
+  }
+  if (!action) {
+    sendChatError(session, 'component_event: missing action');
+    return;
+  }
+
+  // No Claude session id means the user hasn't sent a chat.message
+  // yet — there's no conversation to resume. The PoC and the
+  // playground both surface this as a recoverable error rather than
+  // silently dropping the click.
+  const claudeSessionId = getClaudeSession(session.sessionId);
+  if (!claudeSessionId) {
+    sendChatError(
+      session,
+      'No active Claude session for this WebSocket — please send a chat.message first',
+    );
+    return;
+  }
+
+  // Kill the in-flight subprocess (if any) so the synthesized
+  // prompt can take over the same Claude session id. We await the
+  // kill to make sure no stray stdout leaks into the next turn.
+  await killActiveSubprocess(session.sessionId);
+
+  // Broadcast the synthetic user bubble BEFORE spawning the
+  // follow-up turn so the user_event arrives ahead of the next
+  // ai_text / tool_call frames. Build conditionally so we don't
+  // trip exactOptionalPropertyTypes on undefined name/payload.
+  const userEventPayload: {
+    componentId: string;
+    action: string;
+    name?: string;
+    payload?: Record<string, unknown>;
+  } = { componentId, action };
+  if (name !== undefined) userEventPayload.name = name;
+  if (detail !== undefined) userEventPayload.payload = detail;
+  sendChatUserEvent(session, userEventPayload);
+
+  // Look up the provider that ran the original turn. If the session
+  // has no chat entry yet (extremely rare — only if the kill cleared
+  // it), we can't resume without a provider. Bail with chat.error.
+  const sessionEntry = getChatResumeContext(session.sessionId);
+  if (!sessionEntry) {
+    sendChatError(
+      session,
+      'component_event: chat session lost between turns; please retry',
+    );
+    return;
+  }
+
+  const adaptor = getProviderAdaptor(sessionEntry.providerId);
+  if (!adaptor) {
+    sendChatError(session, `Unknown provider: ${sessionEntry.providerId}`);
+    return;
+  }
+
+  // Build the synthesized prompt and follow-up ChatMessage shell.
+  // The `overridePrompt` argument carries the click-description
+  // prompt; the ChatMessage carries the provider config so
+  // `runChatTurn` doesn't need to re-resolve it.
+  const { followUp, synthesizedPrompt } = __test_buildFollowUpContext(
+    sessionEntry,
+    componentId,
+    name,
+    action,
+    detail,
+  );
+
+  await runChatTurn(session, followUp, adaptor, {
+    overridePrompt: synthesizedPrompt,
+    source: 'component_event',
+  });
+}
+
+/**
+ * Snapshot of per-session state needed by `handleChatComponentEvent`
+ * to resume a Claude turn with the right provider config and
+ * original user prompt. Defined and stored in `chat-session-registry.ts`;
+ * re-exported here so callers can use the typed accessor without a
+ * second import.
+ */
+export type { ResumedChatEntry } from './chat-session-registry.js';

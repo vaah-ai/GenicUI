@@ -97,23 +97,17 @@
 
     <Divider class="config-divider" />
 
-    <!-- Components List -->
+    <!-- Components Count Pill (F43: list is gone, chat is the sole render surface) -->
     <div class="components-section">
       <h3>
         Components
-        <span class="badge" aria-label="component count">{{ components.length }}</span>
+        <span class="badge" :aria-label="`${components.length} mounted`">
+          {{ components.length }} mounted
+        </span>
       </h3>
-      <div
-        v-for="comp in components"
-        :key="comp.componentId"
-        class="component-list-item"
-      >
-        <div class="component-list-item-name">{{ comp.name }}</div>
-        <div class="component-list-item-id">{{ comp.componentId }}</div>
-      </div>
-      <div v-if="components.length === 0" class="components-empty">
-        No components yet
-      </div>
+      <p class="components-section-help">
+        Rendered components live inside chat bubbles.
+      </p>
     </div>
   </aside>
 </template>
@@ -146,19 +140,12 @@ let unsubscribe: () => void = () => {};
 onMounted(() => {
   unsubscribe = subscribe(ws);
 
-  ws.onMessage((frame) => {
-    if (frame.channel === '__chat__') {
-      if (frame.type === 'chat.response') {
-        chat.handleResponse(frame);
-      } else if (frame.type === 'chat.event') {
-        chat.handleEvent(frame);
-      } else if (frame.type === 'chat.complete') {
-        chat.handleComplete(frame);
-      } else if (frame.type === 'chat.error') {
-        chat.handleError();
-      }
-    }
-  });
+  // F43: chat frames (`chat.response` / `chat.event` / `chat.complete`
+  // / `chat.error`) are routed centrally in `app.vue` so the chat
+  // panel keeps streaming even after this sidebar is unmounted (e.g.
+  // in a future responsive layout that hides the sidebar on narrow
+  // viewports). Previously this duplicated listener also routed frames
+  // here; the duplication has been removed.
 });
 onUnmounted(() => {
   unsubscribe();
@@ -346,34 +333,10 @@ watch(wsState, async (newState, oldState) => {
   font-variant-numeric: tabular-nums;
 }
 
-.component-list-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--gp-space-2) var(--gp-space-3);
-  background: var(--gp-surface);
-  border: 1px solid var(--gp-border);
-  border-radius: var(--gp-radius-sm);
-  margin-bottom: var(--gp-space-1);
-}
-
-.component-list-item-name {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--gp-text);
-}
-
-.component-list-item-id {
-  font-family: var(--gp-font-mono);
+.components-section-help {
+  margin: 0;
   font-size: 0.6875rem;
   color: var(--gp-text-muted);
-}
-
-.components-empty {
-  font-size: 0.75rem;
-  color: var(--gp-text-muted);
-  text-align: center;
-  padding: var(--gp-space-3);
   font-style: italic;
 }
 </style>

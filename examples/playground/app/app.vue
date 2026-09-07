@@ -1,7 +1,7 @@
 <template>
   <div id="playground-layout">
     <!-- Skip-to-content link for keyboard users (visually hidden until focused) -->
-    <a class="skip-link" href="#render-surface-main">Skip to render surface</a>
+    <a class="skip-link" href="#chat-panel-main">Skip to chat</a>
 
     <!-- Top bar: brand + connection status + global actions -->
     <header class="topbar">
@@ -60,27 +60,30 @@
       </div>
     </header>
 
-    <!-- 3-zone main content -->
+    <!-- 2-zone main content (F43: chat is the sole render surface) -->
     <main class="main-grid">
       <ConfigPanel />
-      <RenderSurface id="render-surface-main" />
-      <ChatPanel />
+      <ChatPanel panel-id="chat-panel-main" />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * GenicUI Playground root layout — 3-zone.
+ * GenicUI Playground root layout — 2-zone.
  *
  * Zones:
  * - Topbar: brand + connection status (global, persistent)
- * - Left:   ConfigPanel — connection config, registry, components list
- * - Center: RenderSurface — rendered components (the focal area)
- * - Right:  ChatPanel — chat history, loading state, clear action
+ * - Left:   ConfigPanel — connection config, registry, components count pill
+ * - Right:  ChatPanel — chat history + input bar + all rendered components
+ *           (chat is the sole render surface; components mount inside
+ *           tool-call accordions and stay interactive across turns)
  *
- * The center is the visual focus. Prompts surface here as a hero when
- * no components are rendered yet so the user always has something to do.
+ * F43 dropped the third center column (the old `RenderSurface`): the
+ * chat panel already renders every `render_component` tool call as an
+ * interactive accordion, so duplicating them in a center column was
+ * noise. The sidebar keeps a count pill for at-a-glance awareness of
+ * how many components are mounted in the chat.
  */
 import { computed, onBeforeUnmount } from 'vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';

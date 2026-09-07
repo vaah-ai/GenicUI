@@ -201,8 +201,8 @@ export function createServer() {
     // POST /mcp — handles JSON-RPC requests from MCP clients.
     // F43 follow-up: a successful `tools/call` for `render_component`
     // also broadcasts a `COMPONENT_MOUNTED` frame to every connected
-    // WebSocket session so the playground's RenderSurface updates in
-    // real time. The JSON-RPC response itself is unchanged.
+    // WebSocket session so the playground's `useComponents` store
+    // updates in real time. The JSON-RPC response itself is unchanged.
     .post('/mcp', async (c): Promise<unknown> => {
       const message = c.body as JSONRPCMessage;
       const response = await handleMcpRequest(message);
@@ -236,7 +236,8 @@ if (import.meta.main) {
  * response. The connected browser only learns about the new component
  * if we explicitly publish the frame over WebSocket — without this
  * helper, MCP-driven renders never surface in the playground's
- * RenderSurface (F43 follow-up).
+ * `useComponents` store, so chat bubbles that embed the component
+ * never see it (F43 follow-up).
  *
  * The helper inspects both the request and the response: the request
  * identifies the tool name + arguments; the response confirms

@@ -8,7 +8,7 @@
  * state are all module-level, so every `useWebSocket()` call returns
  * the SAME instance. Without this, `ConfigPanel.vue` would call
  * `connect()` and store the socket in one instance, while `useChat`
- * in `RenderSurface.vue` would try to send on a different (null)
+ * in `ChatPanel.vue` would try to send on a different (null)
  * socket — and silently drop messages.
  *
  * @see {F41} — Playground demo app

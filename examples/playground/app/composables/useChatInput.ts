@@ -1,11 +1,11 @@
 /**
  * Chat input bar — shared singleton state.
  *
- * Module-level state so the registry prompt chips (`RenderSurface`)
- * and the chat input bar (`ChatInput`) can coordinate without prop
- * drilling. Chip click → `input.fillAndSubmit(prompt)` → the input
- * bar's watcher fires `handleSubmit()` once → `input.clear()` resets
- * the singleton so the next chip click works.
+ * Module-level state so the registry prompt chips (`ChatHistory`'s
+ * empty-state) and the chat input bar (`ChatInput`) can coordinate
+ * without prop drilling. Chip click → `input.fillAndSubmit(prompt)`
+ * → the input bar's watcher fires `handleSubmit()` once → `input.clear()`
+ * resets the singleton so the next chip click works.
  *
  * @see {F43 follow-up} — Claude Code–style chat panel + prompt input bar
  */
