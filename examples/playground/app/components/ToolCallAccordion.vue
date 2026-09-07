@@ -3,6 +3,7 @@
     class="tool-call"
     :class="`tool-call-${entry.status}`"
     :aria-label="`Tool call: ${entry.name}`"
+    :open="isOpenByDefault"
   >
     <summary class="tool-call-toggle">
       <span class="tool-call-icon" aria-hidden="true">
@@ -212,6 +213,21 @@ const isRenderComponentCall = computed<boolean>(() => {
   if (name === 'render_component') return true;
   return /^mcp__[^_]+(?:_[^_]+)*__render_component$/.test(name);
 });
+
+/**
+ * Auto-expand the accordion when it's a `render_component` call AND
+ * a mounted component is available. F43 follow-up: the POC and the
+ * pre-collapse layout both surfaced the rendered component as the
+ * dominant element in chat (no expand required). Collapsing it
+ * inside a `<details>` made it invisible until the user clicked
+ * the toggle, which read as "the component never rendered."
+ *
+ * Plain tool calls (Read/Bash/etc.) stay collapsed by default —
+ * they're metadata, the user only expands to inspect input/result.
+ */
+const isOpenByDefault = computed<boolean>(
+  () => isRenderComponentCall.value && mountedComponent.value !== undefined,
+);
 
 /**
  * The mounted component for this tool call, looked up by:
