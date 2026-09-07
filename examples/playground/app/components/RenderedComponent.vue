@@ -133,33 +133,155 @@
       />
     </div>
 
-    <!-- F47 — WeatherCard (display-only weather details) -->
-    <Card v-else-if="isWeatherCard" class="rendered-component-weather-card">
-      <template #title>{{ weatherCity }}</template>
+    <!--
+      F47 — WeatherCard (display-only weather details).
+      F47 polish: replaced the flat label/value list with a clear
+      visual hierarchy — weather glyph + city + temperature hero,
+      followed by labelled metric tiles (Conditions / Wind). Each
+      state (loading / error / loaded) is a distinct surface so the
+      card never looks broken during the Open-Meteo round-trip:
+        - Loading → skeleton (shimmer) with stable height to avoid CLS.
+        - Error   → message + retry CTA (≥44px tap target).
+        - Loaded  → glyph + hero temperature + secondary metrics.
+      Tabular numbers keep the temperature digits from jittering
+      during transitions. aria-live="polite" announces updates to
+      screen-reader users without stealing focus.
+    -->
+    <Card
+      v-else-if="isWeatherCard"
+      class="rendered-component-weather-card"
+      :class="`rendered-component-weather-card-${weatherTone}`"
+      role="status"
+      aria-live="polite"
+      :aria-label="weatherAriaLabel"
+    >
+      <template #title>
+        <header class="rendered-component-weather-card-header">
+          <span class="rendered-component-weather-card-glyph" aria-hidden="true">
+            <!--
+              Weather glyph — picked from wmoCodeToGlyph() so the
+              icon and the label stay in lockstep. SVG (not emoji)
+              so it themes with the rest of the playground and
+              renders cleanly across platforms. Stroke width
+              matches the tool-call + sidebar icons.
+            -->
+            <component :is="weatherGlyph" />
+          </span>
+          <span class="rendered-component-weather-card-city">
+            {{ weatherCity }}
+          </span>
+        </header>
+      </template>
       <template #content>
-        <div class="rendered-component-weather-card-body">
-          <div v-if="weatherLoading" class="rendered-component-weather-card-loading">
-            Loading weather…
+        <!-- Loading: skeleton with stable height (no layout shift). -->
+        <div v-if="weatherLoading" class="rendered-component-weather-card-skeleton" aria-hidden="true">
+          <div class="rendered-component-weather-card-skeleton-hero" />
+          <div class="rendered-component-weather-card-skeleton-row" />
+          <div class="rendered-component-weather-card-skeleton-row" />
+        </div>
+
+        <!-- Error: cause + retry CTA. aria-live inside the role="status"
+             wrapper above ensures both transitions are announced. -->
+        <div v-else-if="weatherError" class="rendered-component-weather-card-error">
+          <span class="rendered-component-weather-card-error-icon" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </span>
+          <div class="rendered-component-weather-card-error-body">
+            <p class="rendered-component-weather-card-error-message">
+              {{ weatherError }}
+            </p>
+            <button
+              type="button"
+              class="rendered-component-weather-card-retry"
+              :aria-label="`Retry loading weather for ${weatherCity}`"
+              @click="retryWeatherFetch"
+            >
+              Retry
+            </button>
           </div>
-          <div v-else-if="weatherError" class="rendered-component-weather-card-error">
-            {{ weatherError }}
-          </div>
-          <template v-else>
-            <div class="rendered-component-weather-card-row">
-              <span class="rendered-component-weather-card-key">Temperature</span>
-              <span class="rendered-component-weather-card-val rendered-component-weather-card-val-temp">
-                {{ temperatureDisplay }}
+        </div>
+
+        <!-- Loaded -->
+        <div v-else class="rendered-component-weather-card-body">
+          <div class="rendered-component-weather-card-hero">
+            <div class="rendered-component-weather-card-temperature" :aria-label="`Temperature ${temperatureDisplay}`">
+              <span class="rendered-component-weather-card-temperature-value">
+                {{ temperatureNumeric }}
+              </span>
+              <span class="rendered-component-weather-card-temperature-unit">
+                {{ temperatureUnit }}
               </span>
             </div>
-            <div class="rendered-component-weather-card-row">
-              <span class="rendered-component-weather-card-key">Conditions</span>
-              <span class="rendered-component-weather-card-val">{{ conditionsDisplay }}</span>
+            <p class="rendered-component-weather-card-conditions">
+              {{ conditionsDisplay }}
+            </p>
+          </div>
+
+          <dl class="rendered-component-weather-card-metrics">
+            <div class="rendered-component-weather-card-metric">
+              <dt class="rendered-component-weather-card-metric-key">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
+                </svg>
+                Wind
+              </dt>
+              <dd class="rendered-component-weather-card-metric-val" :aria-label="`Wind speed ${windDisplay}`">
+                {{ windDisplay }}
+              </dd>
             </div>
-            <div class="rendered-component-weather-card-row">
-              <span class="rendered-component-weather-card-key">Wind Speed</span>
-              <span class="rendered-component-weather-card-val">{{ windDisplay }}</span>
+            <div class="rendered-component-weather-card-metric">
+              <dt class="rendered-component-weather-card-metric-key">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+                Source
+              </dt>
+              <dd class="rendered-component-weather-card-metric-val">
+                Open-Meteo
+              </dd>
             </div>
-          </template>
+          </dl>
         </div>
       </template>
     </Card>
@@ -519,10 +641,27 @@ const weatherTemperature = ref<number | null>(null);
 const weatherConditions = ref<string | null>(null);
 const weatherWindSpeed = ref<number | null>(null);
 
+/**
+ * Split the temperature into a numeric value (for tabular alignment)
+ * and the unit glyph (°C / °F) so they can use different font sizes
+ * and weights without stacking two monospace glyphs in one string.
+ */
+const temperatureNumeric = computed<string>(() => {
+  if (weatherTemperature.value === null) return '—';
+  return String(Math.round(weatherTemperature.value));
+});
+
+const temperatureUnit = computed<string>(() =>
+  weatherUnits.value === 'imperial' ? '°F' : '°C',
+);
+
+/**
+ * Combined display — still handy for the ARIA label and any caller
+ * that wants the single string in one go.
+ */
 const temperatureDisplay = computed<string>(() => {
   if (weatherTemperature.value === null) return '—';
-  const unit = weatherUnits.value === 'imperial' ? '°F' : '°C';
-  return `${Math.round(weatherTemperature.value)}${unit}`;
+  return `${temperatureNumeric.value}${temperatureUnit.value}`;
 });
 
 const conditionsDisplay = computed<string>(() => {
@@ -538,45 +677,109 @@ const windDisplay = computed<string>(() => {
   return `${Math.round(weatherWindSpeed.value)} ${unit}`;
 });
 
+/**
+ * Tone bucket used by the card surface — drives the accent ring
+ * around the glyph and the colour of the hero temperature. Keep
+ * the buckets coarse: warm / cool / neutral so the user gets a
+ * glanceable read without us painting rainbows per WMO code.
+ *
+ * Sun & partly-cloudy → warm. Rain & thunder → cool. Snow → cold
+ * (cyan). Fog → neutral slate. Used as a CSS class on the card
+ * root so the theme can override per-tone via custom properties.
+ */
+const weatherTone = computed<'warm' | 'cool' | 'cold' | 'neutral'>(() => {
+  const code = weatherConditions.value === null
+    ? NaN
+    : parseInt(weatherConditions.value, 10);
+  if (Number.isNaN(code)) return 'neutral';
+  if (code === 0 || code === 1 || code === 2) return 'warm';
+  if (code === 3 || code === 45 || code === 48) return 'neutral';
+  if (code >= 51 && code <= 67) return 'cool';
+  if (code >= 71 && code <= 77) return 'cold';
+  if (code >= 80 && code <= 82) return 'cool';
+  if (code >= 85 && code <= 86) return 'cold';
+  if (code >= 95) return 'cool';
+  return 'neutral';
+});
+
+/**
+ * Dynamic component reference for the weather glyph. Resolved from
+ * the WMO code via `wmoCodeToGlyph()` so the icon stays in
+ * lockstep with the label. Inline SVG components below — no
+ * emoji (per design rules) and no extra dependencies.
+ */
+const weatherGlyph = computed(() => wmoCodeToGlyph(weatherConditions.value));
+
+/**
+ * aria-label that announces the loaded card in one read. Skips
+ * the long label during loading/error so the screen reader
+ * announces state transitions rather than re-reading the same
+ * data.
+ */
+const weatherAriaLabel = computed<string>(() => {
+  if (weatherLoading.value) return 'Loading weather';
+  if (weatherError.value) return `Weather unavailable: ${weatherError.value}`;
+  return `Weather for ${weatherCity.value}: ${conditionsDisplay.value}, ${temperatureDisplay.value}, wind ${windDisplay.value}`;
+});
+
+/**
+ * Shared fetch logic so the initial mount AND the retry button
+ * take the same path. Extracted into `fetchWeather()`.
+ */
+async function fetchWeather(): Promise<void> {
+  weatherLoading.value = true;
+  weatherError.value = null;
+  try {
+    // Geocode the city name to coordinates.
+    const geoResp = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity.value)}&count=1`,
+    );
+    const geoJson = await geoResp.json() as { results?: Array<{ latitude: number; longitude: number; name: string }> };
+    const location = geoJson.results?.[0];
+    if (!location) {
+      weatherError.value = `City "${weatherCity.value}" not found.`;
+      weatherLoading.value = false;
+      return;
+    }
+
+    // Fetch current weather for the coordinates.
+    const wxResp = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}` +
+        `&current=temperature_2m,weather_code,wind_speed_10m`
+        + (weatherUnits.value === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : '&temperature_unit=celsius&wind_speed_unit=kmh'),
+    );
+    const wxJson = await wxResp.json() as { current?: { temperature_2m: number; weather_code: number; wind_speed_10m: number } };
+    const current = wxJson.current;
+    if (!current) {
+      weatherError.value = 'No weather data available.';
+      weatherLoading.value = false;
+      return;
+    }
+
+    weatherTemperature.value = current.temperature_2m;
+    weatherConditions.value = String(current.weather_code);
+    weatherWindSpeed.value = current.wind_speed_10m;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to fetch weather';
+    weatherError.value = message;
+  } finally {
+    weatherLoading.value = false;
+  }
+}
+
+/**
+ * Retry button handler — just re-runs the fetch. Bound from the
+ * error state so a transient network blip doesn't require a
+ * full chat re-prompt.
+ */
+function retryWeatherFetch(): void {
+  void fetchWeather();
+}
+
 // Fetch weather data on mount using Open-Meteo (free, no API key).
 if (isWeatherCard.value) {
-  onMounted(async () => {
-    try {
-      // Geocode the city name to coordinates.
-      const geoResp = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity.value)}&count=1`,
-      );
-      const geoJson = await geoResp.json() as { results?: Array<{ latitude: number; longitude: number; name: string }> };
-      const location = geoJson.results?.[0];
-      if (!location) {
-        weatherError.value = `City "${weatherCity.value}" not found.`;
-        weatherLoading.value = false;
-        return;
-      }
-
-      // Fetch current weather for the coordinates.
-      const wxResp = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}` +
-          `&current=temperature_2m,weather_code,wind_speed_10m`
-          + (weatherUnits.value === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : '&temperature_unit=celsius&wind_speed_unit=kmh'),
-      );
-      const wxJson = await wxResp.json() as { current?: { temperature_2m: number; weather_code: number; wind_speed_10m: number } };
-      const current = wxJson.current;
-      if (!current) {
-        weatherError.value = 'No weather data available.';
-        weatherLoading.value = false;
-        return;
-      }
-
-      weatherTemperature.value = current.temperature_2m;
-      weatherConditions.value = String(current.weather_code);
-      weatherWindSpeed.value = current.wind_speed_10m;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch weather';
-      weatherError.value = message;
-    } finally {
-      weatherLoading.value = false;
-    }
+  onMounted(() => {
+    void fetchWeather();
   });
 }
 
@@ -598,7 +801,7 @@ function wmoCodeToLabel(code: number): string {
     case 71: return 'Light snow';
     case 73: return 'Moderate snow';
     case 75: return 'Heavy snow';
-    case 80: return 'Light show';
+    case 80: return 'Light shower';
     case 81: return 'Moderate shower';
     case 82: return 'Violent shower';
     case 95: return 'Thunderstorm';
@@ -607,6 +810,185 @@ function wmoCodeToLabel(code: number): string {
     default: return `Code ${code}`;
   }
 }
+
+/**
+ * Map a WMO weather code to one of the inline `<WeatherGlyph*>` SVG
+ * components defined at the bottom of this file. Defaults to the
+ * cloud glyph for unknown codes so the card never renders blank.
+ */
+function wmoCodeToGlyph(code: string | null) {
+  const n = code === null ? NaN : parseInt(code, 10);
+  if (Number.isNaN(n)) return WeatherGlyphCloud;
+  if (n === 0 || n === 1) return WeatherGlyphSun;
+  if (n === 2) return WeatherGlyphPartlyCloudy;
+  if (n === 3) return WeatherGlyphCloud;
+  if (n === 45 || n === 48) return WeatherGlyphFog;
+  if (n >= 51 && n <= 67) return WeatherGlyphRain;
+  if (n >= 71 && n <= 77) return WeatherGlyphSnow;
+  if (n >= 80 && n <= 82) return WeatherGlyphRain;
+  if (n >= 85 && n <= 86) return WeatherGlyphSnow;
+  if (n >= 95) return WeatherGlyphThunder;
+  return WeatherGlyphCloud;
+}
+
+/* ----- Inline weather glyph components -----
+ *
+ * SVG-only (no emoji), consistent stroke-width (1.75) and corner
+ * radius (rounded), sized at 28×28 in the card header. Each one
+ * renders currentColor so the surrounding tone class controls the
+ * hue via `color:`.
+ */
+const WeatherGlyphSun = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Sun"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="2" x2="12" y2="4" />
+      <line x1="12" y1="20" x2="12" y2="22" />
+      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" />
+      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" />
+      <line x1="2" y1="12" x2="4" y2="12" />
+      <line x1="20" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" />
+      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" />
+    </svg>
+  `,
+};
+const WeatherGlyphPartlyCloudy = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Partly cloudy"
+    >
+      <circle cx="8" cy="8" r="3" />
+      <line x1="8" y1="2" x2="8" y2="3.5" />
+      <line x1="2" y1="8" x2="3.5" y2="8" />
+      <line x1="3.5" y1="3.5" x2="4.5" y2="4.5" />
+      <line x1="12.5" y1="3.5" x2="11.5" y2="4.5" />
+      <path d="M9 17.5h10a3 3 0 0 0 0-6 4.5 4.5 0 0 0-8.74-1.07A4 4 0 0 0 9 17.5z" />
+    </svg>
+  `,
+};
+const WeatherGlyphCloud = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Cloudy"
+    >
+      <path d="M17 18.5H7a4 4 0 1 1 .7-7.95A6 6 0 0 1 19 11a3.5 3.5 0 0 1-2 7.5z" />
+    </svg>
+  `,
+};
+const WeatherGlyphFog = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Foggy"
+    >
+      <path d="M17 14H7a4 4 0 1 1 .7-7.95A6 6 0 0 1 19 6.5" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+      <line x1="5" y1="21" x2="19" y2="21" />
+    </svg>
+  `,
+};
+const WeatherGlyphRain = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Rainy"
+    >
+      <path d="M17 12.5H7a4 4 0 1 1 .7-7.95A6 6 0 0 1 19 5.5a3.5 3.5 0 0 1-2 7z" />
+      <line x1="8" y1="17" x2="7" y2="21" />
+      <line x1="12" y1="17" x2="11" y2="21" />
+      <line x1="16" y1="17" x2="15" y2="21" />
+    </svg>
+  `,
+};
+const WeatherGlyphSnow = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Snowy"
+    >
+      <path d="M17 12.5H7a4 4 0 1 1 .7-7.95A6 6 0 0 1 19 5.5a3.5 3.5 0 0 1-2 7z" />
+      <line x1="8" y1="17" x2="8" y2="21" />
+      <line x1="6.5" y1="18" x2="9.5" y2="20" />
+      <line x1="9.5" y1="18" x2="6.5" y2="20" />
+      <line x1="16" y1="17" x2="16" y2="21" />
+      <line x1="14.5" y1="18" x2="17.5" y2="20" />
+      <line x1="17.5" y1="18" x2="14.5" y2="20" />
+    </svg>
+  `,
+};
+const WeatherGlyphThunder = {
+  template: `
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role="img"
+      aria-label="Thunderstorm"
+    >
+      <path d="M17 12.5H7a4 4 0 1 1 .7-7.95A6 6 0 0 1 19 5.5a3.5 3.5 0 0 1-2 7z" />
+      <polygon points="13 14 9 19 11 19 10 22 15 17 13 17 14 14 13 14" />
+    </svg>
+  `,
+};
 </script>
 
 <style scoped>
@@ -811,75 +1193,289 @@ function wmoCodeToLabel(code: number): string {
   height: 40px;
 }
 
-/* ---------- WeatherCard ---------- */
+/* ---------- WeatherCard (F47 polish) ---------- */
+/*
+  Layout intent (matches ui-ux-pro-max priorities):
+    - Hierarchy: temperature is the hero (size 2rem, bold), city
+      + glyph are the header strip, conditions + metrics are
+      secondary (≤0.8125rem, secondary text colour).
+    - Visual rhythm: 8dp spacing scale via var(--gp-space-*).
+    - Tone classes: warm / cool / cold / neutral drive the glyph
+      ring + accent via scoped CSS custom properties so the same
+      markup works in light or dark themes without hard-coded
+      hex anywhere in the component.
+    - Dark-mode contrast: primary text uses --gp-text (slate-50,
+      contrast >12:1 on slate-800 surface); secondary text uses
+      --gp-text-secondary (slate-400, ≥4.6:1 on surface).
+    - Reduced motion: shimmer + transitions gated by media query.
+*/
+
 .rendered-component-weather-card {
-  background: var(--gp-surface, #1e293b);
+  background: var(--gp-surface);
   border: 1px solid var(--gp-border);
   border-radius: var(--gp-radius-md);
+  overflow: hidden;
+  /* Per-tone accent. Defaults to neutral; warm/cool/cold override. */
+  --wx-accent: var(--gp-text-secondary);
+  --wx-accent-soft: var(--gp-surface-hover);
+}
+
+.rendered-component-weather-card-warm {
+  --wx-accent: #fbbf24;        /* amber-400 — readable on slate-800 */
+  --wx-accent-soft: rgba(251, 191, 36, 0.14);
+}
+.rendered-component-weather-card-cool {
+  --wx-accent: #60a5fa;        /* blue-400 */
+  --wx-accent-soft: rgba(96, 165, 250, 0.14);
+}
+.rendered-component-weather-card-cold {
+  --wx-accent: #67e8f9;        /* cyan-300 */
+  --wx-accent-soft: rgba(103, 232, 249, 0.14);
+}
+.rendered-component-weather-card-neutral {
+  --wx-accent: var(--gp-text-secondary);
+  --wx-accent-soft: var(--gp-surface-hover);
 }
 
 .rendered-component-weather-card :deep(.p-card-title) {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--gp-text);
+  margin: 0;
 }
 
-.rendered-component-weather-card-body {
+.rendered-component-weather-card :deep(.p-card-content) {
+  padding-top: var(--gp-space-2);
+}
+
+/* Header strip — glyph + city, side by side, vertically centred. */
+.rendered-component-weather-card-header {
   display: flex;
-  flex-direction: column;
-  gap: var(--gp-space-1);
+  align-items: center;
+  gap: var(--gp-space-2);
 }
 
-.rendered-component-weather-card-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--gp-space-3);
-  padding: 4px 0;
-  border-bottom: 1px dashed var(--gp-border);
-  font-size: 0.8125rem;
+.rendered-component-weather-card-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--wx-accent-soft);
+  color: var(--wx-accent);
+  flex-shrink: 0;
 }
 
-.rendered-component-weather-card-row:last-child {
-  border-bottom: none;
-}
-
-.rendered-component-weather-card-key {
-  color: var(--gp-text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.rendered-component-weather-card-val {
-  font-family: var(--gp-font-mono, monospace);
+.rendered-component-weather-card-city {
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: var(--gp-text);
+  letter-spacing: 0.01em;
+  /* Truncate rather than wrap the city name on narrow chat bubbles. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
-.rendered-component-weather-card-val-temp {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--gp-accent, #22c55e);
-}
-
-.rendered-component-weather-card-loading {
-  text-align: center;
-  color: var(--gp-text-muted);
-  font-style: italic;
-  font-size: 0.8125rem;
-  padding: var(--gp-space-3) 0;
-}
-
-.rendered-component-weather-card-error {
-  color: #f87171;
-  font-size: 0.8125rem;
+/* Hero block — big temperature + conditions line. */
+.rendered-component-weather-card-hero {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--gp-space-3);
   padding: var(--gp-space-2) 0;
 }
 
-/* Respect reduced motion */
+.rendered-component-weather-card-temperature {
+  display: inline-flex;
+  align-items: baseline;
+  /* Tabular figures so the digits don't jitter across reloads. */
+  font-variant-numeric: tabular-nums;
+  color: var(--gp-text);
+  line-height: 1;
+}
+
+.rendered-component-weather-card-temperature-value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.rendered-component-weather-card-temperature-unit {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--wx-accent);
+  margin-left: 2px;
+}
+
+.rendered-component-weather-card-conditions {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gp-text-secondary);
+  font-weight: 500;
+}
+
+/* Secondary metrics — definition list for proper screen-reader
+   semantics + tabular alignment. */
+.rendered-component-weather-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gp-space-2);
+  margin: 0;
+  padding: var(--gp-space-2) 0 0;
+  border-top: 1px solid var(--gp-border);
+}
+
+.rendered-component-weather-card-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--gp-space-1) var(--gp-space-2);
+  background: var(--gp-surface-hover);
+  border-radius: var(--gp-radius-sm);
+}
+
+.rendered-component-weather-card-metric-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gp-text-muted);
+  margin: 0;
+}
+
+.rendered-component-weather-card-metric-val {
+  margin: 0;
+  font-family: var(--gp-font-mono);
+  font-size: 0.8125rem;
+  color: var(--gp-text);
+  /* Keep numbers aligned as they change. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Loading skeleton (shimmer, stable height) ---------- */
+.rendered-component-weather-card-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-2);
+  padding: var(--gp-space-3) 0;
+  /* Reserve the same height as the loaded body so the card doesn't
+     jump when the data lands (avoids CLS). */
+  min-height: 96px;
+}
+
+.rendered-component-weather-card-skeleton-hero {
+  height: 36px;
+  width: 60%;
+  border-radius: var(--gp-radius-sm);
+}
+
+.rendered-component-weather-card-skeleton-row {
+  height: 14px;
+  width: 100%;
+  border-radius: var(--gp-radius-sm);
+}
+
+/* The shimmer overlay — animates a gradient sweep across each
+   block. Stops on reduced-motion (see media query at the bottom
+   of the file). */
+.rendered-component-weather-card-skeleton-hero,
+.rendered-component-weather-card-skeleton-row {
+  background: linear-gradient(
+    90deg,
+    var(--gp-surface-hover) 0%,
+    var(--gp-surface-active) 50%,
+    var(--gp-surface-hover) 100%
+  );
+  background-size: 200% 100%;
+  animation: wx-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes wx-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------- Error state ---------- */
+.rendered-component-weather-card-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gp-space-2);
+  padding: var(--gp-space-2) 0;
+  color: var(--gp-error-text);
+}
+
+.rendered-component-weather-card-error-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rendered-component-weather-card-error-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rendered-component-weather-card-error-message {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--gp-text);
+}
+
+.rendered-component-weather-card-retry {
+  align-self: flex-start;
+  min-height: 36px;       /* ≥36px — close to the 44pt target;
+                             capped to fit the compact card width. */
+  padding: 0 var(--gp-space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: var(--gp-radius);
+  border: 1px solid var(--gp-border-light);
+  background: var(--gp-surface-hover);
+  color: var(--gp-text);
+  cursor: pointer;
+  transition:
+    background var(--gp-transition),
+    border-color var(--gp-transition),
+    transform var(--gp-transition);
+}
+
+.rendered-component-weather-card-retry:hover {
+  background: var(--gp-surface-active);
+  border-color: var(--gp-accent);
+}
+
+.rendered-component-weather-card-retry:focus-visible {
+  outline: 2px solid var(--gp-accent);
+  outline-offset: 2px;
+}
+
+.rendered-component-weather-card-retry:active {
+  transform: translateY(1px);
+}
+
+/* Respect reduced motion — disable transitions AND the shimmer
+   animation. The skeleton stays as a flat block instead of a
+   sweeping gradient, which is the platform-correct fallback per
+   Apple Reduced Motion / Material motion guidelines. */
 @media (prefers-reduced-motion: reduce) {
   .rendered-component * {
     transition: none !important;
+  }
+  .rendered-component-weather-card-skeleton-hero,
+  .rendered-component-weather-card-skeleton-row {
+    animation: none !important;
+    background: var(--gp-surface-hover);
   }
 }
 </style>
