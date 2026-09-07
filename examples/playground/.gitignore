@@ -2,6 +2,7 @@
 /.nuxt
 /.output
 /.data
+/dist
 
 # Node
 /node_modules

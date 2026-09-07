@@ -227,13 +227,31 @@
         <!-- Loaded -->
         <div v-else class="rendered-component-weather-card-body">
           <div class="rendered-component-weather-card-hero">
-            <div class="rendered-component-weather-card-temperature" :aria-label="`Temperature ${temperatureDisplay}`">
-              <span class="rendered-component-weather-card-temperature-value">
-                {{ temperatureNumeric }}
-              </span>
-              <span class="rendered-component-weather-card-temperature-unit">
-                {{ temperatureUnit }}
-              </span>
+            <div class="rendered-component-weather-card-temperature-block">
+              <div class="rendered-component-weather-card-temperature" :aria-label="`Temperature ${temperatureDisplay}`">
+                <span class="rendered-component-weather-card-temperature-value">
+                  {{ temperatureNumeric }}
+                </span>
+                <span class="rendered-component-weather-card-temperature-unit">
+                  {{ temperatureUnit }}
+                </span>
+              </div>
+              <!--
+                Feels-like sub-line — hidden when the API didn't return
+                one (e.g. some older Open-Meteo payloads). The sub-line
+                sits under the temperature with reduced weight so the
+                hero number stays the dominant element.
+              -->
+              <p
+                v-if="hasFeelsLike"
+                class="rendered-component-weather-card-feels-like"
+                :aria-label="`Feels like ${feelsLikeDisplay}`"
+              >
+                Feels like
+                <span class="rendered-component-weather-card-feels-like-value">
+                  {{ feelsLikeDisplay }}
+                </span>
+              </p>
             </div>
             <p class="rendered-component-weather-card-conditions">
               {{ conditionsDisplay }}
@@ -275,20 +293,12 @@
                   stroke-linejoin="round"
                   aria-hidden="true"
                 >
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" />
-                  <line x1="12" y1="21" x2="12" y2="23" />
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                  <line x1="1" y1="12" x2="3" y2="12" />
-                  <line x1="21" y1="12" x2="23" y2="12" />
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  <path d="M12 2.5c-3 4-6 7-6 11a6 6 0 0 0 12 0c0-4-3-7-6-11z" />
                 </svg>
-                Source
+                Humidity
               </dt>
-              <dd class="rendered-component-weather-card-metric-val">
-                Open-Meteo
+              <dd class="rendered-component-weather-card-metric-val" :aria-label="`Humidity ${humidityDisplay}`">
+                {{ humidityDisplay }}
               </dd>
             </div>
           </dl>
@@ -648,8 +658,10 @@ const weatherUnits = computed<string>(() => {
 const weatherLoading = ref<boolean>(true);
 const weatherError = ref<string | null>(null);
 const weatherTemperature = ref<number | null>(null);
+const weatherFeelsLike = ref<number | null>(null);
 const weatherConditions = ref<string | null>(null);
 const weatherWindSpeed = ref<number | null>(null);
+const weatherHumidity = ref<number | null>(null);
 
 /**
  * Split the temperature into a numeric value (for tabular alignment)
@@ -685,6 +697,26 @@ const windDisplay = computed<string>(() => {
   if (weatherWindSpeed.value === null) return '—';
   const unit = weatherUnits.value === 'imperial' ? 'mph' : 'km/h';
   return `${Math.round(weatherWindSpeed.value)} ${unit}`;
+});
+
+/**
+ * `hasFeelsLike` is the gate for the "Feels like" sub-line. Most
+ * Open-Meteo payloads carry `apparent_temperature`, but we hide the
+ * row entirely when it's missing so the card doesn't leave a dangling
+ * "Feels like —" placeholder.
+ */
+const hasFeelsLike = computed<boolean>(() => weatherFeelsLike.value !== null);
+
+const feelsLikeDisplay = computed<string>(() => {
+  if (weatherFeelsLike.value === null) return '—';
+  // Same unit conventions as the hero number so the two values can
+  // be compared at a glance.
+  return `${Math.round(weatherFeelsLike.value)}${temperatureUnit.value}`;
+});
+
+const humidityDisplay = computed<string>(() => {
+  if (weatherHumidity.value === null) return '—';
+  return `${Math.round(weatherHumidity.value)}%`;
 });
 
 /**
@@ -729,7 +761,9 @@ const weatherGlyph = computed(() => wmoCodeToGlyph(weatherConditions.value));
 const weatherAriaLabel = computed<string>(() => {
   if (weatherLoading.value) return 'Loading weather';
   if (weatherError.value) return `Weather unavailable: ${weatherError.value}`;
-  return `Weather for ${weatherCity.value}: ${conditionsDisplay.value}, ${temperatureDisplay.value}, wind ${windDisplay.value}`;
+  const feels = hasFeelsLike.value ? `, feels like ${feelsLikeDisplay.value}` : '';
+  const humidity = weatherHumidity.value !== null ? `, humidity ${humidityDisplay.value}` : '';
+  return `Weather for ${weatherCity.value}: ${conditionsDisplay.value}, ${temperatureDisplay.value}${feels}, wind ${windDisplay.value}${humidity}`;
 });
 
 /**
@@ -755,10 +789,18 @@ async function fetchWeather(): Promise<void> {
     // Fetch current weather for the coordinates.
     const wxResp = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}` +
-        `&current=temperature_2m,weather_code,wind_speed_10m`
+        `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m`
         + (weatherUnits.value === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : '&temperature_unit=celsius&wind_speed_unit=kmh'),
     );
-    const wxJson = await wxResp.json() as { current?: { temperature_2m: number; weather_code: number; wind_speed_10m: number } };
+    const wxJson = await wxResp.json() as {
+      current?: {
+        temperature_2m: number;
+        apparent_temperature?: number;
+        weather_code: number;
+        wind_speed_10m: number;
+        relative_humidity_2m?: number;
+      };
+    };
     const current = wxJson.current;
     if (!current) {
       weatherError.value = 'No weather data available.';
@@ -767,8 +809,19 @@ async function fetchWeather(): Promise<void> {
     }
 
     weatherTemperature.value = current.temperature_2m;
+    // `apparent_temperature` is the human "feels like" reading — surfaced
+    // below the hero number so the card distinguishes the actual air
+    // temperature from wind-chill / humidity-adjusted feel.
+    weatherFeelsLike.value =
+      typeof current.apparent_temperature === 'number'
+        ? current.apparent_temperature
+        : null;
     weatherConditions.value = String(current.weather_code);
     weatherWindSpeed.value = current.wind_speed_10m;
+    weatherHumidity.value =
+      typeof current.relative_humidity_2m === 'number'
+        ? current.relative_humidity_2m
+        : null;
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch weather';
     weatherError.value = message;
@@ -1353,6 +1406,19 @@ const WeatherGlyphThunder = {
   padding: var(--gp-space-1) 0 0;
 }
 
+/*
+ * Temperature + feels-like stack. The hero number stays the single
+ * largest element on the card; the feels-like sub-line is rendered
+ * beneath it at a smaller size so the eye reads temperature first,
+ * feels-like as supporting context.
+ */
+.rendered-component-weather-card-temperature-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .rendered-component-weather-card-temperature {
   display: inline-flex;
   align-items: flex-start;
@@ -1363,7 +1429,7 @@ const WeatherGlyphThunder = {
 }
 
 .rendered-component-weather-card-temperature-value {
-  font-size: clamp(2rem, 4vw, 2.25rem);
+  font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--gp-text);
@@ -1378,6 +1444,27 @@ const WeatherGlyphThunder = {
   letter-spacing: 0.01em;
 }
 
+/*
+ * Feels-like sub-line. Smaller than the hero number, secondary
+ * text colour so it reads as supporting context, and uses tabular
+ * figures so the digits align with the hero value's column.
+ */
+.rendered-component-weather-card-feels-like {
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--gp-text-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.rendered-component-weather-card-feels-like-value {
+  color: var(--gp-text-secondary);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
 .rendered-component-weather-card-conditions {
   margin: 0 0 4px;
   font-size: 0.875rem;
@@ -1388,13 +1475,16 @@ const WeatherGlyphThunder = {
 /* Secondary metrics — definition list for proper screen-reader
    semantics + tabular alignment. The grid sits on the gradient
    background without its own border so the card reads as one
-   continuous surface. */
+   continuous surface. A subtle 1px rule separates the hero block
+   from the metrics so the eye reads "main number → supporting data"
+   without the rule becoming a heavy divider. */
 .rendered-component-weather-card-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--gp-space-2);
   margin: 0;
-  padding: 0;
+  padding: var(--gp-space-3) 0 0;
+  border-top: 1px solid var(--wx-accent-border);
 }
 
 .rendered-component-weather-card-metric {

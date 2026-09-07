@@ -323,14 +323,22 @@ const CATALOG: CatalogEntry[] = [
     version: '1.0.0',
     registryId: '@genicul-primevue/registry',
     description:
-      'Dropdown to pick a city, with a Submit button. Emits a `submit` ' +
-      'event the chat bridge forwards to the agent — typically used to ' +
-      'kick off a weather lookup whose result renders as a WeatherCard.',
+      'Interactive dropdown for picking a city, with a Submit button. ' +
+      'ALWAYS use this component FIRST when the user asks about weather, ' +
+      'temperature, climate, or any city-scoped information — it collects ' +
+      'the city via a clean dropdown and emits a `submit` event that the ' +
+      'chat bridge forwards back to the agent. The follow-up agent turn ' +
+      'then renders a WeatherCard with the result. Do NOT guess a city ' +
+      'and render a WeatherCard directly — let the user pick.',
     whenToUse:
-      'When the user asks about weather, climate, or another city-scoped ' +
-      'service and the agent wants a clean selection point before doing the ' +
-      'lookup. Prefer this over asking the user to type a city name when ' +
-      'a small dropdown is sufficient.',
+      'First choice for ANY weather query: "what\'s the weather", "is it ' +
+      'raining", "temperature in Tokyo", "weather forecast", "show me ' +
+      'weather", "pick a city and tell me the weather", etc. Also use for ' +
+      'other city-scoped lookups where the user should pick the city. ' +
+      'Prefer this over a text input — the dropdown covers the common ' +
+      'case without free-form typing. After the user submits, the agent ' +
+      'will receive a follow-up turn with the chosen city and then ' +
+      'render a WeatherCard. Never skip this step by guessing a city.',
     tags: [
       'form',
       'input',
@@ -338,6 +346,11 @@ const CATALOG: CatalogEntry[] = [
       'select',
       'city',
       'weather',
+      'pick',
+      'choose',
+      'temperature',
+      'climate',
+      'forecast',
       'interactive',
       'chat-bridge',
     ],
@@ -364,16 +377,26 @@ const CATALOG: CatalogEntry[] = [
     version: '1.0.0',
     registryId: '@genicul-primevue/registry',
     description:
-      'Weather card for one city — temperature, conditions, and unit choice. ' +
-      'Display-only; rendered after CityPicker.submit kicks off a lookup.',
+      'Display-only weather card for a single city — temperature, ' +
+      'conditions, and metric/imperial unit choice. Renders AFTER the ' +
+      'user has picked a city via CityPicker and the agent has fetched ' +
+      'the forecast (e.g. Open-Meteo). This component never asks the user ' +
+      'for input.',
     whenToUse:
-      'When the conversation has produced a weather readout for a specific ' +
-      'city that should be visible inline in the chat. Pairs with CityPicker.',
+      'Only after a CityPicker.submit event has fired (or the user has ' +
+      'already named a specific city in the original prompt and the ' +
+      'agent has the forecast in hand). Pairs 1:1 with CityPicker as the ' +
+      'second half of the city-picker → weather-card flow. Do NOT use ' +
+      'this on a fresh "show me the weather" prompt without first ' +
+      'rendering CityPicker to collect the city.',
     tags: [
       'card',
       'weather',
       'display',
       'city',
+      'temperature',
+      'climate',
+      'forecast',
       'interactive',
       'chat-bridge',
     ],
