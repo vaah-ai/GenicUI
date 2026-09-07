@@ -112,6 +112,58 @@
     <!-- Calculator — fully client-stateful 4-function calculator -->
     <Calculator v-else-if="isCalculator" />
 
+    <!-- F47 — CityPicker (city dropdown + Submit) -->
+    <div v-else-if="isCityPicker" class="rendered-component-city-picker">
+      <label class="rendered-component-city-picker-label">{{ cityLabel }}</label>
+      <Dropdown
+        :model-value="selectedCity"
+        :options="cityOptions"
+        option-label="label"
+        option-value="value"
+        class="rendered-component-city-picker-dropdown"
+        @change="handleCityChange"
+      />
+      <Button
+        :label="citySubmitLabel"
+        icon="pi pi-search"
+        icon-pos="right"
+        class="rendered-component-city-picker-submit"
+        :aria-label="`Show weather for ${selectedCity ?? cityLabel}`"
+        @click="handleCitySubmit"
+      />
+    </div>
+
+    <!-- F47 — WeatherCard (display-only weather details) -->
+    <Card v-else-if="isWeatherCard" class="rendered-component-weather-card">
+      <template #title>{{ weatherCity }}</template>
+      <template #content>
+        <div class="rendered-component-weather-card-body">
+          <div v-if="weatherLoading" class="rendered-component-weather-card-loading">
+            Loading weather…
+          </div>
+          <div v-else-if="weatherError" class="rendered-component-weather-card-error">
+            {{ weatherError }}
+          </div>
+          <template v-else>
+            <div class="rendered-component-weather-card-row">
+              <span class="rendered-component-weather-card-key">Temperature</span>
+              <span class="rendered-component-weather-card-val rendered-component-weather-card-val-temp">
+                {{ temperatureDisplay }}
+              </span>
+            </div>
+            <div class="rendered-component-weather-card-row">
+              <span class="rendered-component-weather-card-key">Conditions</span>
+              <span class="rendered-component-weather-card-val">{{ conditionsDisplay }}</span>
+            </div>
+            <div class="rendered-component-weather-card-row">
+              <span class="rendered-component-weather-card-key">Wind Speed</span>
+              <span class="rendered-component-weather-card-val">{{ windDisplay }}</span>
+            </div>
+          </template>
+        </div>
+      </template>
+    </Card>
+
     <div v-else class="rendered-component-unknown">
       <p>
         Component <code>{{ name }}</code> isn't rendered live yet; here's
@@ -137,13 +189,14 @@
  * @see {F40} — PrimeVue DataTable registry
  * @see {F43} — Chat as the sole render surface (interactive components)
  */
-import { computed, ref, watch, onBeforeUnmount } from 'vue';
+import { computed, ref, watch, onBeforeUnmount, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
+import Dropdown from 'primevue/dropdown';
 
 import Calculator from './Calculator.vue';
 
@@ -174,6 +227,8 @@ const isDataTable = computed<boolean>(() => props.name === 'DataTable');
 const isInputPair = computed<boolean>(() => props.name === 'InputPair');
 const isResultCard = computed<boolean>(() => props.name === 'ResultCard');
 const isCalculator = computed<boolean>(() => props.name === 'Calculator');
+const isCityPicker = computed<boolean>(() => props.name === 'CityPicker');
+const isWeatherCard = computed<boolean>(() => props.name === 'WeatherCard');
 
 // ---------------------------------------------------------------------------
 // DataTable (F40)
@@ -397,6 +452,161 @@ const resultLabel2 = computed<string>(() => {
   const v = props.props['label2'];
   return typeof v === 'string' && v.length > 0 ? v : 'Input 2';
 });
+
+// ---------------------------------------------------------------------------
+// CityPicker (F47) — interactive city dropdown
+// ---------------------------------------------------------------------------
+
+const cityLabel = computed<string>(() => {
+  const v = props.props['label'];
+  return typeof v === 'string' && v.length > 0 ? v : 'City';
+});
+
+const citySubmitLabel = computed<string>(() => {
+  const v = props.props['submitLabel'];
+  return typeof v === 'string' && v.length > 0 ? v : 'Show weather';
+});
+
+const cityOptions = computed<Array<{ label: string; value: string }>>(() => {
+  const opts = props.props['cityOptions'];
+  if (Array.isArray(opts)) {
+    return (opts as string[]).map((city) => ({ label: city, value: city }));
+  }
+  return [];
+});
+
+const selectedCity = ref<string>(
+  typeof props.props['initialCity'] === 'string'
+    ? props.props['initialCity'] as string
+    : (cityOptions.value[0]?.value ?? ''),
+);
+
+function handleCityChange(evt: { value: string }): void {
+  selectedCity.value = evt.value;
+}
+
+function handleCitySubmit(): void {
+  const ws = useWebSocket();
+  const comps = useComponents();
+  comps.sendComponentEvent(
+    ws as unknown as { send: (data: Record<string, unknown>) => void },
+    props.componentId ?? '',
+    props.name,
+    'submit',
+    { city: selectedCity.value },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// WeatherCard (F47) — display-only, fetches from Open-Meteo API
+// ---------------------------------------------------------------------------
+
+const weatherCity = computed<string>(() => {
+  const v = props.props['city'];
+  return typeof v === 'string' && v.length > 0 ? v : 'Unknown';
+});
+
+const weatherUnits = computed<string>(() => {
+  const v = props.props['units'];
+  return (typeof v === 'string' && (v === 'metric' || v === 'imperial'))
+    ? v
+    : 'metric';
+});
+
+const weatherLoading = ref<boolean>(true);
+const weatherError = ref<string | null>(null);
+const weatherTemperature = ref<number | null>(null);
+const weatherConditions = ref<string | null>(null);
+const weatherWindSpeed = ref<number | null>(null);
+
+const temperatureDisplay = computed<string>(() => {
+  if (weatherTemperature.value === null) return '—';
+  const unit = weatherUnits.value === 'imperial' ? '°F' : '°C';
+  return `${Math.round(weatherTemperature.value)}${unit}`;
+});
+
+const conditionsDisplay = computed<string>(() => {
+  if (weatherConditions.value === null) return '—';
+  // WMO weather code → human-readable label
+  const code = parseInt(weatherConditions.value, 10);
+  return wmoCodeToLabel(code);
+});
+
+const windDisplay = computed<string>(() => {
+  if (weatherWindSpeed.value === null) return '—';
+  const unit = weatherUnits.value === 'imperial' ? 'mph' : 'km/h';
+  return `${Math.round(weatherWindSpeed.value)} ${unit}`;
+});
+
+// Fetch weather data on mount using Open-Meteo (free, no API key).
+if (isWeatherCard.value) {
+  onMounted(async () => {
+    try {
+      // Geocode the city name to coordinates.
+      const geoResp = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity.value)}&count=1`,
+      );
+      const geoJson = await geoResp.json() as { results?: Array<{ latitude: number; longitude: number; name: string }> };
+      const location = geoJson.results?.[0];
+      if (!location) {
+        weatherError.value = `City "${weatherCity.value}" not found.`;
+        weatherLoading.value = false;
+        return;
+      }
+
+      // Fetch current weather for the coordinates.
+      const wxResp = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}` +
+          `&current=temperature_2m,weather_code,wind_speed_10m`
+          + (weatherUnits.value === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : '&temperature_unit=celsius&wind_speed_unit=kmh'),
+      );
+      const wxJson = await wxResp.json() as { current?: { temperature_2m: number; weather_code: number; wind_speed_10m: number } };
+      const current = wxJson.current;
+      if (!current) {
+        weatherError.value = 'No weather data available.';
+        weatherLoading.value = false;
+        return;
+      }
+
+      weatherTemperature.value = current.temperature_2m;
+      weatherConditions.value = String(current.weather_code);
+      weatherWindSpeed.value = current.wind_speed_10m;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch weather';
+      weatherError.value = message;
+    } finally {
+      weatherLoading.value = false;
+    }
+  });
+}
+
+function wmoCodeToLabel(code: number): string {
+  // WMO weather interpretation codes (from Open-Meteo documentation).
+  switch (code) {
+    case 0: return 'Clear sky';
+    case 1: return 'Mainly clear';
+    case 2: return 'Partly cloudy';
+    case 3: return 'Overcast';
+    case 45:
+    case 48: return 'Fog';
+    case 51: return 'Light drizzle';
+    case 53: return 'Moderate drizzle';
+    case 55: return 'Dense drizzle';
+    case 61: return 'Light rain';
+    case 63: return 'Moderate rain';
+    case 65: return 'Heavy rain';
+    case 71: return 'Light snow';
+    case 73: return 'Moderate snow';
+    case 75: return 'Heavy snow';
+    case 80: return 'Light show';
+    case 81: return 'Moderate shower';
+    case 82: return 'Violent shower';
+    case 95: return 'Thunderstorm';
+    case 96: return 'Thunderstorm with hail';
+    case 99: return 'Thunderstorm with heavy hail';
+    default: return `Code ${code}`;
+  }
+}
 </script>
 
 <style scoped>
@@ -573,6 +783,97 @@ const resultLabel2 = computed<string>(() => {
   color: var(--gp-text-muted);
   font-style: italic;
   font-size: 0.8125rem;
+}
+
+/* ---------- CityPicker ---------- */
+.rendered-component-city-picker {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--gp-space-2);
+  align-items: end;
+  padding: var(--gp-space-2) 0;
+}
+
+.rendered-component-city-picker-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gp-text-muted);
+  grid-column: 1 / -1;
+}
+
+.rendered-component-city-picker-dropdown :deep(.p-dropdown) {
+  width: 100%;
+}
+
+.rendered-component-city-picker-submit {
+  height: 40px;
+}
+
+/* ---------- WeatherCard ---------- */
+.rendered-component-weather-card {
+  background: var(--gp-surface, #1e293b);
+  border: 1px solid var(--gp-border);
+  border-radius: var(--gp-radius-md);
+}
+
+.rendered-component-weather-card :deep(.p-card-title) {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gp-text);
+}
+
+.rendered-component-weather-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gp-space-1);
+}
+
+.rendered-component-weather-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--gp-space-3);
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--gp-border);
+  font-size: 0.8125rem;
+}
+
+.rendered-component-weather-card-row:last-child {
+  border-bottom: none;
+}
+
+.rendered-component-weather-card-key {
+  color: var(--gp-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rendered-component-weather-card-val {
+  font-family: var(--gp-font-mono, monospace);
+  color: var(--gp-text);
+}
+
+.rendered-component-weather-card-val-temp {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gp-accent, #22c55e);
+}
+
+.rendered-component-weather-card-loading {
+  text-align: center;
+  color: var(--gp-text-muted);
+  font-style: italic;
+  font-size: 0.8125rem;
+  padding: var(--gp-space-3) 0;
+}
+
+.rendered-component-weather-card-error {
+  color: #f87171;
+  font-size: 0.8125rem;
+  padding: var(--gp-space-2) 0;
 }
 
 /* Respect reduced motion */

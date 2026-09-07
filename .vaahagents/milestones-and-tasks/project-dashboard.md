@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-03
-> **Last updated by:** M5-T4/T5/T6 added — Playground demo app (F41/F42/F43)
+> **Last updated:** 2026-09-08
+> **Last updated by:** M5-T7 added — Component-event interactivity (F47)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 21/33 tasks complete · 12 tasks not started
+> **Status:** 3/6 milestones complete · 22/34 tasks complete · 12 tasks not started
 
 ---
 
@@ -15,7 +15,7 @@
 | M2 | Transport: Server + WS + Frames | Transport | W2 | 🟢 Complete | Critical | 7-10 days | 4 | F9, F46, F10, F11 |
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟢 Complete | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
-| M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 6 | F37, F38, F40, F41, F42, F43 |
+| M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 7 | F37, F38, F40, F41, F42, F43, F47 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
@@ -65,7 +65,7 @@
 | M4-T6 | Vite plugin + auto-registration | ✅ Complete | Medium | 2-3 days | F30 | M4-T4 |
 | M4-T7 | Session recovery (last-10-messages) | ✅ Complete | Medium | 2-3 days | F33 | M1-T5, M2-T3 |
 
-### M5 — Registry: Registry + PrimeVue + Playground (6/6 complete)
+### M5 — Registry: Registry + PrimeVue + Playground (7/7 complete)
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -75,6 +75,7 @@
 | M5-T4 | Playground app skeleton (Nuxt + PrimeVue + WS) | ✅ Complete | High | 2-3 days | F41 | M5-T1 |
 | M5-T5 | Agent bridge package (platform-agnostic) | ✅ Complete | Critical | 3-5 days | F42 | M3-T1, M5-T1 |
 | M5-T6 | Suggestive prompts + registry selector | ✅ Complete | High | 2-3 days | F43 | M5-T4, M5-T5 |
+| M5-T7 | Component-event interactivity (CityPicker → WeatherCard) | ✅ Complete | High | 5-7 days | F47 | M5-T1, M5-T3, M5-T4, M5-T6 |
 
 ### M6 — Deployment: CF + Bun + Nitro (0/4 complete)
 

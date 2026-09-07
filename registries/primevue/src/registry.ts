@@ -1,23 +1,29 @@
 /**
- * PrimeVue registry — DataTable + InputPair + ResultCard.
+ * PrimeVue registry — DataTable + InputPair + ResultCard + CityPicker + WeatherCard.
  *
- * Exports three component entries:
+ * Exports five component entries:
  *   - DataTable (F40): table with 8 props, 5 events
  *   - InputPair (F43): two numeric inputs + Submit, fires `submit` event
  *   - ResultCard (F43): display-only card with a computed result
+ *   - CityPicker (F47): city dropdown + Submit, fires `submit` event
+ *   - WeatherCard (F47): display-only card with weather details
  *
  * @module @genicul-primevue/registry/registry
  * @see {F40} — PrimeVue DataTable registry
  * @see {F43} — Chat as the sole render surface (interactive components)
+ * @see {F47} — Component-event interactivity (CityPicker → WeatherCard)
  */
 
 import type { TSchema } from '@sinclair/typebox';
 
+import { CityPickerSchema } from './city-picker-schema.js';
+import { CityPickerEvents } from './city-picker-events.js';
 import { DataTableSchema } from './data-table-schema.js';
 import { DataTableEvents } from './data-table-events.js';
 import { InputPairSchema } from './input-pair-schema.js';
 import { InputPairEvents } from './input-pair-events.js';
 import { ResultCardSchema } from './result-card-schema.js';
+import { WeatherCardSchema } from './weather-card-schema.js';
 
 // ---------------------------------------------------------------------------
 // Component entry — matches ComponentEntry from @genicui/server
@@ -185,9 +191,81 @@ export const ResultCard: ComponentEntry = {
  * Exported for the `./registry` subpath:
  *   `import { registry } from '@genicul-primevue/registry/registry'`
  */
+// ---------------------------------------------------------------------------
+// CityPicker entry (F47)
+// ---------------------------------------------------------------------------
+
+/**
+ * CityPicker component entry.
+ *
+ * City dropdown + Submit button. Clicking Submit fires a `submit` component
+ * event back to the chat bridge, which the server turns into a synthetic
+ * follow-up prompt. The agent then renders a WeatherCard for the chosen city.
+ */
+export const CityPicker: ComponentEntry = {
+  name: 'city-picker',
+  version: '1.0.0',
+  uri: 'ui://components/city-picker@1.0.0',
+  propsSchema: CityPickerSchema,
+  framework: 'primevue@4.2.0',
+  tags: ['form', 'input', 'dropdown', 'city', 'weather', 'interactive'],
+  events: CityPickerEvents,
+  examples: [
+    {
+      cityOptions: ['Paris', 'London', 'Tokyo', 'New York', 'Sydney'],
+      label: 'Pick a city',
+    },
+    {
+      initialCity: 'London',
+      cityOptions: ['London', 'Paris', 'Berlin'],
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// WeatherCard entry (F47)
+// ---------------------------------------------------------------------------
+
+/**
+ * WeatherCard component entry.
+ *
+ * Display-only card showing current weather for a city. Fetches from
+ * the Open-Meteo API (free, no API key) client-side in onMounted.
+ */
+export const WeatherCard: ComponentEntry = {
+  name: 'weather-card',
+  version: '1.0.0',
+  uri: 'ui://components/weather-card@1.0.0',
+  propsSchema: WeatherCardSchema,
+  framework: 'primevue@4.2.0',
+  tags: ['card', 'weather', 'display', 'interactive'],
+  // Display-only — no events (weather is fetched client-side).
+  events: [],
+  examples: [
+    {
+      city: 'Paris',
+      units: 'metric',
+    },
+    {
+      city: 'London',
+      units: 'imperial',
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Registry export — compatible with server registry loader
+// ---------------------------------------------------------------------------
+
+/**
+ * The PrimeVue registry object.
+ *
+ * Exported for the `./registry` subpath:
+ *   `import { registry } from '@genicul-primevue/registry/registry'`
+ */
 export const registry = {
   id: '@genicul-primevue/registry',
   version: '0.2.0',
   framework: 'primevue',
-  components: [DataTable, InputPair, ResultCard],
+  components: [DataTable, InputPair, ResultCard, CityPicker, WeatherCard],
 };

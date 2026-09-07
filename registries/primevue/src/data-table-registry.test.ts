@@ -728,8 +728,8 @@ describe('Registry export', () => {
     expect(registry.framework).toBe('primevue');
   });
 
-  it('has exactly 3 components (DataTable + InputPair + ResultCard)', () => {
-    expect(registry.components.length).toBe(3);
+  it('has exactly 5 components (DataTable + InputPair + ResultCard + CityPicker + WeatherCard)', () => {
+    expect(registry.components.length).toBe(5);
   });
 
   it('first component is the DataTable', () => {

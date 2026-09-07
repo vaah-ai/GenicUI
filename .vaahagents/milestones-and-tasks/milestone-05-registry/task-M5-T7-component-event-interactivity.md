@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F47 (proposed — Component-event interactivity. See Notes below — manifest F{n} assignment pending.)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 5-7 days
 
 ## Description
