@@ -357,6 +357,84 @@ function handleParsedLine(
   // surface raw stderr lines; claude-code doesn't use it.
 }
 /**
+ * Normalize props arriving over the chat bridge before they hit the
+ * component schema validator. Returns a new object — the input is not
+ * mutated.
+ *
+ * The two most common shape mismatches are:
+ *
+ *  - **MCP-wrapped arrays** (`{ item: [...] }`). The MCP transport
+ *    encodes arrays of objects with a single-key object wrapper so the
+ *    tool signature stays valid JSON Schema. The render_component
+ *    schema expects flat arrays, so we unwrap.
+ *  - **Quoted scalars** (`pageSize: "10"`). Claude Code sometimes
+ *    quotes integer-looking values that the schema expects as numbers.
+ *    We coerce numeric strings back to numbers when the value parses.
+ *
+ * Sanitization is intentionally conservative: we only unwrap when the
+ * shape is unambiguously the MCP-array envelope (single-key object
+ * with array value), and we only coerce strings whose trimmed content
+ * is a finite number. Anything else is passed through untouched so
+ * the schema validator can still reject genuinely malformed input.
+ *
+ * @see {F43} — MCP Permissions + Prop Shape
+ */
+function sanitizeBridgeProps(
+  props: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(props)) {
+    out[k] = sanitizeBridgeValue(v);
+  }
+  return out;
+}
+
+function sanitizeBridgeValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeBridgeValue(item));
+  }
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const keys = Object.keys(obj);
+    // MCP-wrapped array: { item: [...] } → unwrap to the inner array.
+    if (keys.length === 1 && keys[0] === 'item' && Array.isArray(obj['item'])) {
+      return (obj['item'] as unknown[]).map((item) => sanitizeBridgeValue(item));
+    }
+    // Nested object: recurse.
+    const nested: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      nested[k] = sanitizeBridgeValue(v);
+    }
+    return nested;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed.length > 0 && trimmed.length <= 16) {
+      // Finite-number coercion only for short, all-digit/numeric strings.
+      // Avoid coercing arbitrary long strings, version-like strings, etc.
+      const asNumber = Number(trimmed);
+      if (Number.isFinite(asNumber) && /^-?\d+(?:\.\d+)?$/.test(trimmed)) {
+        return asNumber;
+      }
+    }
+    return value;
+  }
+  return value;
+}
+
+/**
+ * Test-only export — the sanitizer's two entry points. Lets
+ * unit tests verify each transform rule without going through the
+ * full bridge pipeline. Not part of the public surface.
+ *
+ * @internal
+ */
+export const __test_sanitizeBridge = {
+  props: sanitizeBridgeProps,
+  value: sanitizeBridgeValue,
+};
+
+/**
  * Detect whether a tool-call name refers to `render_component`,
  * accepting both the bare tool name and the MCP-prefixed form
  * (`mcp__<server>__render_component`) that Claude Code emits when the
@@ -394,7 +472,7 @@ function bridgeRenderComponent(
     : typeof args['name'] === 'string'
       ? args['name']
       : '';
-  const props = (args['props'] && typeof args['props'] === 'object')
+  const rawProps = (args['props'] && typeof args['props'] === 'object')
     ? (args['props'] as Record<string, unknown>)
     : {};
   const layout = typeof args['layout'] === 'string' ? args['layout'] : undefined;
@@ -406,6 +484,25 @@ function bridgeRenderComponent(
     return;
   }
 
+  // Sanitize bridge-side props before validation. The MCP-direct trust
+  // boundary (`packages/server/src/mcp/render-handler.ts::validateProps`)
+  // still rejects malformed input — but the chat bridge receives wire
+  // shapes from Claude Code that aren't always JSON-Schema-clean:
+  //
+  //   1. MCP arrays are encoded as `{ item: [...] }` per the MCP spec
+  //      when they survive a tool_use ↔ tool_result round-trip. Our
+  //      component schemas (e.g. DataTable.rows) expect a flat array.
+  //   2. Stringified numbers (`"10"` for `pageSize: 10`) appear when
+  //      Claude Code quotes scalar values that should be integers.
+  //
+  // Without sanitization, the bridge returns -32003, Claude Code's MCP
+  // loop retries the same bad payload up to ~25 times, and the user
+  // perceives this as "the table takes forever to render." The POC
+  // didn't see this because its `McpBridge` *was* the renderer — the
+  // schema validation happened once, on the server, before Claude Code
+  // ever saw a tool result.
+  const props = sanitizeBridgeProps(rawProps);
+
   const renderInput: {
     name: string;
     props: Record<string, unknown>;
@@ -416,7 +513,8 @@ function bridgeRenderComponent(
 
   if (result.error) {
     console.error(
-      `[chat] bridge render_component failed (${result.error.code}): ${result.error.message}`,
+      `[chat] bridge render_component failed (${result.error.code}): ${result.error.message}` +
+        (result.error.details?.length ? ` | details=${JSON.stringify(result.error.details)}` : ''),
     );
     return;
   }

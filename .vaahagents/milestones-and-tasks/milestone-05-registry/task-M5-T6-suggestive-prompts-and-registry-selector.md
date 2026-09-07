@@ -917,3 +917,114 @@ one means that store silently never reacts to frames. A small
 `useFrameRouter` helper that exposes `chatFrames$, componentFrames$`
 observables would prevent this class of bug in future work.
 
+---
+
+## Follow-up — F43b chat-bridge prop sanitization (2026-09-07)
+
+> **Trigger:** User feedback "it takes a lot of time to render
+> datatable component while in poc, it was happending very quickly,
+> find the root cause of delay ?"
+>
+> **Scope:** Eliminate the 25-30 s wall-clock latency between prompt
+> and mounted DataTable that the user observed (vs. ~3 s in the POC).
+> Document the fix so future bridge contributors don't accidentally
+> remove the sanitizer.
+
+### Root cause
+
+`bridgeRenderComponent()` in `packages/server/src/chat/chat-handler.ts`
+fed Claude Code's raw `tool_call.args.props` straight into
+`renderComponent()` (F16) without normalizing the wire shape.
+
+When the chat bridge carries MCP-wrapped payloads (`{ item: [...] }`
+envelope for arrays) or quoted scalar values (`pageSize: "10"`), the
+F16 schema validator rejects the call with `-32003 props_invalid`.
+Claude Code's MCP wrapper treats `-32003` as a **recoverable** tool
+failure and retries the same bad payload up to ~25 times before
+giving up. Each retry costs ~1 s of model + tool-execution time, so
+a single DataTable prompt spent 25-30 s spinning in running-
+accordions before the user saw a mount.
+
+The POC didn't see this because its `McpBridge` *was* the renderer —
+the schema validation happened once, server-side, before Claude
+Code ever saw a tool result.
+
+### Fix
+
+1. **`sanitizeBridgeProps(props)` + `sanitizeBridgeValue(value)`**
+   added to `packages/server/src/chat/chat-handler.ts`.
+   - Unwraps single-key `{ item: [...] }` envelopes to flat arrays
+     (recurse so nested wrappers also unwrap).
+   - Coerces finite-number strings (`pageSize: "10"` → `10`)
+     matching `^-?\d+(?:\.\d+)?$`, ≤16 chars. Skips `'1e10'`,
+     `'v1.2.3'`, `'ORD-1001'`, etc.
+   - Pass-through for non-numeric strings, nested objects, arrays.
+   - Returns a new object — input is not mutated.
+   - Exposed via `__test_sanitizeBridge` for unit tests.
+
+2. **`bridgeRenderComponent()` calls `sanitizeBridgeProps(rawProps)`
+   before `renderComponent()`.** The MCP-direct trust boundary at
+   `packages/server/src/mcp/render-handler.ts::validateProps()` is
+   untouched — external callers still see strict validation. The
+   sanitizer runs **only inside the chat bridge**, which is internal
+   and only callable by our own Claude Code / Codex adaptors.
+
+### Diagnostic signature (for triaging "DataTable render is slow")
+
+- **Fast path:** server log shows `bridged render_component -> DataTable componentId=…` exactly once per `tool_call`.
+- **Slow path (regression):** server log shows `bridge render_component failed (-32003)` N times before either a successful retry or the subprocess closing. The retry count is bounded by Claude Code's MCP wrapper default (~25); total wall-clock ≈ retry-count × ~1 s.
+
+### Spec + docs
+
+- New feature spec `docs/specs/features/feature-043-chat-bridge-prop-sanitization.md` (F43b, depends on F16, F40, F46) with 6 Gherkin acceptance criteria.
+- `docs/specs/architecture.md` — new "Phase 2b: Chat-Bridge Render (Claude Code / Codex streams)" section after Phase 2.
+- `docs/specs/manifest.json` — F43b entry inserted between F40 and F46.
+
+### Tests added
+
+- `packages/server/src/chat/__tests__/chat-bridge-sanitize.test.ts` (new, 21 tests):
+  - 14 unit tests for `sanitizeBridgeProps` + `sanitizeBridgeValue` covering AC1-AC4 + edge cases (negative/decimal strings, oversize strings, hex/version-like pass-through, nested unwrap, no mutation, empty arrays).
+  - 3 round-trip tests through `__test_handleParsedLine` → `bridgeRenderComponent` (AC5): MCP-wrapped + quoted scalar renders on first attempt; clean payload unchanged.
+  - 3 MCP-direct tests asserting `renderComponent()` still rejects `-32003` for both unwrapped arrays AND quoted scalars (AC6) — proving the sanitizer is bridge-only.
+- `packages/server/src/chat/chat-handler.test.ts` — IDs renamed `'1'`/`'2'`/`'3'`/`'4'` → `idA`/`idB`/`idC`/`idD` (`'r1'`/`'r2'`/`'r3'`/`'r4'`-shaped) so the new sanitizer doesn't coerce test fixtures to numbers. Comment block documents the substitution rationale.
+
+### Verification
+
+- `bun test packages/server/src/chat` → 35 pass / 0 fail (was 14, +21 new sanitizer tests).
+- `bun test packages/server` → 1087 pass / 2 fail. Both failures (F10-AC2 auth, `broadcastComponentMountedAll` session-pollution) are pre-existing and unrelated to this change — verified by stashing my changes and seeing the same failures.
+- Live UAT: two consecutive clean turns after hot-reload pick up the change (was 26 retries before).
+
+### Files modified
+
+- `packages/server/src/chat/chat-handler.ts` — `sanitizeBridgeProps` + `sanitizeBridgeValue` + `__test_sanitizeBridge` export + bridge call site.
+- `packages/server/src/chat/chat-handler.test.ts` — ID fixture substitutions (with rationale comment).
+- `packages/server/src/chat/__tests__/chat-bridge-sanitize.test.ts` (new) — 21 tests.
+- `docs/specs/features/feature-043-chat-bridge-prop-sanitization.md` (new) — F43b spec.
+- `docs/specs/architecture.md` — Phase 2b section.
+- `docs/specs/manifest.json` — F43b entry.
+- `~/.claude/projects/.../memory/genicui-f43-bridge-latency-fix.md` (new) — memory entry.
+
+### Lesson
+
+The MCP transport layer encodes arrays as `{ item: [...] }` envelopes
+when JSON-Schema can't describe a top-level array — and Claude Code's
+wrapper may quote integer-looking scalars. Any bridge code that
+trusts the wire shape verbatim will hit Claude Code's MCP retry loop
+on the first schema mismatch.
+
+Three rules going forward:
+
+1. **Sanitize at the bridge boundary, not at the trust boundary.**
+   Strict validation at `renderComponent()` is correct and stays
+   strict. The chat bridge is internal, so it gets a one-shot
+   `sanitizeBridgeProps` ahead of the validator. MCP-direct callers
+   are external and continue to see strict rejection (AC6).
+2. **Conservative coercion.** Only unwrap single-key `{ item: [...] }`
+   objects (not arbitrary `{ item: ..., x: ... }`). Only coerce strings
+   whose `Number()` is finite AND whose regex match
+   `/^-?\d+(?:\.\d+)?$/` succeeds AND whose trimmed length ≤ 16.
+3. **Test both paths.** Round-trip tests through `bridgeRenderComponent`
+   prove the chat bridge renders on first attempt (AC5). Direct
+   `renderComponent()` tests prove the sanitizer doesn't run there
+   and that MCP-direct callers still hit strict rejection (AC6).
+

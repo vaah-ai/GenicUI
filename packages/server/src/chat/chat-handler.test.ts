@@ -219,6 +219,15 @@ describe('chat-handler', () => {
       componentStore.clear();
     });
 
+    // NOTE: The bridge applies `sanitizeBridgeProps` (F43b) before
+    // validation, which coerces finite-number strings to numbers. Use
+    // non-numeric IDs (`r1`, `r2`, …) so the assertions compare the
+    // string verbatim — bare `'1'` would become `1` after sanitization.
+    const idA = 'r1';
+    const idB = 'r2';
+    const idC = 'r3';
+    const idD = 'r4';
+
     it('bridges a render_component tool_call to a COMPONENT_MOUNTED frame', () => {
       const session = createMockSession();
 
@@ -231,7 +240,7 @@ describe('chat-handler', () => {
         name: 'render_component',
         input: {
           componentName: 'DataTable',
-          props: { rows: [{ id: '1', name: 'Alice' }] },
+          props: { rows: [{ id: idA, name: 'Alice' }] },
         },
       });
 
@@ -247,7 +256,7 @@ describe('chat-handler', () => {
       const payload = mounted!.payload as Record<string, unknown>;
       expect(payload['componentId']).toBe(mounted!.channel);
       expect(payload['name']).toBe('DataTable');
-      expect(payload['initialState']).toEqual({ rows: [{ id: '1', name: 'Alice' }] });
+      expect(payload['initialState']).toEqual({ rows: [{ id: idA, name: 'Alice' }] });
     });
 
     it('bridges a render_component tool_call using legacy `name` arg shape', () => {
@@ -259,7 +268,7 @@ describe('chat-handler', () => {
         name: 'render_component',
         input: {
           name: 'DataTable',
-          props: { rows: [{ id: '2', name: 'Bob' }] },
+          props: { rows: [{ id: idB, name: 'Bob' }] },
         },
       });
 
@@ -271,7 +280,7 @@ describe('chat-handler', () => {
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
       expect(payload['name']).toBe('DataTable');
-      expect(payload['initialState']).toEqual({ rows: [{ id: '2', name: 'Bob' }] });
+      expect(payload['initialState']).toEqual({ rows: [{ id: idB, name: 'Bob' }] });
     });
 
     it('bridges an MCP-prefixed render_component tool_call (mcp__<server>__render_component)', () => {
@@ -293,7 +302,7 @@ describe('chat-handler', () => {
               name: 'mcp__genicui__render_component',
               input: {
                 componentName: 'DataTable',
-                props: { rows: [{ id: '3', name: 'Carol' }] },
+                props: { rows: [{ id: idC, name: 'Carol' }] },
               },
             },
           ],
@@ -308,7 +317,7 @@ describe('chat-handler', () => {
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
       expect(payload['name']).toBe('DataTable');
-      expect(payload['initialState']).toEqual({ rows: [{ id: '3', name: 'Carol' }] });
+      expect(payload['initialState']).toEqual({ rows: [{ id: idC, name: 'Carol' }] });
     });
 
     it('bridges an MCP-prefixed render_component in compact (top-level tool_use) form', () => {
@@ -320,7 +329,7 @@ describe('chat-handler', () => {
         name: 'mcp__genicui__render_component',
         input: {
           componentName: 'DataTable',
-          props: { rows: [{ id: '4', name: 'Dan' }] },
+          props: { rows: [{ id: idD, name: 'Dan' }] },
         },
       });
 
@@ -331,7 +340,7 @@ describe('chat-handler', () => {
         .find((f) => f.type === 'COMPONENT_MOUNTED');
       expect(mounted).toBeDefined();
       const payload = mounted!.payload as Record<string, unknown>;
-      expect(payload['initialState']).toEqual({ rows: [{ id: '4', name: 'Dan' }] });
+      expect(payload['initialState']).toEqual({ rows: [{ id: idD, name: 'Dan' }] });
     });
 
     it('does not bridge non-render_component tool calls', () => {
