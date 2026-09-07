@@ -62,6 +62,41 @@ export function shouldRenderToolError(
 }
 
 /**
+ * F47-AC7 (clean-view): decides whether the live `<RenderedComponent>`
+ * preview should be rendered in clean mode (debug toggle OFF).
+ *
+ * The preview is the user-facing surface — it shows the actual
+ * interactive CityPicker / WeatherCard widget the agent mounted. It
+ * must stay visible in BOTH modes:
+ *
+ *   - Debug ON  → the preview lives inside the `<ToolCallAccordion>`'s
+ *                 opened body (existing behaviour, unchanged).
+ *   - Debug OFF → the preview lives next to the compact status pill
+ *                 in `ChatHistory.vue`, so the user still sees the
+ *                 component even when the diagnostic accordions are
+ *                 hidden.
+ *
+ * This predicate gates the clean-mode render in `ChatHistory.vue`. The
+ * debug-mode render is unconditional inside `ToolCallAccordion` (the
+ * `showComponentProps` predicate covers only the per-component Props
+ * JSON dump, not the component itself).
+ *
+ * @param isRenderComponentCall - True when this tool call is
+ *                                `render_component` (bare or
+ *                                MCP-prefixed).
+ * @param hasMountedComponent   - True when the COMPONENT_MOUNTED
+ *                                frame has landed and the matching
+ *                                entry exists in the
+ *                                `useComponents()` store.
+ */
+export function shouldRenderCleanComponentPreview(
+  isRenderComponentCall: boolean,
+  hasMountedComponent: boolean,
+): boolean {
+  return isRenderComponentCall && hasMountedComponent;
+}
+
+/**
  * F47-AC7 (clean-view): when the chat column debug toggle is OFF,
  * `ChatHistory` replaces every `ToolCallAccordion` with a compact
  * one-line status pill. This function produces the visible label:

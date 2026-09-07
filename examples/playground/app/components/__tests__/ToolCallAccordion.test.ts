@@ -12,8 +12,17 @@
  *
  * Also covers `formatCleanToolLabel`, which `ChatHistory.vue` uses
  * to render a compact one-line status pill in place of the full
- * `ToolCallAccordion` when the debug toggle is OFF. The pill is the
- * only thing the user sees in clean mode — it must read clearly.
+ * `ToolCallAccordion` when the debug toggle is OFF. The pill is
+ * shown alongside the live `<RenderedComponent>` preview for
+ * `render_component` calls so the user still sees the widget
+ * they're interacting with in clean mode.
+ *
+ * F47-AC7 responsibility split:
+ *   - ToolCallAccordion owns the *diagnostic* surfaces only.
+ *   - The live component preview now lives in `ChatHistory.vue`,
+ *     not in this component. Its resolution is shared via
+ *     `./resolve-mounted-component.ts` (see
+ *     `resolve-mounted-component.test.ts`).
  *
  * @see {F47-AC7} — Chat column debug toggle (M5-T7-05)
  */

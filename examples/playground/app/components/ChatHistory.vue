@@ -72,23 +72,43 @@
           F47-AC7: tool-call rendering switches between two surfaces
           depending on the chat column debug toggle.
             - Debug ON  → the full `<ToolCallAccordion>` (header +
-                          props / input / result / error blocks).
+                          props / input / result / error blocks
+                          AND the live component preview for
+                          `render_component` calls).
             - Debug OFF → a compact one-line status pill (`✓ render_component`)
-                          so the chat reads as prose + interactive
-                          components only.
+                          AND, for `render_component` calls, the
+                          live `<RenderedComponent>` preview
+                          alongside the pill.
           The rendered component preview (CityPicker / WeatherCard)
-          stays visible in both modes — it's NOT a tool-call card.
+          stays visible in both modes — it's the user-facing surface,
+          not a diagnostic one. Hiding it would defeat the whole point
+          of the chat column (live interactive widgets).
         -->
         <template v-for="(call, callIdx) in msg.toolCalls" :key="`${msg.timestamp}-tool-${callIdx}`">
           <ToolCallAccordion v-if="isDebug" class="chat-tool" :entry="call" />
-          <div
-            v-else
-            class="chat-tool-pill"
-            :class="`chat-tool-pill-${call.status}`"
-            :aria-label="`Tool call ${call.name} (${call.status})`"
-          >
-            {{ formatCleanToolLabel(call.name, call.status) }}
-          </div>
+          <template v-else>
+            <div
+              class="chat-tool-pill"
+              :class="`chat-tool-pill-${call.status}`"
+              :aria-label="`Tool call ${call.name} (${call.status})`"
+            >
+              {{ formatCleanToolLabel(call.name, call.status) }}
+            </div>
+            <!--
+              Live component preview (CityPicker / WeatherCard etc.)
+              for `render_component` calls. Only rendered in clean
+              mode — in debug mode it's already inside
+              `<ToolCallAccordion>`'s body. Gating is in
+              `tool-call-gating.ts` so the rule has unit coverage.
+            -->
+            <RenderedComponent
+              v-if="renderedComponentFor(call)"
+              class="chat-tool-component"
+              :name="renderedComponentFor(call)!.name"
+              :props="renderedComponentFor(call)!.props"
+              :component-id="renderedComponentFor(call)!.componentId"
+            />
+          </template>
         </template>
 
         <!-- Error banner (when the assistant bubble ends in error state) -->
@@ -126,13 +146,19 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
 import ToolCallAccordion from './ToolCallAccordion.vue';
+import RenderedComponent from './RenderedComponent.vue';
 import EmptyState from './EmptyState.vue';
 import PromptChips from './PromptChips.vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useRegistries } from '~/composables/useRegistries.ts';
 import { useChatInput } from '~/composables/useChatInput.ts';
 import { useDebugMode } from '~/composables/useDebugMode.ts';
-import { formatCleanToolLabel } from './tool-call-gating.ts';
+import { useComponents } from '~/composables/useComponents.ts';
+import { formatCleanToolLabel, shouldRenderCleanComponentPreview } from './tool-call-gating.ts';
+import {
+  resolveMountedComponent,
+  isRenderComponentCall,
+} from './resolve-mounted-component.ts';
 
 /**
  * Shape of a single chat message — mirrors `useChat().history.value`.
@@ -194,6 +220,29 @@ const isConnected = computed<boolean>(() => ws.state.value === 'connected');
  * interactive components only.
  */
 const { isDebug } = useDebugMode();
+
+/**
+ * F47-AC7 (clean-view): the live `<RenderedComponent>` preview for
+ * `render_component` calls. Exposed as a helper rather than a `v-for`
+ * of computeds so the template stays a flat list — keeps `:key`
+ * scoping simple and the per-call lookup cheap.
+ *
+ * Returns the resolved mounted entry or `undefined` when the tool
+ * call isn't `render_component`, or when the COMPONENT_MOUNTED frame
+ * hasn't landed yet. The template uses the predicate
+ * `shouldRenderCleanComponentPreview` to keep the gating rule unit-
+ * testable.
+ */
+const { components, findComponent } = useComponents();
+function renderedComponentFor(call: ToolCallEntry) {
+  if (!shouldRenderCleanComponentPreview(
+    isRenderComponentCall(call.name),
+    resolveMountedComponent(call, components, findComponent) !== undefined,
+  )) {
+    return undefined;
+  }
+  return resolveMountedComponent(call, components, findComponent);
+}
 
 /**
  * Prompt chips derived from the currently selected registry. When no
@@ -425,6 +474,21 @@ function formatTime(isoString: string): string {
 .chat-tool-pill-error {
   color: rgba(239, 68, 68, 0.95);
   opacity: 1;
+}
+
+/*
+ * F47-AC7 (clean-view): the live `<RenderedComponent>` preview
+ * rendered next to the status pill in clean mode (debug toggle
+ * OFF). This is the user-facing surface — the actual interactive
+ * widget the agent mounted — so it stays visible in both modes.
+ * Debug mode renders it inside the accordion body instead.
+ */
+.chat-tool-component {
+  margin-top: var(--gp-space-1);
+  padding: var(--gp-space-2);
+  background: var(--gp-surface);
+  border: 1px solid var(--gp-border);
+  border-radius: var(--gp-radius-md);
 }
 
 .chat-error-banner {
