@@ -34,7 +34,17 @@ examples/docs/
 ├── app/
 │   └── app.config.ts          # brand placeholder (M5.1-T1) → full theme (M5.1-T4)
 ├── content/                   # markdown pages authored in M5.1-T4 onward
-│   └── index.md               # placeholder landing
+│   ├── .navigation.yml        # top-level (M5.1-T3)
+│   ├── index.md               # placeholder landing (T4 fills)
+│   ├── 1.getting-started/     # 3 pages + .navigation.yml
+│   ├── 2.concepts/            # 7 pages + .navigation.yml
+│   ├── 3.guides/              # 5 pages + .navigation.yml
+│   ├── 4.api/                 # 6 pages + .navigation.yml
+│   ├── 5.cookbook/            # 6 pages + .navigation.yml
+│   ├── 6.deployment/          # 4 pages + .navigation.yml
+│   ├── 7.resources/           # 3 pages + .navigation.yml
+│   ├── 8.community/           # 3 pages + .navigation.yml
+│   └── 9.migration/           # 1 page + .navigation.yml
 ├── nuxt.config.ts             # extends: ['docus']
 └── package.json               # workspace member
 ```
@@ -42,6 +52,7 @@ examples/docs/
 ## Tasks completed in this scaffold
 
 - M5.1-T1 ✅ Scaffold + workspace wiring — landing renders, build works, MIT deps only.
+- M5.1-T3 ✅ Information architecture — 9 section directories, 38 page skeletons (frontmatter + `::note` placeholder), 10 `.navigation.yml` files. Build passes, all 38 routes return 200. See `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md`.
 
 ## UAT findings (Playwright, 2026-09-08)
 
