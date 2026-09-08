@@ -224,8 +224,8 @@ function handleSubmit(prompt: string): void {
 }
 
 .chat-debug-switch-on {
-  background: rgba(34, 197, 94, 0.18);
-  border-color: rgba(34, 197, 94, 0.45);
+  background: var(--gp-success-bg-strong);
+  border-color: var(--gp-success-border-strong);
 }
 
 .chat-debug-switch-on .chat-debug-switch-knob {

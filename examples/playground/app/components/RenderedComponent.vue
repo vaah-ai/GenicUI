@@ -1063,38 +1063,42 @@ const WeatherGlyphThunder = {
 }
 
 .rendered-component-grid :deep(.p-datatable-table) {
-  background: var(--gp-surface, #1e293b);
-  color: var(--gp-text, #f8fafc);
+  background: var(--gp-surface);
+  color: var(--gp-text);
   font-size: 0.8125rem;
 }
 
 .rendered-component-grid :deep(.p-datatable-header),
 .rendered-component-grid :deep(.p-datatable-thead > tr > th) {
-  background: var(--gp-topbar, #0b1224);
-  color: var(--gp-text-secondary, #94a3b8);
-  border-color: var(--gp-surface-hover, #272f42);
+  background: var(--gp-table-header-bg);
+  color: var(--gp-text-secondary);
+  border-color: var(--gp-table-border);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .rendered-component-grid :deep(.p-datatable-tbody > tr) {
-  background: var(--gp-surface, #1e293b);
-  color: var(--gp-text, #f8fafc);
+  background: var(--gp-surface);
+  color: var(--gp-text);
 }
 
 .rendered-component-grid :deep(.p-datatable-tbody > tr.p-row-odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--gp-row-stripe);
 }
 
-.rendered-component-grid :deep(.p-datatable-tbody > tr:hover) {
-  background: var(--gp-surface-hover, #272f42);
+.rendered-component-grid :deep(.p-datatable-tbody > tr.p-row-odd:hover) {
+  background: var(--gp-row-stripe-hover);
+}
+
+.rendered-component-grid :deep(.p-datatable-tbody > tr:not(.p-row-odd):hover) {
+  background: var(--gp-surface-hover);
 }
 
 .rendered-component-grid :deep(.p-paginator) {
-  background: var(--gp-topbar, #0b1224);
-  color: var(--gp-text-secondary, #94a3b8);
-  border-color: var(--gp-surface-hover, #272f42);
+  background: var(--gp-table-header-bg);
+  color: var(--gp-text-secondary);
+  border-color: var(--gp-table-border);
 }
 
 .rendered-component-status {
@@ -1294,7 +1298,7 @@ const WeatherGlyphThunder = {
     var(--gp-surface-hover) 100%
   );
   --wx-accent-tint: var(--gp-surface-hover);
-  --wx-accent-border: rgba(148, 163, 184, 0.18);
+  --wx-accent-border: var(--gp-glass-border);
 
   position: relative;
   border-radius: var(--gp-radius-md);
@@ -1307,44 +1311,44 @@ const WeatherGlyphThunder = {
   /* Subtle ambient glow behind the card so the tone reads as
      atmosphere, not just an icon colour. */
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    var(--gp-glass-inner-shadow),
     0 8px 24px -12px var(--wx-accent-tint);
   backdrop-filter: blur(6px) saturate(1.1);
   -webkit-backdrop-filter: blur(6px) saturate(1.1);
 }
 
 .rendered-component-weather-card-warm {
-  --wx-accent: #fbbf24;            /* amber-400 */
+  --wx-accent: var(--gp-tone-amber-text);
   --wx-accent-bg: linear-gradient(
     135deg,
-    rgba(251, 191, 36, 0.06) 0%,
-    rgba(251, 191, 36, 0.02) 60%,
+    var(--gp-tone-amber-tint) 0%,
+    transparent 60%,
     transparent 100%
   );
-  --wx-accent-tint: rgba(251, 191, 36, 0.35);
-  --wx-accent-border: rgba(251, 191, 36, 0.22);
+  --wx-accent-tint: var(--gp-tone-amber-tint-strong);
+  --wx-accent-border: var(--gp-tone-amber-border);
 }
 .rendered-component-weather-card-cool {
-  --wx-accent: #60a5fa;            /* blue-400 */
+  --wx-accent: var(--gp-tone-blue-text);
   --wx-accent-bg: linear-gradient(
     135deg,
-    rgba(96, 165, 250, 0.08) 0%,
-    rgba(96, 165, 250, 0.02) 60%,
+    var(--gp-tone-blue-tint) 0%,
+    transparent 60%,
     transparent 100%
   );
-  --wx-accent-tint: rgba(96, 165, 250, 0.35);
-  --wx-accent-border: rgba(96, 165, 250, 0.22);
+  --wx-accent-tint: var(--gp-tone-blue-tint-strong);
+  --wx-accent-border: var(--gp-tone-blue-border);
 }
 .rendered-component-weather-card-cold {
-  --wx-accent: #67e8f9;            /* cyan-300 */
+  --wx-accent: var(--gp-tone-cyan-text);
   --wx-accent-bg: linear-gradient(
     135deg,
-    rgba(103, 232, 249, 0.08) 0%,
-    rgba(103, 232, 249, 0.02) 60%,
+    var(--gp-tone-cyan-tint) 0%,
+    transparent 60%,
     transparent 100%
   );
-  --wx-accent-tint: rgba(103, 232, 249, 0.35);
-  --wx-accent-border: rgba(103, 232, 249, 0.22);
+  --wx-accent-tint: var(--gp-tone-cyan-tint-strong);
+  --wx-accent-border: var(--gp-tone-cyan-border);
 }
 
 /* Inner padding wrapper — separates the border / gradient from the
@@ -1379,7 +1383,7 @@ const WeatherGlyphThunder = {
      gradient — uses accent at low alpha so it doesn't fight the
      gradient. */
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px var(--gp-glass-ring),
     inset 0 0 0 2px var(--wx-accent-border);
 }
 
@@ -1492,12 +1496,11 @@ const WeatherGlyphThunder = {
   flex-direction: column;
   gap: 4px;
   padding: var(--gp-space-2) var(--gp-space-3);
-  /* Frosted tile — uses the surface-hover tone at low alpha so
-     it sits inside the gradient instead of stacking another
-     border on top. */
-  background: rgba(15, 23, 42, 0.35);
+  /* Frosted tile — uses the glass token so it sits inside the
+     gradient instead of stacking another border on top. */
+  background: var(--gp-glass-bg);
   border-radius: var(--gp-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--gp-glass-border);
   min-width: 0;
 }
 
@@ -1605,7 +1608,7 @@ const WeatherGlyphThunder = {
   letter-spacing: 0.02em;
   border-radius: var(--gp-radius);
   border: 1px solid var(--gp-border-light);
-  background: rgba(15, 23, 42, 0.35);
+  background: var(--gp-glass-bg);
   color: var(--gp-text);
   cursor: pointer;
   transition:
@@ -1615,7 +1618,7 @@ const WeatherGlyphThunder = {
 }
 
 .rendered-component-weather-card-retry:hover {
-  background: rgba(15, 23, 42, 0.55);
+  background: var(--gp-glass-bg-hover);
   border-color: var(--wx-accent);
 }
 

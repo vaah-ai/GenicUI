@@ -29,6 +29,7 @@
       </div>
 
       <div class="topbar-status">
+        <ThemeToggle />
         <div
           class="connection-status"
           :class="wsState"
@@ -96,6 +97,13 @@ import { computed, onBeforeUnmount } from 'vue';
 import { useWebSocket } from '~/composables/useWebSocket.ts';
 import { useComponents } from '~/composables/useComponents.ts';
 import { useChat } from '~/composables/useChat.ts';
+import { useColorMode } from '~/composables/useColorMode.ts';
+
+// Initialize the color-mode singleton on app mount. The actual theme
+// value was already painted by the FOUC inline script in nuxt.config.ts;
+// this call just registers the Vue watchers so subsequent toggles
+// round-trip through <html data-theme="...">.
+useColorMode();
 
 const ws = useWebSocket();
 const wsState = ws.state;

@@ -167,13 +167,13 @@ function statusSeverity(status: OrderStatus): string {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--gp-text, #f8fafc);
+  color: var(--gp-text);
 }
 
 .orders-table-subtitle {
   margin: 0;
   font-size: 12px;
-  color: var(--gp-text-secondary, #94a3b8);
+  color: var(--gp-text-secondary);
 }
 
 .orders-table-mono {
@@ -189,39 +189,52 @@ function statusSeverity(status: OrderStatus): string {
   margin: 0;
   padding: 24px 8px;
   text-align: center;
-  color: var(--gp-text-muted, #64748b);
+  color: var(--gp-text-muted);
 }
 
 /* PrimeVue 4 DataTable uses CSS variables from the Aura preset — these
-   tweaks re-tone the surface to match the playground's dark palette. */
+   tweaks re-tone the surface to match the playground's --gp-* token
+   layer (dark and light mode both). */
 .orders-table-grid :deep(.p-datatable-table) {
-  background: var(--gp-surface, #1e293b);
-  color: var(--gp-text, #f8fafc);
+  background: var(--gp-surface);
+  color: var(--gp-text);
 }
 
 .orders-table-grid :deep(.p-datatable-header),
 .orders-table-grid :deep(.p-datatable-thead > tr > th) {
-  background: var(--gp-topbar, #0b1224);
-  color: var(--gp-text-secondary, #94a3b8);
-  border-color: var(--gp-surface-hover, #272f42);
+  background: var(--gp-table-header-bg);
+  color: var(--gp-text-secondary);
+  border-color: var(--gp-table-border);
 }
 
 .orders-table-grid :deep(.p-datatable-tbody > tr) {
-  background: var(--gp-surface, #1e293b);
-  color: var(--gp-text, #f8fafc);
+  background: var(--gp-surface);
+  color: var(--gp-text);
 }
 
+/* The bug fix: `rgba(255,255,255,0.02)` was a dark-only literal that
+   showed as a near-white stripe. Now it flows through --gp-row-stripe
+   which flips between dark alpha (dark mode) and light alpha (light
+   mode) via the [data-theme="light"] companion block. */
 .orders-table-grid :deep(.p-datatable-tbody > tr.p-row-odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--gp-row-stripe);
 }
 
-.orders-table-grid :deep(.p-datatable-tbody > tr:hover) {
-  background: var(--gp-surface-hover, #272f42);
+/* Split the hover rule so a hover on an odd row uses the slightly
+   stronger stripe hover, while a hover on an even row uses the
+   surface hover. Without the split, the odd-row :hover would lose
+   to the base :hover by specificity. */
+.orders-table-grid :deep(.p-datatable-tbody > tr.p-row-odd:hover) {
+  background: var(--gp-row-stripe-hover);
+}
+
+.orders-table-grid :deep(.p-datatable-tbody > tr:not(.p-row-odd):hover) {
+  background: var(--gp-surface-hover);
 }
 
 .orders-table-grid :deep(.p-paginator) {
-  background: var(--gp-topbar, #0b1224);
-  color: var(--gp-text-secondary, #94a3b8);
-  border-color: var(--gp-surface-hover, #272f42);
+  background: var(--gp-table-header-bg);
+  color: var(--gp-text-secondary);
+  border-color: var(--gp-table-border);
 }
 </style>

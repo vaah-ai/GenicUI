@@ -370,7 +370,7 @@ function formatTime(isoString: string): string {
 /* Distinguish user vs assistant visually */
 .chat-bubble-user {
   background: var(--gp-accent-subtle);
-  border-color: rgba(34, 197, 94, 0.25);
+  border-color: var(--gp-success-border-soft);
   /* Right-align within the column to match Claude Code parity. */
   align-self: flex-end;
   max-width: 88%;
@@ -383,12 +383,12 @@ function formatTime(isoString: string): string {
 }
 
 .chat-bubble-streaming {
-  border-color: rgba(59, 130, 246, 0.35);
+  border-color: var(--gp-info-border-soft);
 }
 
 .chat-bubble-error {
-  border-color: rgba(239, 68, 68, 0.45);
-  background: rgba(239, 68, 68, 0.06);
+  border-color: var(--gp-error-border-strong);
+  background: var(--gp-error-bg-soft);
 }
 
 .chat-bubble-meta {
@@ -412,7 +412,7 @@ function formatTime(isoString: string): string {
 
 .chat-role-badge.user {
   color: var(--gp-accent);
-  background: rgba(34, 197, 94, 0.18);
+  background: var(--gp-success-bg-strong);
 }
 
 .chat-role-badge.assistant {
@@ -472,7 +472,7 @@ function formatTime(isoString: string): string {
 }
 
 .chat-tool-pill-error {
-  color: rgba(239, 68, 68, 0.95);
+  color: var(--gp-error-text-strong);
   opacity: 1;
 }
 
@@ -499,10 +499,10 @@ function formatTime(isoString: string): string {
   margin-top: var(--gp-space-2);
   padding: var(--gp-space-1) var(--gp-space-2);
   font-size: 0.75rem;
-  color: rgba(239, 68, 68, 0.95);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--gp-error-text-strong);
+  border: 1px solid var(--gp-error-border-soft);
   border-radius: var(--gp-radius-sm);
-  background: rgba(239, 68, 68, 0.05);
+  background: var(--gp-error-bg-soft);
 }
 
 /* ----- Pending dots (assistant typing) ----- */

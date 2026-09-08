@@ -261,12 +261,12 @@ function formatJson(value: unknown): string {
 }
 
 .tool-call-running {
-  border-color: rgba(34, 197, 94, 0.35);
+  border-color: var(--gp-success-border-strong);
 }
 
 .tool-call-error {
-  border-color: rgba(239, 68, 68, 0.45);
-  background: rgba(239, 68, 68, 0.06);
+  border-color: var(--gp-error-border-strong);
+  background: var(--gp-error-bg-soft);
 }
 
 .tool-call-toggle {
@@ -332,8 +332,8 @@ function formatJson(value: unknown): string {
 
 .tool-call-status-running {
   color: var(--gp-accent);
-  border-color: rgba(34, 197, 94, 0.4);
-  background: rgba(34, 197, 94, 0.08);
+  border-color: var(--gp-success-border-strong);
+  background: var(--gp-success-bg-strong);
 }
 
 .tool-call-status-done {
@@ -341,9 +341,9 @@ function formatJson(value: unknown): string {
 }
 
 .tool-call-status-error {
-  color: rgba(239, 68, 68, 0.95);
-  border-color: rgba(239, 68, 68, 0.4);
-  background: rgba(239, 68, 68, 0.08);
+  color: var(--gp-error-text-strong);
+  border-color: var(--gp-error-border-strong);
+  background: var(--gp-error-bg-strong);
 }
 
 .tool-call-chevron {
@@ -455,9 +455,9 @@ function formatJson(value: unknown): string {
 }
 
 .tool-call-block-error .tool-call-block-pre {
-  color: rgba(239, 68, 68, 0.95);
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.05);
+  color: var(--gp-error-text-strong);
+  border-color: var(--gp-error-border-soft);
+  background: var(--gp-error-bg-soft);
 }
 
 /* Respect reduced motion */
