@@ -1,25 +1,72 @@
-// GenicUI brand placeholder — full theming lives in M5.1-T4 (Landing page).
-// See: .vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-M5.1-T1-docus-scaffold.md
+// GenicUI brand palette — M5.1-T4 (Landing page).
 //
-// Brand color is a placeholder ("indigo") until T4 lands. Never reference
-// @nuxt/ui-pro here — Nuxt UI v4 is MIT and ships Pro features in the
+// Three accent colors encode the framework's positioning:
+//   - primary (blue)     — MCP/protocol layer, the wire that connects agents
+//   - secondary (violet) — the component contract, where schemas live
+//   - tertiary (emerald) — successful renders, positive actions
+//
+// Nuxt UI v4 token map accepts Tailwind color names OR hex values.
+// These are the T4-approved placeholders; T12 may revise before production.
+// Never reference @nuxt/ui-pro — Nuxt UI v4 MIT ships Pro features in the
 // unified open-source package.
 
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'indigo',
-      secondary: 'sky',
-      tertiary: 'violet',
+      primary: 'blue',
+      secondary: 'violet',
+      tertiary: 'emerald',
       info: 'sky',
       success: 'emerald',
       warning: 'amber',
       error: 'rose'
+    },
+    icons: {
+      dynamic: true
+    },
+    // M5.1-T4 — PageHero title sizing override. The default
+    // 'text-5xl sm:text-7xl' clips our 8-word tagline at 1440px.
+    // Cap at sm:text-6xl and add lg:text-7xl for wide screens so
+    // the hierarchy stays strong without overflowing the
+    // --ui-container width.
+    pageHero: {
+      slots: {
+        title: 'text-4xl sm:text-5xl lg:text-6xl text-pretty tracking-tight font-bold text-highlighted text-balance',
+        description: 'text-base sm:text-lg text-muted text-balance mt-4'
+      }
     }
   },
 
   site: {
     name: 'GenicUI',
-    description: 'Generative agentic UI framework — render custom UI from any AI agent via MCP.'
+    url: 'https://genicui.dev',
+    description: 'The protocol that lets AI agents use your UI. MCP-native, library-agnostic, framework-agnostic.',
+    defaultLocale: 'en'
+  },
+
+  // GitHub — Docus's AppHeader reads appConfig.github.url and renders an
+  // icon button in the header right slot. T12 may revise the repo URL.
+  github: {
+    url: 'https://github.com/genicui/genicui',
+    branch: 'main'
+  },
+
+  // Docus owns the color-mode shortcut. Keep 'd' — it's also Docus's prefix
+  // for the in-app command palette.
+  docus: {
+    shortcuts: {
+      toggleColorMode: 'd'
+    }
+  },
+
+  // SEO defaults — title template + OG card metadata. Per-page `seo:` blocks
+  // (in frontmatter) override these. T11 (Search + SEO + llms) may layer
+  // additional modules on top.
+  seo: {
+    siteName: 'GenicUI',
+    titleTemplate: '%s · GenicUI',
+    description: 'The protocol that lets AI agents use your UI. MCP-native, library-agnostic, framework-agnostic.',
+    twitter: '@genicui',
+    image: '/og-image.png'
   }
 })

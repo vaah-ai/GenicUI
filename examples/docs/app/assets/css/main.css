@@ -1,0 +1,343 @@
+/* GenicUI landing — design tokens, premium typography, motion
+ *
+ * This file is the source of truth for the landing page's visual identity.
+ * It overrides Docus/Nuxt UI defaults where the framework's stock theme
+ * is too generic. Loaded via nuxt.config.ts (app entry css).
+ *
+ * Design archetype: Ethereal Glass (dark, OLED-black with radial mesh
+ * gradients). Pair with Asymmetrical Bento layout in content/index.md.
+ *
+ * Type scale follows a 1.250 minor third (1.250x step) anchored at 16px.
+ * Premium families: Geist (sans), Geist Mono (code), Instrument Serif
+ * (editorial accent). Explicitly NOT Inter, Roboto, Arial, Helvetica.
+ */
+
+/* Premium font stack — Geist (sans), Instrument Serif (editorial),
+ * Geist Mono (code). Loaded from Vercel's CDN.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+/* Geist via @fontsource-style CDN */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.5/files/geist-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.5/files/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+/* Design tokens — registered via :root so they survive Tailwind's
+ * @theme processing. Docus already brings its own Tailwind theme; we
+ * scope our additions to the landing surface and avoid clashing.
+ */
+:root {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Instrument Serif', 'Geist', ui-serif, Georgia, serif;
+
+  /* Landing-page-specific color tokens (OLED-black + radial accents) */
+  --color-canvas: #08090A;
+  --color-canvas-elevated: #0E1012;
+  --color-canvas-glass: rgba(14, 16, 18, 0.6);
+  --color-canvas-border: rgba(255, 255, 255, 0.08);
+  --color-canvas-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Accent palette — depth comes from layered radial gradients */
+  --color-accent-blue: #3B82F6;
+  --color-accent-violet: #8B5CF6;
+  --color-accent-emerald: #10B981;
+  --color-accent-amber: #F59E0B;
+  --color-text-muted: #A1A1AA;
+  --color-text-dim: #71717A;
+
+  /* Motion tokens — custom cubic-bezier for spring-like feel */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Keyframes must live outside @theme so the browser actually finds them
+ * when CSS resolves `animation-name` from a `var(--animate-*)` reference.
+ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, -2%) rotate(1deg); }
+  66% { transform: translate(-1%, 1%) rotate(-1deg); }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Override Tailwind defaults — push the landing away from the standard
+ * light-mode SaaS look. We force dark mode on the landing regardless of
+ * system preference.
+ */
+html, html.dark, html.light {
+  background-color: var(--color-canvas);
+  color: var(--color-text, #FAFAFA);
+}
+
+/* Landing-page scoped overrides (cascade to children via .landing-root) */
+.landing-root {
+  background-color: var(--color-canvas);
+  color: #FAFAFA;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
+.landing-root :where(code) {
+  font-family: var(--font-mono);
+}
+
+/* Massive display type — Instrument Serif for editorial weight */
+.landing-root .display-serif {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  font-style: italic;
+}
+
+.landing-root .display-sans {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+/* Glass card primitive — Double-Bezel nested architecture.
+ * Background is a literal rgba so it works regardless of CSS variable
+ * resolution (the @theme custom property resolves to empty under Docus).
+ */
+.glass-card {
+  position: relative;
+  background: rgba(14, 16, 18, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 60px -20px rgba(0, 0, 0, 0.5);
+  transition: all 500ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.glass-card:hover {
+  border-color: var(--color-canvas-border-strong);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 40px 80px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* "Button-in-Button" trailing icon container */
+.btn-icon-nest {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.group:hover .btn-icon-nest,
+.group:focus-visible .btn-icon-nest {
+  transform: translate(2px, -2px) scale(1.05);
+}
+
+/* Custom cubic-bezier transitions for Nuxt UI buttons on landing */
+.landing-root button,
+.landing-root a {
+  transition: all 400ms var(--ease-out-quart);
+}
+
+/* Radial mesh background — placed on body via ::before */
+.landing-mesh {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-mesh::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  z-index: -1;
+  background:
+    radial-gradient(60% 50% at 20% 10%, rgba(59, 130, 246, 0.28) 0%, transparent 60%),
+    radial-gradient(50% 40% at 80% 20%, rgba(139, 92, 246, 0.26) 0%, transparent 55%),
+    radial-gradient(70% 60% at 60% 80%, rgba(16, 185, 129, 0.18) 0%, transparent 60%),
+    radial-gradient(40% 30% at 10% 90%, rgba(245, 158, 11, 0.14) 0%, transparent 55%);
+  animation: mesh-drift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Noise texture overlay — physical paper/film grain */
+.landing-mesh::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Code window — terminal chrome */
+.code-window {
+  position: relative;
+  background: #050607;
+  border: 1px solid var(--color-canvas-border);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 50px 100px -30px rgba(0, 0, 0, 0.7);
+}
+
+.code-window-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--color-canvas-border);
+}
+
+.code-window-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.code-window-dot.red { background: #FF5F57; }
+.code-window-dot.amber { background: #FEBC2E; }
+.code-window-dot.green { background: #28C840; }
+
+.code-window-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: lowercase;
+}
+
+/* Bento grid for features */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid { gap: 1.25rem; }
+}
+
+/* Bento card sizes — single column on mobile, asymmetric on >=md.
+ * Each variant starts at full width; @media upgrades the spans above 768px.
+ */
+.bento-lg { grid-column: span 12; }
+.bento-md { grid-column: span 12; }
+.bento-sm { grid-column: span 12; }
+.bento-wide { grid-column: span 12; }
+.bento-narrow { grid-column: span 12; }
+.bento-hero-feature { grid-column: span 12; }
+.bento-side-feature { grid-column: span 12; }
+
+@media (min-width: 768px) {
+  .bento-md { grid-column: span 6; }
+  .bento-sm { grid-column: span 4; }
+  .bento-wide { grid-column: span 8; }
+  .bento-narrow { grid-column: span 4; }
+  .bento-hero-feature { grid-column: span 8; }
+  .bento-side-feature { grid-column: span 4; }
+}
+
+/* Stagger entrance — apply via inline style --i for delay.
+ * Animation is written as a literal (not via --animate-fade-up var) because
+ * the @theme custom property resolves to empty under Docus's CSS pipeline.
+ */
+.stagger {
+  opacity: 0;
+  animation: fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Pulse ring dot — used for status indicators (e.g. "live" badges) */
+.landing-pulse {
+  animation: pulse-ring 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .stagger,
+  .landing-mesh::before {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+  .landing-root * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Smooth scroll for in-page anchors */
+html { scroll-behavior: smooth; }
+
+/* Selection */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #FAFAFA;
+}
+
+/* Focus ring — visible, non-default */
+*:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
