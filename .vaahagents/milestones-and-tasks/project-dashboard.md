@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-08
-> **Last updated by:** M5-T7 added — Component-event interactivity (F47)
+> **Last updated by:** M5.1 added — Documentation Site (12 tasks, F68–F76)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 3/6 milestones complete · 22/34 tasks complete · 12 tasks not started
+> **Status:** 5/7 milestones complete (M1–M5 done) · 30/46 tasks complete · 16 tasks not started (M5.1 + M6)
 
 ---
 
@@ -16,6 +16,7 @@
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟢 Complete | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 7 | F37, F38, F40, F41, F42, F43, F47 |
+| M5.1 | Documentation Site (Docus + Vercel) | Post-M5, parallel to M6 | W8-W9 | ⚪ Not Started | High | 14 days | 12 | F68, F69a, F69b, F70, F71a–F71f, F72, F73 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
@@ -85,6 +86,27 @@
 | M6-T2 | Bun self-host deployment | ⚪ Not Started | Medium | 2-3 days | F62 | M2-T1 |
 | M6-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M6-T1 |
 | M6-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
+
+### M5.1 — Documentation Site (Docus + Vercel) (0/12 complete)
+
+> **Folder:** `milestone-05.1-documentation-site/`
+> **Convention note:** `M5.1` deliberately violates the planner's `M{n}` no-zero-pad rule (user-authorized extension). Permitted as a one-off; see project-conventions memory entry.
+> **Manifest mapping:** F68 (scaffold), F69a (corpus reconciliation), F69b (IA), F70 (API Reference), F71a (landing), F71b (Getting Started), F71c (Concepts), F71d (Guides), F71e (Cookbook), F71f (Deployment section), F72 (search/SEO/llms.txt), F73 (Vercel deploy). 12 new IDs; manifest tops out at F67 today, F41/F42/F43/F47 already double-booked.
+
+| ID | Title | Status | Priority | Effort | Manifest | Dependencies |
+|---|---|---|---|---|---|---|
+| M5.1-T1 | Docus scaffold + workspace wiring | ⚪ Not Started | Critical | 0.5 day | F68 | None |
+| M5.1-T2 | Corpus reconciliation + cross-ref rewrite | ⚪ Not Started | Critical | 1 day | F69a | None |
+| M5.1-T3 | Information architecture + `.navigation.yml` | ⚪ Not Started | Critical | 1 day | F69b | M5.1-T1 |
+| M5.1-T4 | Landing page + global layout | ⚪ Not Started | High | 1 day | F71a | M5.1-T1, M5.1-T3 |
+| M5.1-T5 | Getting Started (3 pages) | ⚪ Not Started | Critical | 1 day | F71b | M5.1-T1, M5.1-T3 |
+| M5.1-T6 | Concepts section (7 pages) | ⚪ Not Started | Critical | 2 days | F71c | M5.1-T1, M5.1-T3 |
+| M5.1-T7 | Guides section (5 pages) | ⚪ Not Started | Critical | 2 days | F71d | M5.1-T1, M5.1-T3 |
+| M5.1-T8 | API Reference (5 packages + 1 registry + MCP tools) | ⚪ Not Started | Critical | 2 days | F70 | M5.1-T1, M5.1-T3 |
+| M5.1-T9 | Cookbook (4–6 recipes) | ⚪ Not Started | Medium | 1 day | F71e | M5.1-T6, M5.1-T8 |
+| M5.1-T10 | Deployment section (4 landing pages) | ⚪ Not Started | Medium | 1 day | F71f | M5.1-T3 |
+| M5.1-T11 | Search + SEO + llms.txt | ⚪ Not Started | High | 1 day | F72 | M5.1-T4 |
+| M5.1-T12 | Vercel deploy + smoke test | ⚪ Not Started | Critical | 0.5 day | F73 | M5.1-T1–M5.1-T11 |
 
 ---
 
