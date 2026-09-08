@@ -1,8 +1,15 @@
 // GenicUI brand palette — M5.1-T4 (Landing page).
 //
+// Primary moved to **violet** to match the GenicUI etymology:
+// Generative (Gen) + Agent(ic) + UI = a bridge between generative AI
+// and agentic interfaces. Violet is the color generative AI tooling
+// has been converging on (Claude, Cursor, v0) and it threads through
+// the GenicElement Web Component's closed Shadow DOM as the registry
+// accent on every rendered component.
+//
 // Three accent colors encode the framework's positioning:
-//   - primary (blue)     — MCP/protocol layer, the wire that connects agents
-//   - secondary (violet) — the component contract, where schemas live
+//   - primary (violet)   — the bridge itself, generative ↔ agentic
+//   - secondary (blue)   — MCP/protocol layer, the wire that connects agents
 //   - tertiary (emerald) — successful renders, positive actions
 //
 // Nuxt UI v4 token map accepts Tailwind color names OR hex values.
@@ -13,8 +20,8 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'blue',
-      secondary: 'violet',
+      primary: 'violet',
+      secondary: 'blue',
       tertiary: 'emerald',
       info: 'sky',
       success: 'emerald',

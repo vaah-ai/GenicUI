@@ -43,13 +43,14 @@ onBeforeUnmount(() => {
 <template>
   <div class="landing-root">
     <!-- Hero -->
-    <section class="landing-mesh relative overflow-hidden">
+    <section class="landing-mesh landing-hero-mesh relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20">
         <div class="flex flex-col items-center text-center">
           <div
-            class="stagger inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--color-text-muted)]"
+            class="stagger relative inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-400/30 bg-violet-500/10 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-violet-200"
             style="--i:0"
           >
+            <span class="orbit-ring orbit-ring-a rounded-full" aria-hidden="true" />
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 landing-pulse" />
             <span>v0.5 — M5.1 docs site</span>
           </div>
@@ -191,7 +192,7 @@ onBeforeUnmount(() => {
             </div>
 
             <!-- Right: the rendered component (live-looking mock) -->
-            <div class="glass-card p-6 sm:p-8">
+            <div class="glass-card glass-card-tilt p-6 sm:p-8">
               <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-shopping-cart" class="size-4 text-blue-300" />
@@ -382,7 +383,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div class="glass-card p-6 sm:p-8">
+            <div class="glass-card glass-card-tilt p-6 sm:p-8">
               <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-chart-line" class="size-4 text-emerald-300" />
@@ -447,7 +448,7 @@ onBeforeUnmount(() => {
 
           <!-- Use case 4: Form assistance -->
           <div class="usecase-grid">
-            <div class="glass-card p-6 sm:p-8 order-2 lg:order-1">
+            <div class="glass-card glass-card-tilt p-6 sm:p-8 order-2 lg:order-1">
               <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />

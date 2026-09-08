@@ -103,6 +103,41 @@
   }
 }
 
+/* Hue rotation for the animated install pill border — slow, gentle.
+ * Conveys "alive" without distracting from the headline.
+ */
+@keyframes hue-rotate {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Slow orbiting glow — used on hero badge accent rings.
+ * Two concentric rings rotate in opposite directions so the eye
+ * catches the motion without being able to track a single point.
+ */
+@keyframes orbit-glow {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes orbit-glow-reverse {
+  0%   { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Drift the SVG noise overlay so it doesn't look like a static sticker.
+ * Uses `steps()` so the grain stays discrete (avoids the "slowly
+ * swirling fog" artifact of linear interpolation on a tiled noise pattern).
+ */
+@keyframes noise-drift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-2%, 1%); }
+  40%  { transform: translate(1%, -2%); }
+  60%  { transform: translate(-1%, -1%); }
+  80%  { transform: translate(2%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+
 /* Override Tailwind defaults — push the landing away from the standard
  * light-mode SaaS look. We force dark mode on the landing regardless of
  * system preference.
@@ -114,6 +149,8 @@ html, html.dark, html.light {
 
 /* Landing-page scoped overrides (cascade to children via .landing-root) */
 .landing-root {
+  position: relative;
+  isolation: isolate;
   background-color: var(--color-canvas);
   color: #FAFAFA;
   font-family: var(--font-sans);
@@ -168,6 +205,72 @@ html, html.dark, html.light {
     0 40px 80px -20px rgba(0, 0, 0, 0.6);
 }
 
+/* Hover-tilt variant — for use-case visuals that should feel physical
+ * when the visitor's cursor passes over them. Capped at ~2deg on both
+ * axes so it never tips into "novelty parallax" territory. Pair with
+ * the standard .glass-card surface; this only adds the 3D shell.
+ *
+ * Falls back to plain glass on touch devices (no hover state).
+ */
+.glass-card-tilt {
+  transform-style: preserve-3d;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-card-tilt:hover {
+    transform: perspective(1200px) rotateX(1.5deg) rotateY(-1.5deg) translateY(-2px);
+  }
+}
+
+/* Orbiting glow rings — used on hero badges to suggest depth.
+ * Two rings, opposite directions. `prefers-reduced-motion` halts them.
+ */
+.orbit-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.orbit-ring-a {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(139, 92, 246, 0.5) 90deg,
+    transparent 180deg,
+    rgba(59, 130, 246, 0.4) 270deg,
+    transparent 360deg
+  );
+  animation: orbit-glow 14s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+  opacity: 0.7;
+}
+
+.orbit-ring-b {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(16, 185, 129, 0.35) 120deg,
+    transparent 240deg,
+    rgba(139, 92, 246, 0.4) 360deg
+  );
+  animation: orbit-glow-reverse 18s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1.5px;
+  opacity: 0.45;
+}
+
 /* "Button-in-Button" trailing icon container */
 .btn-icon-nest {
   display: inline-flex;
@@ -192,7 +295,15 @@ html, html.dark, html.light {
   transition: all 400ms var(--ease-out-quart);
 }
 
-/* Radial mesh background — placed on body via ::before */
+/* Radial mesh background — placed on body via ::before.
+ *
+ * M5.1-T4 (final): violet-led gradient (matches the brand primary and
+ * the GenicUI etymology — Generative + Agentic). Five layered radial
+ * gradients replace the four-layer SaaS default, with opacities pushed
+ * up from 0.14-0.28 to 0.42-0.62 so they actually register on the
+ * OLED-black canvas. Conic gradient gives modern depth instead of
+ * the soft-blob look.
+ */
 .landing-mesh {
   position: relative;
   overflow: hidden;
@@ -204,24 +315,45 @@ html, html.dark, html.light {
   inset: -10%;
   z-index: -1;
   background:
-    radial-gradient(60% 50% at 20% 10%, rgba(59, 130, 246, 0.28) 0%, transparent 60%),
-    radial-gradient(50% 40% at 80% 20%, rgba(139, 92, 246, 0.26) 0%, transparent 55%),
-    radial-gradient(70% 60% at 60% 80%, rgba(16, 185, 129, 0.18) 0%, transparent 60%),
-    radial-gradient(40% 30% at 10% 90%, rgba(245, 158, 11, 0.14) 0%, transparent 55%);
-  animation: mesh-drift 20s ease-in-out infinite;
+    radial-gradient(50% 40% at 20% 10%, rgba(139, 92, 246, 0.55) 0%, transparent 60%),
+    radial-gradient(45% 35% at 80% 20%, rgba(99, 102, 241, 0.48) 0%, transparent 55%),
+    radial-gradient(60% 50% at 60% 75%, rgba(59, 130, 246, 0.42) 0%, transparent 60%),
+    radial-gradient(35% 25% at 10% 90%, rgba(16, 185, 129, 0.32) 0%, transparent 55%),
+    radial-gradient(45% 35% at 90% 85%, rgba(245, 158, 11, 0.22) 0%, transparent 55%),
+    conic-gradient(from 230deg at 50% 50%, rgba(139, 92, 246, 0.18), rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.10), rgba(139, 92, 246, 0.18));
+  animation: mesh-drift 24s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Noise texture overlay — physical paper/film grain */
-.landing-mesh::after {
+/* Hero-only mesh override — push the violet wash harder in the hero so
+ * the etymology headline lives in an unmistakable brand moment. Other
+ * sections get a quieter background.
+ */
+.landing-hero-mesh::before {
+  background:
+    radial-gradient(60% 50% at 25% 15%, rgba(139, 92, 246, 0.7) 0%, transparent 60%),
+    radial-gradient(50% 40% at 75% 25%, rgba(99, 102, 241, 0.55) 0%, transparent 55%),
+    radial-gradient(70% 55% at 50% 90%, rgba(59, 130, 246, 0.4) 0%, transparent 60%),
+    conic-gradient(from 220deg at 50% 40%, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.12), rgba(139, 92, 246, 0.25));
+  animation: mesh-drift 18s ease-in-out infinite;
+}
+
+/* Noise texture overlay — physical paper/film grain. Scoped to the
+ * landing-root (not `position: fixed` page-wide) so it never paints
+ * on top of the Docus header or sidebar. `pointer-events: none`
+ * keeps it click-through; `mix-blend-mode: overlay` blends over
+ * dark surfaces and disappears on light.
+ */
+.landing-root::after {
   content: '';
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
-  opacity: 0.06;
+  opacity: 0.08;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
+  animation: noise-drift 8s steps(8) infinite;
 }
 
 /* Code window — terminal chrome */
@@ -310,22 +442,58 @@ html, html.dark, html.light {
 /* Sleak install pill — single command, copy-to-clipboard.
  * Sits in the hero as the dominant CTA. No fake telemetry, no multi-runner
  * comparison; npm/pnpm/yarn links live in the secondary row below.
+ *
+ * M5.1-T4 (final): animated gradient border (slow hue rotation via the
+ * ::before pseudo). Conveys "alive" without competing with the headline.
  */
 .install-pill {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 0.5rem 0.625rem 1rem;
-  background: rgba(14, 16, 18, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(14, 16, 18, 0.78);
+  border: 1px solid transparent;
   border-radius: 0.875rem;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 20px 60px -20px rgba(59, 130, 246, 0.15),
+    0 20px 60px -20px rgba(139, 92, 246, 0.28),
     0 0 0 1px rgba(255, 255, 255, 0.02);
   transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
+}
+
+.install-pill::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    115deg,
+    rgba(139, 92, 246, 0.7),
+    rgba(59, 130, 246, 0.6),
+    rgba(16, 185, 129, 0.55),
+    rgba(139, 92, 246, 0.7)
+  );
+  background-size: 300% 300%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: gradient-pan 6s ease-in-out infinite;
+}
+
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
 .install-pill:hover {
@@ -424,11 +592,18 @@ html, html.dark, html.light {
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .stagger,
-  .landing-mesh::before {
+  .landing-mesh::before,
+  .landing-root::after,
+  .install-pill::before,
+  .orbit-ring-a,
+  .orbit-ring-b {
     animation: none;
     opacity: 1;
     filter: none;
     transform: none;
+  }
+  .glass-card-tilt:hover {
+    transform: translateY(-2px);
   }
   .landing-root * {
     transition-duration: 0.01ms !important;
@@ -438,15 +613,30 @@ html, html.dark, html.light {
 /* Smooth scroll for in-page anchors */
 html { scroll-behavior: smooth; }
 
-/* Selection */
+/* Selection — violet wash to match the primary */
 ::selection {
-  background: rgba(59, 130, 246, 0.3);
+  background: rgba(139, 92, 246, 0.35);
   color: #FAFAFA;
 }
 
-/* Focus ring — visible, non-default */
+/* Focus ring — visible, non-default, violet to match primary */
 *:focus-visible {
-  outline: 2px solid var(--color-accent-blue);
+  outline: 2px solid var(--color-accent-violet);
   outline-offset: 2px;
   border-radius: 0.25rem;
+}
+
+/* Docus AppHeader — make it transparent on the landing so the violet
+ * hero mesh shows through. Keep the rest of the chrome (search, github,
+ * theme toggle) as-is. Docus renders the header inside the UApp root
+ * which is also the parent of our landing-root, so the selector must
+ * be unscoped.
+ */
+body:has(.landing-root) header,
+body:has(.landing-root) #header {
+  background-color: rgba(8, 9, 10, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+  color: #FAFAFA;
 }
