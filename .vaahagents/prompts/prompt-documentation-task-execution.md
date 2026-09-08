@@ -109,12 +109,27 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 
 Load `{{STEPS_DIR}}/step-{NN}-{slug}.md` for each step. Follow it exactly. Never load multiple.
 
-| Phase                              | Steps | Step Files                         |
-| ---------------------------------- | ----- | ---------------------------------- |
-| **Phase 1: Orientation**           | 0–2   | `step-00` → `step-02`             |
-| **Phase 2: Content Sourcing**      | 3–5   | `step-03` → `step-05`             |
-| **Phase 3: Authoring**             | 6–9   | `step-06` → `step-09`             |
-| **Phase 4: Polish & Publish**      | 10–13 | `step-10` → `step-13`             |
+| Phase                              | Steps  | Step Files                                         |
+| ---------------------------------- | ------ | -------------------------------------------------- |
+| **Phase 1: Orientation**           | 0–2    | `step-00` → `step-02`                              |
+| **Phase 2: Content Sourcing**      | 3–5    | `step-03` → `step-05`                              |
+| **Phase 3: Authoring**             | 6–7    | `step-06` → `step-07`                              |
+| **Phase 4: Polish & Publish**      | 8–11   | `step-08` → `step-11`                              |
+
+**Reference files** (load when a step instructs you to):
+
+| File | Purpose |
+|---|---|
+| `reference-role.md` | Your role + scope boundaries |
+| `reference-key-files.md` | Read map for docs-relevant paths |
+| `reference-tech-stack.md` | Docus 5.13.0 + Nuxt UI v4 + Nuxt Content v3 stack |
+| `reference-skills.md` | Skills to invoke per area |
+| `reference-mcp-servers.md` | MCP server usage map |
+| `reference-codebase-structure.md` | Repo tree slice for docs work |
+| `reference-coding-principles.md` | Authoring rules (voice, frontmatter, MDC, a11y, SEO) |
+| `reference-project-context.md` | GenicUI framing + 5 packages + 1 registry |
+
+**Independent workflow script:** `workflow-documentation-task-execution.js` (sibling to this file) — runs the same 12 steps as parallel `agent()` calls with shared context threading. Use it for multi-agent fan-out; use this prompt's table for single-agent sequential execution.
 
 ---
 
