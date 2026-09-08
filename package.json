@@ -12,7 +12,8 @@
   },
   "workspaces": [
     "packages/*",
-    "registries/*"
+    "registries/*",
+    "examples/*"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
