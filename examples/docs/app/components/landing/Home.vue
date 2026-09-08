@@ -44,7 +44,7 @@ onBeforeUnmount(() => {
   <div class="landing-root">
     <!-- Hero -->
     <section class="landing-mesh relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20">
         <div class="flex flex-col items-center text-center">
           <div
             class="stagger inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--color-text-muted)]"
@@ -54,19 +54,22 @@ onBeforeUnmount(() => {
             <span>v0.5 — M5.1 docs site</span>
           </div>
 
+          <!-- Etymology + concrete promise. The Gen + IC + UI line is the
+               most shareable thing on the page — it tells you what we are
+               in three seconds. Headline leads with it, not a fragment. -->
           <h1
-            class="stagger display-serif text-5xl sm:text-6xl lg:text-7xl xl:text-8xl mt-8 text-white max-w-5xl"
+            class="stagger display-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-8 text-white max-w-5xl"
             style="--i:1"
           >
-            Your AI agent.<br>
-            <span class="not-italic text-[var(--color-text-dim)]">Your components.</span> Your users.
+            Generative + Agentic<br>
+            <span class="text-[var(--color-text-dim)]">=</span> GenicUI.
           </h1>
 
           <p
-            class="stagger mt-8 text-lg sm:text-xl text-[var(--color-text-muted,#A1A1AA)] max-w-2xl leading-relaxed"
+            class="stagger mt-6 text-lg sm:text-xl text-[var(--color-text-muted,#A1A1AA)] max-w-2xl leading-relaxed"
             style="--i:2"
           >
-            GenicUI is the missing protocol between any MCP-capable agent and your real UI. Your agent doesn't speak JSON to the user — it renders your checkout flow, your support console, your data tables, your forms. Live, interactive, on the same page as the conversation.
+            The MCP-native protocol that lets any AI agent render your real components — your checkout flow, your support console, your data tables, your forms. Live, interactive, on the same page as the conversation. No copy-paste, no context switch.
           </p>
 
           <!-- Sleak install header — primary action sits above secondary CTAs.
@@ -132,7 +135,7 @@ onBeforeUnmount(() => {
 
     <!-- USE CASES — what you actually build with GenicUI -->
     <section class="landing-mesh relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
             What you build
@@ -145,7 +148,7 @@ onBeforeUnmount(() => {
           </p>
         </div>
 
-        <div class="space-y-20 lg:space-y-32">
+        <div class="space-y-14 lg:space-y-20">
           <!-- Use case 1: E-commerce / shopping assistant -->
           <div class="usecase-grid">
             <!-- Left: chat log -->
@@ -532,7 +535,7 @@ onBeforeUnmount(() => {
 
     <!-- The contract — bento grid (technical primitives) -->
     <section class="landing-mesh relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
             The contract
@@ -643,7 +646,7 @@ onBeforeUnmount(() => {
 
     <!-- CTA: what's next -->
     <section class="landing-mesh relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div class="max-w-4xl mx-auto text-center">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-violet)] mb-4">
             What's next
