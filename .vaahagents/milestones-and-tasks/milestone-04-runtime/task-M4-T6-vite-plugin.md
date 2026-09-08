@@ -55,5 +55,5 @@ Delivered `@genicui/vite-plugin` package with 5 source files and 36 tests.
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F30]`
-- Per-feature: `docs/requirements/specs/features/feature-030-vite-plugin.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F30]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-030-vite-plugin.md`

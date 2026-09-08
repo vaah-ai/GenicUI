@@ -49,5 +49,5 @@ Implement `subscribe_to_events`: agent subscribes to component events by filter 
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F18]`
-- Per-feature: `docs/requirements/specs/features/feature-018-subscribe-to-events-tool.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F18]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-018-subscribe-to-events-tool.md`

@@ -8,7 +8,7 @@
 
 ## Description
 
-The existing requirements corpus lives in two divergent trees: `docs/requirements/` (the planner-prompt source-of-truth, frozen pipeline snapshot, 39 files with 125 internal references) and `docs/specs/` + `docs/idea/` (newer, active source-of-truth, contains files that exist ONLY there — `feature-043-chat-bridge-prop-sanitization.md`, `feature-e2e-testing-infrastructure.md`). Reconcile into one canonical tree at `.vaahagents/requirements/` (per user decision in Step 1 of the planner session), seeded from the **newer** `docs/specs/` + `docs/idea/` content. Archive `docs/requirements/` so history is preserved.
+The existing requirements corpus lives in two divergent trees: `.vaahagents/requirements/` (the planner-prompt source-of-truth, frozen pipeline snapshot, 39 files with 125 internal references) and `docs/specs/` + `docs/idea/` (newer, active source-of-truth, contains files that exist ONLY there — `feature-043-chat-bridge-prop-sanitization.md`, `feature-e2e-testing-infrastructure.md`). Reconcile into one canonical tree at `.vaahagents/requirements/` (per user decision in Step 1 of the planner session), seeded from the **newer** `docs/specs/` + `docs/idea/` content. Archive `.vaahagents/requirements/` so history is preserved.
 
 This unblocks T3 (Information Architecture) and T8 (API Reference) by giving them a single source-of-truth to mine.
 
@@ -16,8 +16,8 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 
 - `git mv docs/specs → .vaahagents/requirements/specs` (preserve history)
 - `git mv docs/idea → .vaahagents/requirements/idea` (preserve history)
-- `git mv docs/requirements → .vaahagents/requirements/_archive` (preserve history, demote visibility)
-- Rewrite all 125 `docs/requirements` references across 39 files to `.vaahagents/requirements`
+- `git mv .vaahagents/requirements → .vaahagents/requirements/_archive` (preserve history, demote visibility)
+- Rewrite all 125 `.vaahagents/requirements` references across 39 files to `.vaahagents/requirements`
 - Rewrite all 552 relative `.md` links (78 files) — but defer 552-to-Docus-route mapping to T3 + per-page authoring (this task handles only the corpus rebase, not the IA rewrite)
 
 ## Implementation Plan
@@ -25,7 +25,7 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 ### Pre-Implementation Analysis
 
 - Inventory current corpus: confirm 105 markdown files + 2 manifests (32,128 lines), 0 images, 0 mermaid blocks (all diagrams are ASCII in fenced blocks — no asset migration needed)
-- Inventory the 125 cross-references (`grep -r "docs/requirements" --include="*.md" --include="*.json"`); classify each as: corpus-internal (→ `.vaahagents/requirements`) vs. link into Docus route (→ defer to T3)
+- Inventory the 125 cross-references (`grep -r ".vaahagents/requirements" --include="*.md" --include="*.json"`); classify each as: corpus-internal (→ `.vaahagents/requirements`) vs. link into Docus route (→ defer to T3)
 - Identify the 3 out-of-tree links that break regardless (`../../../poc/README.md`, `../ai-base-prompts/*`) — flag for manual review
 - Plan the `git mv` sequence to preserve history (no force-push, no delete-then-add)
 
@@ -33,10 +33,10 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 
 1. `git mv docs/specs .vaahagents/requirements/specs` — preserves history
 2. `git mv docs/idea .vaahagents/requirements/idea` — preserves history
-3. `git mv docs/requirements .vaahagents/requirements/_archive` — preserves history under demoted visibility
+3. `git mv .vaahagents/requirements .vaahagents/requirements/_archive` — preserves history under demoted visibility
 4. Resolve conflicts if any spec file exists in both trees with different content (`diff -rq docs/specs _archive/specs` — newer file wins; log decisions in commit body)
-5. Generate the 125-ref map: `grep -rl "docs/requirements" --include="*.md" --include="*.json"` → output to `.vaahagents/requirements/_archive/ref-rewrite-map.json` for review
-6. Write a small migration script (Python or `sed -i`) that rewrites `docs/requirements/...` → `.vaahagents/requirements/...` in-place across the 39 affected files
+5. Generate the 125-ref map: `grep -rl ".vaahagents/requirements" --include="*.md" --include="*.json"` → output to `.vaahagents/requirements/_archive/ref-rewrite-map.json` for review
+6. Write a small migration script (Python or `sed -i`) that rewrites `.vaahagents/requirements/...` → `.vaahagents/requirements/...` in-place across the 39 affected files
 7. Run the script on a dry-run branch; verify diffs are limited to path-only changes (no content drift); commit only when clean
 8. Mark the 3 out-of-tree links (`../../../poc/README.md`, `../ai-base-prompts/*`) as `TODO(review)` with a code comment + file listing in the migration report
 9. Document the final tree layout in `.vaahagents/requirements/README.md` (one-time artefact, archived after T8)
@@ -53,9 +53,9 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 
 - AC1: `.vaahagents/requirements/specs/manifest.json` exists and is identical to the pre-reconciliation `docs/specs/manifest.json` (modulo path)
 - AC2: `.vaahagents/requirements/specs/roadmap.md` exists and contains all 12 weeks of plan content
-- AC3: `.vaahagents/requirements/specs/features/feature-043-chat-bridge-prop-sanitization.md` exists (this file was ONLY in `docs/specs/`, not in `docs/requirements/`)
-- AC4: `.vaahagents/requirements/_archive/` exists and contains the contents of the old `docs/requirements/` tree
-- AC5: `grep -r "docs/requirements" --include="*.md" --include="*.json"` returns **zero** matches (the 125 refs are all rewritten) — except inside `.vaahagents/requirements/_archive/` itself (allowed)
+- AC3: `.vaahagents/requirements/specs/features/feature-043-chat-bridge-prop-sanitization.md` exists (this file was ONLY in `docs/specs/`, not in `.vaahagents/requirements/`)
+- AC4: `.vaahagents/requirements/_archive/` exists and contains the contents of the old `.vaahagents/requirements/` tree
+- AC5: `grep -r ".vaahagents/requirements" --include="*.md" --include="*.json"` returns **zero** matches (the 125 refs are all rewritten) — except inside `.vaahagents/requirements/_archive/` itself (allowed)
 - AC6: `git log --follow .vaahagents/requirements/specs/manifest.json` shows the full history from `docs/specs/manifest.json` (history preserved)
 - AC7: The migration report at `.vaahagents/requirements/_archive/ref-rewrite-map.json` lists all 39 files touched, with before/after paths
 - AC8: The 3 out-of-tree links are flagged in the migration report with `TODO(review)` markers
@@ -67,13 +67,13 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 - [ ] All 10 acceptance criteria above pass
 - [ ] `bun run lint` exits 0
 - [ ] `git log --stat` shows clean three-commit history (mv + mv + mv + optional rewrite commit)
-- [ ] No `docs/requirements` directory remains at top level (only inside `.vaahagents/requirements/_archive/`)
+- [ ] No `.vaahagents/requirements` directory remains at top level (only inside `.vaahagents/requirements/_archive/`)
 
 ## Testing Checklist
 
-- [ ] Unit: `diff -rq docs/requirements .vaahagents/requirements/_archive` returns zero (preserved tree)
+- [ ] Unit: `diff -rq .vaahagents/requirements .vaahagents/requirements/_archive` returns zero (preserved tree)
 - [ ] Unit: `diff -rq docs/specs .vaahagents/requirements/specs` returns zero (preserved tree)
-- [ ] Unit: `grep -c "docs/requirements" .vaahagents/requirements/specs/manifest.json` returns 0 after rewrite
+- [ ] Unit: `grep -c ".vaahagents/requirements" .vaahagents/requirements/specs/manifest.json` returns 0 after rewrite
 - [ ] Property: rerun the rewrite script — idempotent (second pass produces zero diff)
 - [ ] Manual: open 5 random files from `.vaahagents/requirements/specs/` and verify links resolve
 - [ ] No e2e (no UI affected)
@@ -91,12 +91,12 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 ## Dependencies
 
 - **Requires:** None (the requirements tree is independent of the doc site scaffold)
-- **Soft dependency:** T1 should have created `examples/docs/` first so the workspace doesn't conflict on the top-level `docs/` directory (this task removes `docs/requirements/` but creates `.vaahagents/requirements/` — no collision with `examples/docs/`)
+- **Soft dependency:** T1 should have created `examples/docs/` first so the workspace doesn't conflict on the top-level `docs/` directory (this task removes `.vaahagents/requirements/` but creates `.vaahagents/requirements/` — no collision with `examples/docs/`)
 - **Blocks:** T3 (IA reads from the canonical tree), T8 (API Reference cites per-package features from `.vaahagents/requirements/specs/features/`)
 
 ## Documentation References
 
-- Existing corpus: `docs/requirements/` (pre-reconciliation, will become `_archive/`)
+- Existing corpus: `.vaahagents/requirements/` (pre-reconciliation, will become `_archive/`)
 - Existing corpus: `docs/specs/` (the newer authoritative tree)
 - Existing corpus: `docs/idea/` (consolidated requirements, locked decisions)
 - Cross-ref map: `.vaahagents/requirements/_archive/ref-rewrite-map.json` (produced by this task)

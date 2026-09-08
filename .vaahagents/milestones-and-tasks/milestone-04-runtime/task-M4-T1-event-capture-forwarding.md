@@ -49,5 +49,5 @@ Implement event capture from Custom Elements: `composed: true` events bubble acr
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F19]`
-- Per-feature: `docs/requirements/specs/features/feature-019-event-capture-forwarding.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F19]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-019-event-capture-forwarding.md`

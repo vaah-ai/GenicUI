@@ -9,7 +9,7 @@
 
 ## Objective
 
-Establish the `@genicui/core` package skeleton, schema abstraction, protocol envelope, JSON-Patch engine, and session store — the five building blocks every subsequent milestone depends on. This milestone corresponds to the W1 Foundations phase in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-1-monorepo--core-foundations-f1-f2-f3-f4-f5) and satisfies the manifest pipeline_handoff invariant that F1 has zero dependencies.
+Establish the `@genicui/core` package skeleton, schema abstraction, protocol envelope, JSON-Patch engine, and session store — the five building blocks every subsequent milestone depends on. This milestone corresponds to the W1 Foundations phase in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-1-monorepo--core-foundations-f1-f2-f3-f4-f5) and satisfies the manifest pipeline_handoff invariant that F1 has zero dependencies.
 
 ## Success Criteria
 

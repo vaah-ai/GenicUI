@@ -47,6 +47,6 @@ Implement `ui://` URI grammar for MCP Apps: catalog URIs (`ui://components/{comp
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F28]`
-- Per-feature: `docs/requirements/specs/features/feature-028-ui-resource-grammar.md`
-- Wire protocol: `docs/requirements/idea/consolidated-requirements.md` §E
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F28]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-028-ui-resource-grammar.md`
+- Wire protocol: `.vaahagents/requirements/idea/consolidated-requirements.md` §E

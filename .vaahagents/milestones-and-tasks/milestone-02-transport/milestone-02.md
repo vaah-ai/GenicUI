@@ -9,7 +9,7 @@
 
 ## Objective
 
-Build the server transport layer: Elysia HTTP server skeleton, WebSocket transport with API key auth and heartbeat, and frame envelope serialization with channel multiplexing. This enables the first client-server communication path — the backbone for all MCP tool calls. Corresponds to W2 in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-2-server-skeleton-f9-f10-f11).
+Build the server transport layer: Elysia HTTP server skeleton, WebSocket transport with API key auth and heartbeat, and frame envelope serialization with channel multiplexing. This enables the first client-server communication path — the backbone for all MCP tool calls. Corresponds to W2 in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-2-server-skeleton-f9-f10-f11).
 
 ## Success Criteria
 

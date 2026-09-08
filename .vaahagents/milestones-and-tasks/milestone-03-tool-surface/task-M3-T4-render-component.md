@@ -58,6 +58,6 @@ Implement `render_component`: validates props via `GenicSchema<T>`, allocates a 
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F16]`
-- Per-feature: `docs/requirements/specs/features/feature-016-render-component-tool.md`
-- Tool contracts: `docs/requirements/idea/consolidated-requirements.md` §D
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F16]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-016-render-component-tool.md`
+- Tool contracts: `.vaahagents/requirements/idea/consolidated-requirements.md` §D

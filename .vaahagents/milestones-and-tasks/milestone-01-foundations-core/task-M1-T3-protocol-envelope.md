@@ -58,6 +58,6 @@ Implement the `SequenceGenerator` for monotonic `uint64` sequence numbers and th
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F3]`
-- Per-feature: `docs/requirements/specs/features/feature-003-protocol-envelope.md`
-- Wire protocol: `docs/requirements/idea/consolidated-requirements.md` §E
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F3]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-003-protocol-envelope.md`
+- Wire protocol: `.vaahagents/requirements/idea/consolidated-requirements.md` §E

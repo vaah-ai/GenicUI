@@ -49,5 +49,5 @@ Implement registry trust tiers: project (highest), user (medium), remote (lowest
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F38]`
-- Per-feature: `docs/requirements/specs/features/feature-038-registry-trust-tiers.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F38]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-038-registry-trust-tiers.md`

@@ -46,6 +46,6 @@ Build the Bun self-host deployment: single binary via `bun build --compile`, run
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F62]`
-- Per-feature: `docs/requirements/specs/features/feature-062-bun-self-host.md`
-- Deployment: `docs/requirements/specs/deployment.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F62]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-062-bun-self-host.md`
+- Deployment: `.vaahagents/requirements/specs/deployment.md`

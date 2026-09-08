@@ -49,6 +49,6 @@ Implement the component registry loader: loads `registry.json` into `Map<uri, en
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F37]`
-- Per-feature: `docs/requirements/specs/features/feature-037-component-registry.md`
-- Registry contract: `docs/requirements/idea/consolidated-requirements.md` §G
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F37]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-037-component-registry.md`
+- Registry contract: `.vaahagents/requirements/idea/consolidated-requirements.md` §G

@@ -21,7 +21,7 @@ Memory entries supplement this file — they do **not** replace it.
 - **`{{PROJECT_ROOT}}`** _(dynamic)_ — Path to the project root directory. Detected from the current workspace. Accepts any OS path format — forward slashes (`/`) on macOS/Linux, backslashes (`\`) on Windows.
 - **`{{WORK_DESCRIPTION}}`** _(dynamic)_ — User's description of the work to be done.
 - **`{{DOCS_DIR}}`** _(static, optional)_ — `docs/` — May or may not exist. Read normally if present; ignore if absent.
-- **`{{REQUIREMENTS_DIR}}`** _(static, required)_ — `docs/requirements/` — **Must exist and must not be empty.** Holds project requirements, per-feature specs, locked decisions, and consolidated requirements.
+- **`{{REQUIREMENTS_DIR}}`** _(static, required)_ — `.vaahagents/requirements/` — **Must exist and must not be empty.** Holds project requirements, per-feature specs, locked decisions, and consolidated requirements.
 - **`{{MILESTONES_DIR}}`** _(static)_ — `.vaahagents/milestones-and-tasks/`
 
 ## Role
@@ -73,16 +73,16 @@ Your expertise covers:
 | Working on...                          | Read first                                                                                                              |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Any planning decision                  | `.vaahagents/milestones-and-tasks/project-dashboard.md`                                                                          |
-| Locked architectural / scope decisions | `docs/requirements/idea/consolidated-requirements.md` (13 sections A-M, signed off 2026-08-28)                          |
-| Master feature catalog + ACs           | `docs/requirements/specs/manifest.json` (29 features, dependsOn graph, quality attributes, pipeline handoff)            |
-| Long-form feature spec (29 features)   | `docs/requirements/specs/features.md` (1,032 lines)                                                                     |
-| System architecture / request lifecycle | `docs/requirements/specs/architecture.md` (4-phase lifecycle: Discovery → Render → Update → Interact; 3-package boundaries) |
-| Implementation plan / 12-week schedule | `docs/requirements/specs/roadmap.md` (W1 Foundations → W12 Nuxt binding, 10-point Definition of Done, risk register)    |
-| Deployment recipes (CF Workers / Bun / Nitro) | `docs/requirements/specs/deployment.md` (wrangler.toml, env vars, 10-item production checklist)                   |
-| Test pyramid + coverage + CI matrix    | `docs/requirements/specs/testing-strategy.md` (150 unit / 20 integration / 3-5 e2e; 80% core, 90% tool handlers)         |
-| Security model + trust boundaries      | `docs/requirements/specs/security.md` (3 trust boundaries, API key auth, stripProtoKeys, `additionalProperties: false`) |
-| Vocabulary / term definitions          | `docs/requirements/specs/glossary.md`                                                                                   |
-| Per-feature Gherkin ACs (32 files)     | `docs/requirements/specs/features/feature-NNN-*.md`                                                                     |
+| Locked architectural / scope decisions | `.vaahagents/requirements/idea/consolidated-requirements.md` (13 sections A-M, signed off 2026-08-28)                          |
+| Master feature catalog + ACs           | `.vaahagents/requirements/specs/manifest.json` (29 features, dependsOn graph, quality attributes, pipeline handoff)            |
+| Long-form feature spec (29 features)   | `.vaahagents/requirements/specs/features.md` (1,032 lines)                                                                     |
+| System architecture / request lifecycle | `.vaahagents/requirements/specs/architecture.md` (4-phase lifecycle: Discovery → Render → Update → Interact; 3-package boundaries) |
+| Implementation plan / 12-week schedule | `.vaahagents/requirements/specs/roadmap.md` (W1 Foundations → W12 Nuxt binding, 10-point Definition of Done, risk register)    |
+| Deployment recipes (CF Workers / Bun / Nitro) | `.vaahagents/requirements/specs/deployment.md` (wrangler.toml, env vars, 10-item production checklist)                   |
+| Test pyramid + coverage + CI matrix    | `.vaahagents/requirements/specs/testing-strategy.md` (150 unit / 20 integration / 3-5 e2e; 80% core, 90% tool handlers)         |
+| Security model + trust boundaries      | `.vaahagents/requirements/specs/security.md` (3 trust boundaries, API key auth, stripProtoKeys, `additionalProperties: false`) |
+| Vocabulary / term definitions          | `.vaahagents/requirements/specs/glossary.md`                                                                                   |
+| Per-feature Gherkin ACs (32 files)     | `.vaahagents/requirements/specs/features/feature-NNN-*.md`                                                                     |
 
 ## Instructions
 
@@ -163,7 +163,7 @@ Your expertise covers:
 # Milestone M{X} — {Title}
 
 > **Roadmap phase:** {Foundations | Transport | Tool Surface | Runtime | Registry | Security | Deployment}
-> **Roadmap week:** W{n} (from docs/requirements/specs/roadmap.md)
+> **Roadmap week:** W{n} (from .vaahagents/requirements/specs/roadmap.md)
 > **Priority:** {Critical | High | Medium | Low}
 > **Status:** ⚪ Not Started
 > **Estimated Effort:** {7-10 days (1 week × single maintainer)}
@@ -171,7 +171,7 @@ Your expertise covers:
 
 ## Objective
 
-{Why this milestone exists in 2-3 sentences — link to the section in docs/requirements/specs/roadmap.md it derives from and the manifest pipeline_handoff invariants it satisfies.}
+{Why this milestone exists in 2-3 sentences — link to the section in .vaahagents/requirements/specs/roadmap.md it derives from and the manifest pipeline_handoff invariants it satisfies.}
 
 ## Success Criteria
 
@@ -203,7 +203,7 @@ Your expertise covers:
 # Task M{X}-T{Y} — {Title}
 
 > **Milestone:** M{X} ({Milestone Name})
-> **Manifest feature:** F{n} ({feature ID from docs/requirements/specs/features/feature-NNN-*.md})
+> **Manifest feature:** F{n} ({feature ID from .vaahagents/requirements/specs/features/feature-NNN-*.md})
 > **Priority:** {Critical | High | Medium | Low}
 > **Status:** ⚪ Not Started
 > **Estimated Effort:** {X-Y days}
@@ -278,10 +278,10 @@ Your expertise covers:
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F{n}]`
-- Per-feature: `docs/requirements/specs/features/feature-NNN-{slug}.md`
-- Architecture: `docs/requirements/specs/architecture.md` (section reference)
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F{n}]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-NNN-{slug}.md`
+- Architecture: `.vaahagents/requirements/specs/architecture.md` (section reference)
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B
 
 ## Notes
 
@@ -303,11 +303,11 @@ Goal: Understand current project state and domain context before any planning.
 Read in parallel:
 
 - `.vaahagents/milestones-and-tasks/project-dashboard.md` **(may not exist — gate below)**
-- `docs/requirements/specs/manifest.json` — 29 features, dependsOn graph, pipeline_handoff block
-- `docs/requirements/specs/roadmap.md` — 12-week schedule, Definition of Done
-- `docs/requirements/specs/testing-strategy.md` — coverage targets, property tests, CI matrix
-- `docs/requirements/idea/consolidated-requirements.md` — 13 locked sections A-M
-- `docs/requirements/specs/features/feature-NNN-*.md` — per-feature Gherkin ACs
+- `.vaahagents/requirements/specs/manifest.json` — 29 features, dependsOn graph, pipeline_handoff block
+- `.vaahagents/requirements/specs/roadmap.md` — 12-week schedule, Definition of Done
+- `.vaahagents/requirements/specs/testing-strategy.md` — coverage targets, property tests, CI matrix
+- `.vaahagents/requirements/idea/consolidated-requirements.md` — 13 locked sections A-M
+- `.vaahagents/requirements/specs/features/feature-NNN-*.md` — per-feature Gherkin ACs
 
 **Gate:** IF `project-dashboard.md` does not exist (project is pre-milestone tracking), THEN scan `roadmap.md` and `manifest.json` for the current week's status and report the absence of a central dashboard — propose seeding one in Step 8. IF `{{REQUIREMENTS_DIR}}` is missing or empty, THEN stop and ask the user to populate it before planning.
 
@@ -469,10 +469,10 @@ Run in order:
 3. Search for leftover `{placeholder}` tokens in the **body sections** (Description, Task Goals, Implementation Plan, Acceptance Criteria, Dependencies, Documentation References) — must be zero. The Sub Tasks table may retain `{placeholder}` tokens only if the task genuinely has no sub-tasks defined yet.
 4. Verify naming conventions match project patterns exactly (`M{n}`, `M{n}-T{n}`, `M{n}-T{n}-{nn}`).
 5. Validate IDs are unique and non-duplicate across the workspace.
-6. Confirm dependency references point to existing milestone/task IDs (and to manifest `F{n}` entries that exist in `docs/requirements/specs/features/feature-NNN-*.md`).
+6. Confirm dependency references point to existing milestone/task IDs (and to manifest `F{n}` entries that exist in `.vaahagents/requirements/specs/features/feature-NNN-*.md`).
 7. Confirm Completion Criteria includes `bun run test`, `bun run lint`, `bun run build`, coverage targets, and (where applicable) trust-boundary + property-test checks.
 8. Confirm Testing Checklist includes unit, property (fast-check 10K runs for F3 / F4 / F2 / F14 / F21), integration, and (for registry tasks) conformance-suite references.
-9. Confirm Documentation References point to real files under `docs/requirements/` — no dangling refs.
+9. Confirm Documentation References point to real files under `.vaahagents/requirements/` — no dangling refs.
 
 IF any check fails, THEN fix the file and re-validate before proceeding.
 

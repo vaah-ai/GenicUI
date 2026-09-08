@@ -9,7 +9,7 @@
 
 ## Objective
 
-Ship the deployment targets: Cloudflare Workers + Durable Objects (primary), Bun self-host binary (escape hatch), DODurableObjectStore (DO session backend), and Nitro/Nuxt binding (Vercel deploy). This makes the framework deployable. Corresponds to W11-W12 in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-11-cloudflare-workers-deploy-f61).
+Ship the deployment targets: Cloudflare Workers + Durable Objects (primary), Bun self-host binary (escape hatch), DODurableObjectStore (DO session backend), and Nitro/Nuxt binding (Vercel deploy). This makes the framework deployable. Corresponds to W11-W12 in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-11-cloudflare-workers-deploy-f61).
 
 ## Success Criteria
 

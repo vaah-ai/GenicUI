@@ -67,5 +67,5 @@ Implement the runtime engine: mounts components from `STATE_SNAPSHOT` within 50m
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F29]`
-- Per-feature: `docs/requirements/specs/features/feature-029-runtime-engine.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F29]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-029-runtime-engine.md`

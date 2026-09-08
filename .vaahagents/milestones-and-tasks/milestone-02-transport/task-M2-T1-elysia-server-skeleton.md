@@ -48,6 +48,6 @@ Bootstrap the Elysia HTTP server on `:8080` with a `/health` route. This is the 
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F9]`
-- Per-feature: `docs/requirements/specs/features/feature-009-bun-elysia-server-skeleton.md`
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B (L1)
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F9]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-009-bun-elysia-server-skeleton.md`
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B (L1)

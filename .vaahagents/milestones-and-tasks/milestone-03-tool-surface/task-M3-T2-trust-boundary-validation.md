@@ -68,6 +68,6 @@ Implement trust-boundary validation: strip `__proto__`/`constructor`/`prototype`
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F14]`
-- Per-feature: `docs/requirements/specs/features/feature-014-trust-boundary-validation.md`
-- Security: `docs/requirements/specs/security.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F14]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-014-trust-boundary-validation.md`
+- Security: `.vaahagents/requirements/specs/security.md`

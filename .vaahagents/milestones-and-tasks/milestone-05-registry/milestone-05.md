@@ -9,7 +9,7 @@
 
 ## Objective
 
-Build the component registry system: manifest loader with `additionalProperties: false` enforcement, trust tier system (project/user/remote), and the PrimeVue DataTable registry adapter with PassThrough API. This enables the first component library integration — the MVP's sole registry target. Corresponds to W7 in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-7-proxyvue-registry-f37-f38-f40).
+Build the component registry system: manifest loader with `additionalProperties: false` enforcement, trust tier system (project/user/remote), and the PrimeVue DataTable registry adapter with PassThrough API. This enables the first component library integration — the MVP's sole registry target. Corresponds to W7 in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-7-proxyvue-registry-f37-f38-f40).
 
 ## Success Criteria
 
