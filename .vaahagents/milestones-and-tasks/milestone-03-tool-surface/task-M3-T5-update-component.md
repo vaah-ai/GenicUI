@@ -62,6 +62,6 @@ Implement `update_component` with discriminated union: JSON-Patch primary (`{ co
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F17]`
-- Per-feature: `docs/requirements/specs/features/feature-017-update-component-tool.md`
-- Tool contracts: `docs/requirements/idea/consolidated-requirements.md` §D
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F17]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-017-update-component-tool.md`
+- Tool contracts: `.vaahagents/requirements/idea/consolidated-requirements.md` §D

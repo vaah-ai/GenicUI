@@ -21,7 +21,7 @@ Build the `GenicSchema<T>` abstraction layer wrapping TypeBox, producing JSON Sc
 ### Pre-Implementation Analysis
 
 - This depends on M1-T1 (F1) — the core package must exist first
-- TypeBox locked per [consolidated-requirements.md §L9](../../../docs/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
+- TypeBox locked per [consolidated-requirements.md §L9](../../../.vaahagents/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
 - Property-based test required: all TypeBox types round-trip to JSON Schema 2020-12 and back (testing-strategy.md)
 
 ### Steps
@@ -70,6 +70,6 @@ Build the `GenicSchema<T>` abstraction layer wrapping TypeBox, producing JSON Sc
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F2]`
-- Per-feature: `docs/requirements/specs/features/feature-002-genicschema-abstraction.md`
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B (L9)
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F2]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-002-genicschema-abstraction.md`
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B (L9)

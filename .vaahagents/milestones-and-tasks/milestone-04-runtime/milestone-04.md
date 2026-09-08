@@ -9,7 +9,7 @@
 
 ## Objective
 
-Build the runtime layer: event capture from Custom Elements, internal event bus with backpressure, `GenicElement` Web Component base class, server-side event application, runtime engine (mount/patch/lifecycle), Vite plugin with auto-registration, and session recovery. This is the bridge between server-side state and browser-rendered components. Corresponds to W4-W8 in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-5-ag-ui-events--error-codes-f20-f21).
+Build the runtime layer: event capture from Custom Elements, internal event bus with backpressure, `GenicElement` Web Component base class, server-side event application, runtime engine (mount/patch/lifecycle), Vite plugin with auto-registration, and session recovery. This is the bridge between server-side state and browser-rendered components. Corresponds to W4-W8 in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-5-ag-ui-events--error-codes-f20-f21).
 
 ## Success Criteria
 

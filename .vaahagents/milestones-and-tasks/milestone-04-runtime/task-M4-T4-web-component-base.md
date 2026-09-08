@@ -62,6 +62,6 @@ Implement `GenicElement` — the Web Component base class with closed Shadow DOM
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F21]`
-- Per-feature: `docs/requirements/specs/features/feature-021-web-component-base.md`
-- Component system: `docs/requirements/idea/consolidated-requirements.md` §F
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F21]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-021-web-component-base.md`
+- Component system: `.vaahagents/requirements/idea/consolidated-requirements.md` §F

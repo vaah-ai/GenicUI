@@ -18,7 +18,7 @@ Implement GenicUI development tasks by loading per-step instructions on-demand f
 - **`{{FEATURE_BRANCH}}`** _(dynamic)_ — Git branch. Pattern: `feature/F{n}-short-description` (derived from commit convention: `feat(...)`, `fix(...)`).
 - **`{{DOCS_DIR}}`** _(static)_ — `docs/` — design docs, architecture, research, requirements
 - **`{{SPECS_DIR}}`** _(static)_ — `docs/specs/` — locked Testable MVP specs (29 features, 93 ACs)
-- **`{{REQUIREMENTS_DIR}}`** _(static)_ — `docs/requirements/` — feature specs, acceptance criteria
+- **`{{REQUIREMENTS_DIR}}`** _(static)_ — `.vaahagents/requirements/` — feature specs, acceptance criteria
 - **`{{IDEA_DIR}}`** _(static)_ — `docs/idea/` — research, requirements, PoC learnings
 - **`{{PROMPT_FILE_PATH}}`** _(static)_ — `.vaahagents/prompts/prompt-task-execution.md`
 - **`{{STEPS_DIR}}`** _(static)_ — `.vaahagents/prompts/prompt-task-execution-steps/` — step files + reference files

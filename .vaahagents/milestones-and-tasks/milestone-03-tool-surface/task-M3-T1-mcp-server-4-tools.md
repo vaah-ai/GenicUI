@@ -53,6 +53,6 @@ Delivered MCP server with 4 public tool stubs (`find_ui_component`, `render_comp
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F13]`
-- Per-feature: `docs/requirements/specs/features/feature-013-mcp-server-4-tools.md`
-- Tool contracts: `docs/requirements/idea/consolidated-requirements.md` §D
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F13]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-013-mcp-server-4-tools.md`
+- Tool contracts: `.vaahagents/requirements/idea/consolidated-requirements.md` §D

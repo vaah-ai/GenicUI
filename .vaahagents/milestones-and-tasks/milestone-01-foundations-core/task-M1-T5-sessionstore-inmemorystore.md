@@ -21,7 +21,7 @@ Define the `SessionStore` interface (`get`, `set`, `append`, `subscribe`) and im
 ### Pre-Implementation Analysis
 
 - Depends on M1-T1 (F1) — core package must exist
-- SessionStore interface per [consolidated-requirements.md §H](../../../docs/requirements/idea/consolidated-requirements.md#h-architecture-patterns-locked): 3 implementations (DODurableObjectStore, PostgresListenNotifyStore, InMemoryStore)
+- SessionStore interface per [consolidated-requirements.md §H](../../../.vaahagents/requirements/idea/consolidated-requirements.md#h-architecture-patterns-locked): 3 implementations (DODurableObjectStore, PostgresListenNotifyStore, InMemoryStore)
 - CI matrix runs full test suite against all three backends (testing-strategy.md)
 - This is effort = M (2 days)
 
@@ -61,6 +61,6 @@ Delivered 4 source files + 1 test file (11 tests, 0 failures). SessionStore inte
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F5]`
-- Per-feature: `docs/requirements/specs/features/feature-005-sessionstore-inmemorystore.md`
-- Architecture: `docs/requirements/idea/consolidated-requirements.md` §H
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F5]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-005-sessionstore-inmemorystore.md`
+- Architecture: `.vaahagents/requirements/idea/consolidated-requirements.md` §H

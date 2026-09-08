@@ -22,7 +22,7 @@ Build the `JsonPatchEngine` wrapper around `fast-json-patch`, implementing RFC 6
 ### Pre-Implementation Analysis
 
 - Depends on M1-T1 (F1) — core package must exist
-- `fast-json-patch` with `{ mutate: false }` per [consolidated-requirements.md §F Prop Diffing](../../../docs/requirements/idea/consolidated-requirements.md#f-component-system-locked)
+- `fast-json-patch` with `{ mutate: false }` per [consolidated-requirements.md §F Prop Diffing](../../../.vaahagents/requirements/idea/consolidated-requirements.md#f-component-system-locked)
 - Property-based test required: 10K random pairs (testing-strategy.md)
 - This is effort = M (2 days) due to property test implementation
 - Invoke `sequential-thinking` for diff/apply correctness proof
@@ -69,6 +69,6 @@ Build the `JsonPatchEngine` wrapper around `fast-json-patch`, implementing RFC 6
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F4]`
-- Per-feature: `docs/requirements/specs/features/feature-004-json-patch-engine.md`
-- Prop diffing: `docs/requirements/idea/consolidated-requirements.md` §F
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F4]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-004-json-patch-engine.md`
+- Prop diffing: `.vaahagents/requirements/idea/consolidated-requirements.md` §F

@@ -48,5 +48,5 @@ Implement `find_ui_component`: agent searches the component catalog by query. Fo
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F15]`
-- Per-feature: `docs/requirements/specs/features/feature-015-find-ui-component-tool.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F15]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-015-find-ui-component-tool.md`

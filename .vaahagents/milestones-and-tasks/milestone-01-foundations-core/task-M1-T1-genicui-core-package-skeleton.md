@@ -20,8 +20,8 @@ Create the `@genicui/core` monorepo workspace package with ESM exports, strict T
 
 ### Pre-Implementation Analysis
 
-- Review [consolidated-requirements.md §B](../../../docs/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions): L6 (package count), L9 (schema system), L1 (dev stack)
-- Review [consolidated-requirements.md §A](../../../docs/requirements/idea/consolidated-requirements.md#a-foundational-decisions-locked): F6 (3 core packages), F7 (registry naming)
+- Review [consolidated-requirements.md §B](../../../.vaahagents/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions): L6 (package count), L9 (schema system), L1 (dev stack)
+- Review [consolidated-requirements.md §A](../../../.vaahagents/requirements/idea/consolidated-requirements.md#a-foundational-decisions-locked): F6 (3 core packages), F7 (registry naming)
 - This task is small (effort = S, 3 ACs) — implement without sub-tasks
 
 ### Steps
@@ -65,7 +65,7 @@ Create the `@genicui/core` monorepo workspace package with ESM exports, strict T
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F1]`
-- Per-feature: `docs/requirements/specs/features/feature-001-genicui-core-package-skeleton.md`
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B, §A
-- Testing: `docs/requirements/specs/testing-strategy.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F1]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-001-genicui-core-package-skeleton.md`
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B, §A
+- Testing: `.vaahagents/requirements/specs/testing-strategy.md`

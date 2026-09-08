@@ -48,6 +48,6 @@ Deploy GenicUI to Cloudflare Workers with Durable Objects for session state. Col
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F61]`
-- Per-feature: `docs/requirements/specs/features/feature-061-cloudflare-workers-do-deployment.md`
-- Deployment: `docs/requirements/specs/deployment.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F61]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-061-cloudflare-workers-do-deployment.md`
+- Deployment: `.vaahagents/requirements/specs/deployment.md`

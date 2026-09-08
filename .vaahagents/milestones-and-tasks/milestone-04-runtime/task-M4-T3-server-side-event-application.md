@@ -64,5 +64,5 @@ Implement server-side event application: atomic apply of events (no torn reads),
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F24]`
-- Per-feature: `docs/requirements/specs/features/feature-024-server-side-event-application.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F24]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-024-server-side-event-application.md`

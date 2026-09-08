@@ -71,6 +71,6 @@ Implement frame envelope serialization with monotonic `seq` values and channel m
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F11]`
-- Per-feature: `docs/requirements/specs/features/feature-011-frame-envelope-multiplexing.md`
-- Wire protocol: `docs/requirements/idea/consolidated-requirements.md` §E
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F11]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-011-frame-envelope-multiplexing.md`
+- Wire protocol: `.vaahagents/requirements/idea/consolidated-requirements.md` §E

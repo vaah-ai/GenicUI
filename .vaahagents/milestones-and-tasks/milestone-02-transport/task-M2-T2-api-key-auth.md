@@ -24,7 +24,7 @@ Implement API key authentication middleware: `gnc_live_` prefix + 32 random char
 ### Pre-Implementation Analysis
 
 - Depends on M2-T1 (F9 — Elysia server, same milestone)
-- Auth model: API key only per [consolidated-requirements.md §L10](../../../docs/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
+- Auth model: API key only per [consolidated-requirements.md §L10](../../../.vaahagents/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
 - Trust boundary: server re-validates every inbound call (§F)
 
 ### Steps
@@ -62,7 +62,7 @@ Implement API key authentication middleware: `gnc_live_` prefix + 32 random char
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F46]`
-- Per-feature: `docs/requirements/specs/features/feature-046-api-key-auth.md`
-- Security: `docs/requirements/specs/security.md`
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B (L10)
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F46]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-046-api-key-auth.md`
+- Security: `.vaahagents/requirements/specs/security.md`
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B (L10)

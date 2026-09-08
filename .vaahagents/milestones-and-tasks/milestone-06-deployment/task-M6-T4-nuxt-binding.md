@@ -48,6 +48,6 @@ Implement the Nitro/Nuxt binding: WS upgrade via Nitro experimental websocket, A
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F64]`
-- Per-feature: `docs/requirements/specs/features/feature-064-nuxt-binding.md`
-- Deployment: `docs/requirements/specs/deployment.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F64]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-064-nuxt-binding.md`
+- Deployment: `.vaahagents/requirements/specs/deployment.md`

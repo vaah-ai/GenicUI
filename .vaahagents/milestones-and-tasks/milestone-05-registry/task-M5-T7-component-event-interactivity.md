@@ -150,10 +150,10 @@ The detailed plan lives in `/Users/pk/.claude/plans/abstract-zooming-hellman.md`
 ## Documentation References
 
 - Detailed implementation plan: `/Users/pk/.claude/plans/abstract-zooming-hellman.md` (6-step plan, authoritative)
-- Manifest: `docs/requirements/specs/manifest.json` → F47 is currently in the deferred-backlog list ("JWT auth + identity propagation"). **See Notes below — manifest F{n} assignment is a follow-up.**
-- Per-feature spec: `docs/requirements/specs/features/feature-047-component-event-interactivity.md` (to be authored separately if/when F47 is reclaimed from the deferred bucket)
-- Architecture: `docs/requirements/specs/architecture.md` §4-phase lifecycle → Interact phase is what this task lands
-- Locked decisions: `docs/requirements/idea/consolidated-requirements.md` §B (no explicit decision covers the component-event path; the synthetic-prompt approach is derived from the fire-and-forget `--print` invocation in `chat-handler.ts` lines 176-188)
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → F47 is currently in the deferred-backlog list ("JWT auth + identity propagation"). **See Notes below — manifest F{n} assignment is a follow-up.**
+- Per-feature spec: `.vaahagents/requirements/specs/features/feature-047-component-event-interactivity.md` (to be authored separately if/when F47 is reclaimed from the deferred bucket)
+- Architecture: `.vaahagents/requirements/specs/architecture.md` §4-phase lifecycle → Interact phase is what this task lands
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B (no explicit decision covers the component-event path; the synthetic-prompt approach is derived from the fire-and-forget `--print` invocation in `chat-handler.ts` lines 176-188)
 - F43 follow-up memory entries: `genicui-f43-component-in-chat.md`, `genicui-f43-bridge-followup.md`, `genicui-f43-prompts-panel.md`, `genicui-f43-mcp-permissions-and-prop-shape.md`
 
 ## Notes

@@ -48,6 +48,6 @@ Implement `DODurableObjectStore` — the Cloudflare Durable Objects backend for 
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F62b]`
-- Per-feature: `docs/requirements/specs/features/feature-062b-do-session-store.md`
-- Architecture: `docs/requirements/idea/consolidated-requirements.md` §H
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F62b]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-062b-do-session-store.md`
+- Architecture: `.vaahagents/requirements/idea/consolidated-requirements.md` §H

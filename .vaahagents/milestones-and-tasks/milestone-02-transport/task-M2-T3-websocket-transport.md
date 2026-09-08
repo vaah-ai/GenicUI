@@ -62,6 +62,6 @@ Implement WebSocket transport: upgrade with `genicui.v1` subprotocol, API key au
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F10]`
-- Per-feature: `docs/requirements/specs/features/feature-010-websocket-transport.md`
-- Wire protocol: `docs/requirements/idea/consolidated-requirements.md` §E
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F10]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-010-websocket-transport.md`
+- Wire protocol: `.vaahagents/requirements/idea/consolidated-requirements.md` §E

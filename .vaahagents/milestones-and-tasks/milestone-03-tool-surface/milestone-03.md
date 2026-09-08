@@ -9,7 +9,7 @@
 
 ## Objective
 
-Build the MCP server with 4 public tools (`find_ui_component`, `render_component`, `update_component`, `subscribe_to_events`), trust-boundary validation, and `ui://` URI grammar. This is the agent-facing surface — where AI agents interact with the framework. Corresponds to W3-W4 in [roadmap.md](../../../docs/requirements/specs/roadmap.md#week-3-mcp-server--trust-boundary-f13-f14).
+Build the MCP server with 4 public tools (`find_ui_component`, `render_component`, `update_component`, `subscribe_to_events`), trust-boundary validation, and `ui://` URI grammar. This is the agent-facing surface — where AI agents interact with the framework. Corresponds to W3-W4 in [roadmap.md](../../../.vaahagents/requirements/specs/roadmap.md#week-3-mcp-server--trust-boundary-f13-f14).
 
 ## Success Criteria
 

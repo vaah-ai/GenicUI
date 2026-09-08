@@ -52,5 +52,5 @@ Session recovery (F33) implemented with 4 source files in `packages/server/src/s
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F33]`
-- Per-feature: `docs/requirements/specs/features/feature-033-session-recovery.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F33]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-033-session-recovery.md`

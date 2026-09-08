@@ -53,5 +53,5 @@ Implement the internal event bus with post-emit hooks and backpressure. `emit` r
 
 ## Documentation References
 
-- Manifest: `docs/requirements/specs/manifest.json` → `features[F20]`
-- Per-feature: `docs/requirements/specs/features/feature-020-event-system-internal.md`
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F20]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-020-event-system-internal.md`
