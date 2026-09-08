@@ -246,6 +246,85 @@
           "title": "Sum"
         }
       ]
+    },
+    {
+      "name": "city-picker",
+      "version": "1.0.0",
+      "propsSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cityOptions"],
+        "properties": {
+          "initialCity": { "type": "string" },
+          "cityOptions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 2
+          },
+          "label": { "type": "string" }
+        }
+      },
+      "tags": ["form", "input", "dropdown", "city", "weather", "interactive"],
+      "events": [
+        {
+          "name": "submit",
+          "payloadSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["city"],
+            "properties": {
+              "city": { "type": "string" }
+            }
+          }
+        }
+      ],
+      "examplePrompts": [
+        "Show me today's weather",
+        "Weather in Paris please",
+        "Pick a city and tell me the weather"
+      ],
+      "examples": [
+        {
+          "cityOptions": ["Paris", "London", "Tokyo", "New York", "Sydney"],
+          "label": "Pick a city"
+        },
+        {
+          "initialCity": "London",
+          "cityOptions": ["London", "Paris", "Berlin"]
+        }
+      ]
+    },
+    {
+      "name": "weather-card",
+      "version": "1.0.0",
+      "propsSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["city"],
+        "properties": {
+          "city": { "type": "string" },
+          "units": {
+            "type": "string",
+            "enum": ["metric", "imperial"]
+          }
+        }
+      },
+      "tags": ["card", "weather", "display", "interactive"],
+      "events": [],
+      "examplePrompts": [
+        "Weather forecast for Paris",
+        "What's the weather in Tokyo right now"
+      ],
+      "examples": [
+        {
+          "city": "Paris",
+          "units": "metric"
+        },
+        {
+          "city": "London",
+          "units": "imperial"
+        }
+      ]
     }
   ]
 }

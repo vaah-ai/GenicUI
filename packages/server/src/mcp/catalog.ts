@@ -97,6 +97,68 @@ const DataTablePropsSchema: TSchema = Type.Object({
  *  `keystroke` events when the user presses a key. */
 const CalculatorPropsSchema: TSchema = Type.Object({}, { additionalProperties: false });
 
+/** TypeBox schema for InputPair props — two numeric inputs with a
+ *  Submit button. Emits `submit` events on click.
+ *
+ *  Mirrors @genicul-primevue/registry/src/input-pair-schema.ts so the
+ *  server-side validation matches what the playground's renderer
+ *  expects. Keep in sync with `registries/primevue/src/input-pair-schema.ts`.
+ *
+ *  @see {F47} — Component-event interactivity (M5-T7) */
+const InputPairPropsSchema: TSchema = Type.Object({
+  input1: Type.Optional(Type.Number()),
+  input2: Type.Optional(Type.Number()),
+  label1: Type.Optional(Type.String()),
+  label2: Type.Optional(Type.String()),
+  submitLabel: Type.Optional(Type.String()),
+  resultComponentId: Type.Optional(Type.String()),
+}, { additionalProperties: false });
+
+/** TypeBox schema for ResultCard props — display-only computed value.
+ *
+ *  Mirrors @genicul-primevue/registry/src/result-card-schema.ts.
+ *
+ *  @see {F47} — Component-event interactivity (M5-T7) */
+const ResultCardPropsSchema: TSchema = Type.Object({
+  input1: Type.Optional(Type.Number()),
+  input2: Type.Optional(Type.Number()),
+  sum: Type.Number(),
+  operation: Type.Optional(
+    Type.Union([
+      Type.Literal('add'),
+      Type.Literal('subtract'),
+      Type.Literal('multiply'),
+      Type.Literal('divide'),
+    ]),
+  ),
+  title: Type.Optional(Type.String()),
+}, { additionalProperties: false });
+
+/** TypeBox schema for CityPicker props — interactive dropdown of cities
+ *  with a Submit button. Emits a `submit` event when the user picks
+ *  a city and clicks Submit, carrying `{ city }` as the payload.
+ *
+ *  Mirrors @genicul-primevue/registry/src/city-picker-schema.ts.
+ *
+ *  @see {F47} — Component-event interactivity (M5-T7) */
+const CityPickerPropsSchema: TSchema = Type.Object({
+  initialCity: Type.Optional(Type.String()),
+  cityOptions: Type.Array(Type.String(), { minItems: 2 }),
+  label: Type.Optional(Type.String()),
+}, { additionalProperties: false });
+
+/** TypeBox schema for WeatherCard props — display-only weather card.
+ *
+ *  Mirrors @genicul-primevue/registry/src/weather-card-schema.ts.
+ *
+ *  @see {F47} — Component-event interactivity (M5-T7) */
+const WeatherCardPropsSchema: TSchema = Type.Object({
+  city: Type.String(),
+  units: Type.Optional(
+    Type.Union([Type.Literal('metric'), Type.Literal('imperial')]),
+  ),
+}, { additionalProperties: false });
+
 const CATALOG: CatalogEntry[] = [
   /**
    * PrimeVue DataTable — the only component in the MVP catalog.
@@ -168,6 +230,183 @@ const CATALOG: CatalogEntry[] = [
     propsJsonSchema: CalculatorPropsSchema as unknown as Record<string, unknown>,
     events: ['keystroke'],
     examples: [{}],
+  },
+
+  /**
+   * InputPair — two-number calculator input form with a Submit button.
+   *
+   * Emits `submit` events with `{ input1, input2 }` when the user
+   * clicks the Submit button. The chat bridge routes the click
+   * back into a fresh Claude turn via `[component_event]` so the
+   * agent can compute and return a ResultCard.
+   *
+   * @see {F43} — Interactive components + chat bridge
+   * @see {F47} — Component-event interactivity (M5-T7)
+   */
+  {
+    name: 'InputPair',
+    version: '1.0.0',
+    registryId: '@genicul-primevue/registry',
+    description:
+      'Two-number input form with a Submit button. Emits `submit` events ' +
+      'the chat bridge feeds back to the agent for follow-up computation.',
+    whenToUse:
+      'When the user wants to perform an arithmetic operation, do a quick ' +
+      'computation, or otherwise feed two numbers to the agent for processing. ' +
+      'Prefer this over a text input when both numbers are required up front ' +
+      'and the result is best surfaced as a ResultCard on submit.',
+    tags: [
+      'form',
+      'input',
+      'numeric',
+      'submit',
+      'calculator',
+      'pair',
+      'interactivity',
+      'chat-bridge',
+    ],
+    propsSchema: InputPairPropsSchema,
+    propsJsonSchema: InputPairPropsSchema as unknown as Record<string, unknown>,
+    events: ['submit'],
+    examples: [
+      { input1: 5, input2: 3, label1: 'First number', label2: 'Second number', submitLabel: 'Add them' },
+    ],
+  },
+
+  /**
+   * ResultCard — display-only computed-value card.
+   *
+   * Use as the answer surface for an interactive flow. After the
+   * agent receives a `submit` event from InputPair, it renders a
+   * ResultCard with the computed `sum` (or other operation) so the
+   * chat panel shows the answer next to the input form.
+   *
+   * @see {F43} — Chat as the sole render surface (interactive components)
+   */
+  {
+    name: 'ResultCard',
+    version: '1.0.0',
+    registryId: '@genicul-primevue/registry',
+    description:
+      'Display-only card for a computed result. Pairs with InputPair: after ' +
+      'the form submits, the agent renders a ResultCard with the answer.',
+    whenToUse:
+      'When the chat conversation has produced a numeric result that deserves ' +
+      'a structured, in-place display alongside the InputPair form that ' +
+      'asked for it.',
+    tags: [
+      'card',
+      'result',
+      'display',
+      'calculator',
+      'chat-bridge',
+    ],
+    propsSchema: ResultCardPropsSchema,
+    propsJsonSchema: ResultCardPropsSchema as unknown as Record<string, unknown>,
+    events: [],
+    examples: [
+      { input1: 5, input2: 3, sum: 8, operation: 'add', title: 'Sum' },
+    ],
+  },
+
+  /**
+   * CityPicker — interactive city-selector dropdown with a Submit
+   * button. Emits `submit` events with `{ city }` when the user picks
+   * a city and clicks Submit. The chat bridge forwards the click
+   * into a follow-up agent turn that fetches weather and renders
+   * a WeatherCard.
+   *
+   * @see {F47} — Component-event interactivity (M5-T7)
+   */
+  {
+    name: 'CityPicker',
+    version: '1.0.0',
+    registryId: '@genicul-primevue/registry',
+    description:
+      'Interactive dropdown for picking a city, with a Submit button. ' +
+      'ALWAYS use this component FIRST when the user asks about weather, ' +
+      'temperature, climate, or any city-scoped information — it collects ' +
+      'the city via a clean dropdown and emits a `submit` event that the ' +
+      'chat bridge forwards back to the agent. The follow-up agent turn ' +
+      'then renders a WeatherCard with the result. Do NOT guess a city ' +
+      'and render a WeatherCard directly — let the user pick.',
+    whenToUse:
+      'First choice for ANY weather query: "what\'s the weather", "is it ' +
+      'raining", "temperature in Tokyo", "weather forecast", "show me ' +
+      'weather", "pick a city and tell me the weather", etc. Also use for ' +
+      'other city-scoped lookups where the user should pick the city. ' +
+      'Prefer this over a text input — the dropdown covers the common ' +
+      'case without free-form typing. After the user submits, the agent ' +
+      'will receive a follow-up turn with the chosen city and then ' +
+      'render a WeatherCard. Never skip this step by guessing a city.',
+    tags: [
+      'form',
+      'input',
+      'dropdown',
+      'select',
+      'city',
+      'weather',
+      'pick',
+      'choose',
+      'temperature',
+      'climate',
+      'forecast',
+      'interactive',
+      'chat-bridge',
+    ],
+    propsSchema: CityPickerPropsSchema,
+    propsJsonSchema: CityPickerPropsSchema as unknown as Record<string, unknown>,
+    events: ['submit'],
+    examples: [
+      { cityOptions: ['Paris', 'London', 'Tokyo', 'New York', 'Sydney'], label: 'Pick a city' },
+      { initialCity: 'London', cityOptions: ['London', 'Paris', 'Berlin'] },
+    ],
+  },
+
+  /**
+   * WeatherCard — display-only weather card for a single city.
+   *
+   * Rendered after the user picks a city via CityPicker. The agent
+   * fetches the weather (e.g. Open-Meteo) and renders this card with
+   * the result.
+   *
+   * @see {F47} — Component-event interactivity (M5-T7)
+   */
+  {
+    name: 'WeatherCard',
+    version: '1.0.0',
+    registryId: '@genicul-primevue/registry',
+    description:
+      'Display-only weather card for a single city — temperature, ' +
+      'conditions, and metric/imperial unit choice. Renders AFTER the ' +
+      'user has picked a city via CityPicker and the agent has fetched ' +
+      'the forecast (e.g. Open-Meteo). This component never asks the user ' +
+      'for input.',
+    whenToUse:
+      'Only after a CityPicker.submit event has fired (or the user has ' +
+      'already named a specific city in the original prompt and the ' +
+      'agent has the forecast in hand). Pairs 1:1 with CityPicker as the ' +
+      'second half of the city-picker → weather-card flow. Do NOT use ' +
+      'this on a fresh "show me the weather" prompt without first ' +
+      'rendering CityPicker to collect the city.',
+    tags: [
+      'card',
+      'weather',
+      'display',
+      'city',
+      'temperature',
+      'climate',
+      'forecast',
+      'interactive',
+      'chat-bridge',
+    ],
+    propsSchema: WeatherCardPropsSchema,
+    propsJsonSchema: WeatherCardPropsSchema as unknown as Record<string, unknown>,
+    events: [],
+    examples: [
+      { city: 'Paris', units: 'metric' },
+      { city: 'London', units: 'imperial' },
+    ],
   },
 ];
 

@@ -1,7 +1,14 @@
 /* ============================================================
    GenicUI Playground — Design System
    ============================================================
-   Palette: Dark developer tools
+   Theme: Dark default, with a light-mode companion block below.
+         A [data-theme="light"] attribute on <html> flips every
+         `--gp-*` token to its light variant via specificity
+         (attribute selector beats :root). The PrimeVue plugin
+         uses the same `darkModeSelector` so its components flip
+         in step with the playground chrome.
+
+   Palette: Slate (cool grey) base + green accent
    Typography: IBM Plex Sans (body) + JetBrains Mono (code)
    Spacing: 8dp rhythm (4, 8, 12, 16, 24, 32, 48)
    Radius: 8px cards, 6px inputs, 4px badges
@@ -13,6 +20,8 @@
 
 /* ---------- Custom Properties ---------- */
 :root {
+  color-scheme: dark light;
+
   /* Surface */
   --gp-bg: #0f172a;           /* slate-900 */
   --gp-surface: #1e293b;      /* slate-800 */
@@ -34,15 +43,68 @@
   --gp-border: #334155;       /* slate-700 */
   --gp-border-light: #475569; /* slate-600 */
 
-  /* Status */
+  /* Status — semantic tiers (soft = subtle bg, strong = visible, text = legible on bg) */
+  --gp-success-bg-soft: rgba(34, 197, 94, 0.06);
   --gp-success-bg: rgba(34, 197, 94, 0.12);
-  --gp-success-text: #4ade80; /* green-400 */
+  --gp-success-bg-strong: rgba(34, 197, 94, 0.18);
+  --gp-success-border-soft: rgba(34, 197, 94, 0.25);
+  --gp-success-border-strong: rgba(34, 197, 94, 0.40);
+  --gp-success-text: #4ade80;          /* green-400 */
+  --gp-success-text-strong: rgba(34, 197, 94, 0.95);
+
   --gp-warning-bg: rgba(234, 179, 8, 0.12);
-  --gp-warning-text: #facc15; /* yellow-400 */
+  --gp-warning-text: #facc15;          /* yellow-400 */
+  --gp-warning-border-soft: rgba(234, 179, 8, 0.25);
+
+  --gp-error-bg-soft: rgba(239, 68, 68, 0.05);
   --gp-error-bg: rgba(239, 68, 68, 0.12);
-  --gp-error-text: #f87171;   /* red-400 */
+  --gp-error-bg-strong: rgba(239, 68, 68, 0.18);
+  --gp-error-border-soft: rgba(239, 68, 68, 0.30);
+  --gp-error-border-strong: rgba(239, 68, 68, 0.40);
+  --gp-error-text: #f87171;            /* red-400 */
+  --gp-error-text-strong: rgba(239, 68, 68, 0.95);
+
+  --gp-info-bg-soft: rgba(59, 130, 246, 0.06);
   --gp-info-bg: rgba(59, 130, 246, 0.12);
-  --gp-info-text: #60a5fa;    /* blue-400 */
+  --gp-info-border-soft: rgba(59, 130, 246, 0.35);
+  --gp-info-text: #60a5fa;             /* blue-400 */
+
+  /* Table */
+  --gp-row-stripe: rgba(255, 255, 255, 0.04);   /* odd-row tint on dark surface */
+  --gp-row-stripe-hover: rgba(255, 255, 255, 0.06);
+  --gp-table-header-bg: var(--gp-topbar);
+  --gp-table-border: var(--gp-surface-hover);
+
+  /* Calculator accents */
+  --gp-button-secondary-hover-bg: #2f3a52;
+  --gp-button-action-bg: #2a3349;
+  --gp-button-op-bg: #3a4358;
+  --gp-button-equals-text: #052e16;
+  --gp-button-equals-hover-bg: #16a34a;
+  --gp-button-on-accent-text: #052e16;          /* dark text on green-500/600 button */
+
+  /* WeatherCard tone pairings — light + dark variants per tone (amber/blue/cyan) */
+  --gp-tone-amber-text: #fbbf24;                 /* amber-400 on slate-800 */
+  --gp-tone-amber-tint: rgba(251, 191, 36, 0.06);
+  --gp-tone-amber-tint-strong: rgba(251, 191, 36, 0.35);
+  --gp-tone-amber-border: rgba(251, 191, 36, 0.22);
+
+  --gp-tone-blue-text: #60a5fa;                  /* blue-400 on slate-800 */
+  --gp-tone-blue-tint: rgba(96, 165, 250, 0.02);
+  --gp-tone-blue-tint-strong: rgba(96, 165, 250, 0.35);
+  --gp-tone-blue-border: rgba(96, 165, 250, 0.22);
+
+  --gp-tone-cyan-text: #67e8f9;                  /* cyan-300 on slate-800 */
+  --gp-tone-cyan-tint: rgba(103, 232, 249, 0.02);
+  --gp-tone-cyan-tint-strong: rgba(103, 232, 249, 0.35);
+  --gp-tone-cyan-border: rgba(103, 232, 249, 0.22);
+
+  /* Glassmorphism (WeatherCard halo + retry button) */
+  --gp-glass-bg: rgba(15, 23, 42, 0.35);
+  --gp-glass-bg-hover: rgba(15, 23, 42, 0.55);
+  --gp-glass-border: rgba(255, 255, 255, 0.04);
+  --gp-glass-ring: rgba(255, 255, 255, 0.05);
+  --gp-glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
   /* Typography */
   --gp-font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
@@ -82,6 +144,103 @@
   --gp-topbar-height: 56px;
 }
 
+/* ---------- Light-mode companion ----------
+   Attribute selector (0,1,0) beats :root (0,0,1,0), so every
+   variable below overrides the dark value when [data-theme="light"]
+   is present on <html>. The PrimeVue plugin reads the same attribute
+   via `darkModeSelector` so its components flip in step with the
+   playground chrome. */
+[data-theme="light"] {
+  color-scheme: light dark;
+
+  /* Surface — slate-900 ↔ slate-50, slate-800 ↔ white */
+  --gp-bg: #f8fafc;           /* slate-50 (page) */
+  --gp-surface: #ffffff;      /* white (cards) */
+  --gp-surface-hover: #f1f5f9;/* slate-100 */
+  --gp-surface-active: #e2e8f0;/* slate-200 */
+  --gp-topbar: #ffffff;       /* white topbar */
+
+  /* Text — slate-50 ↔ slate-900, mid-greys stay */
+  --gp-text: #0f172a;         /* slate-900 */
+  --gp-text-secondary: #64748b;/* slate-500 */
+  --gp-text-muted: #94a3b8;   /* slate-400 */
+
+  /* Accent — green stays */
+  --gp-accent: #16a34a;       /* green-600 (slightly darker for white bg) */
+  --gp-accent-hover: #15803d; /* green-700 */
+  --gp-accent-subtle: rgba(22, 163, 74, 0.10);
+
+  /* Borders — light on white */
+  --gp-border: #e2e8f0;       /* slate-200 */
+  --gp-border-light: #cbd5e1;/* slate-300 */
+
+  /* Status — stronger alphas for visibility on white surface */
+  --gp-success-bg-soft: rgba(22, 163, 74, 0.08);
+  --gp-success-bg: rgba(22, 163, 74, 0.12);
+  --gp-success-bg-strong: rgba(22, 163, 74, 0.18);
+  --gp-success-border-soft: rgba(22, 163, 74, 0.35);
+  --gp-success-border-strong: rgba(22, 163, 74, 0.55);
+  --gp-success-text: #15803d;          /* green-700 */
+  --gp-success-text-strong: #166534;
+
+  --gp-warning-bg: rgba(202, 138, 4, 0.12);
+  --gp-warning-text: #a16207;          /* yellow-700 */
+  --gp-warning-border-soft: rgba(202, 138, 4, 0.35);
+
+  --gp-error-bg-soft: rgba(220, 38, 38, 0.06);
+  --gp-error-bg: rgba(220, 38, 38, 0.10);
+  --gp-error-bg-strong: rgba(220, 38, 38, 0.16);
+  --gp-error-border-soft: rgba(220, 38, 38, 0.40);
+  --gp-error-border-strong: rgba(220, 38, 38, 0.55);
+  --gp-error-text: #b91c1c;            /* red-700 */
+  --gp-error-text-strong: #991b1b;
+
+  --gp-info-bg-soft: rgba(37, 99, 235, 0.08);
+  --gp-info-bg: rgba(37, 99, 235, 0.10);
+  --gp-info-border-soft: rgba(37, 99, 235, 0.45);
+  --gp-info-text: #1d4ed8;             /* blue-700 */
+
+  /* Table — dark alpha on light surface (inverts the dark-mode stripe) */
+  --gp-row-stripe: rgba(15, 23, 42, 0.03);
+  --gp-row-stripe-hover: rgba(15, 23, 42, 0.06);
+
+  /* Calculator accents — keep dark-text-on-green-equals but tone hover backgrounds */
+  --gp-button-secondary-hover-bg: #e2e8f0;   /* slate-200 */
+  --gp-button-action-bg: #f1f5f9;            /* slate-100 */
+  --gp-button-op-bg: #cbd5e1;                /* slate-300 */
+  --gp-button-equals-text: #052e16;          /* keep AAA contrast on green */
+  --gp-button-equals-hover-bg: #15803d;      /* green-700 */
+  --gp-button-on-accent-text: #052e16;       /* stays — dark on green-600 light-mode too */
+
+  /* WeatherCard tones — amber-700 / blue-700 / cyan-700 for ≥4.5:1 on white */
+  --gp-tone-amber-text: #b45309;             /* amber-700 */
+  --gp-tone-amber-tint: rgba(180, 83, 9, 0.06);
+  --gp-tone-amber-tint-strong: rgba(180, 83, 9, 0.35);
+  --gp-tone-amber-border: rgba(180, 83, 9, 0.28);
+
+  --gp-tone-blue-text: #1d4ed8;              /* blue-700 */
+  --gp-tone-blue-tint: rgba(29, 78, 216, 0.05);
+  --gp-tone-blue-tint-strong: rgba(29, 78, 216, 0.35);
+  --gp-tone-blue-border: rgba(29, 78, 216, 0.28);
+
+  --gp-tone-cyan-text: #0e7490;              /* cyan-700 */
+  --gp-tone-cyan-tint: rgba(14, 116, 144, 0.05);
+  --gp-tone-cyan-tint-strong: rgba(14, 116, 144, 0.35);
+  --gp-tone-cyan-border: rgba(14, 116, 144, 0.28);
+
+  /* Glass — flip to white-translucent for light mode */
+  --gp-glass-bg: rgba(255, 255, 255, 0.65);
+  --gp-glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --gp-glass-border: rgba(15, 23, 42, 0.08);
+  --gp-glass-ring: rgba(15, 23, 42, 0.06);
+  --gp-glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* Shadows — slightly stronger on light bg for the same visual weight */
+  --gp-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --gp-shadow: 0 1px 3px rgba(15, 23, 42, 0.10), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --gp-shadow-md: 0 4px 6px rgba(15, 23, 42, 0.10), 0 2px 4px rgba(15, 23, 42, 0.06);
+}
+
 /* ---------- Reset ---------- */
 html,
 body {
@@ -93,6 +252,7 @@ body {
   line-height: 1.5;
   color: var(--gp-text);
   background: var(--gp-bg);
+  transition: background-color var(--gp-transition), color var(--gp-transition);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -143,7 +303,7 @@ pre {
   height: 36px;
   border-radius: var(--gp-radius);
   background: var(--gp-accent-subtle);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  border: 1px solid var(--gp-success-border-soft);
   color: var(--gp-accent);
   display: flex;
   align-items: center;
@@ -356,7 +516,7 @@ pre {
   height: 40px;
   border-radius: var(--gp-radius);
   background: var(--gp-accent-subtle);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  border: 1px solid var(--gp-success-border-soft);
   color: var(--gp-accent);
   display: flex;
   align-items: center;
@@ -581,7 +741,7 @@ pre {
 .connection-status.connected {
   background: var(--gp-success-bg);
   color: var(--gp-success-text);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  border: 1px solid var(--gp-success-border-soft);
 }
 
 .connection-status.connected::before {
@@ -592,7 +752,7 @@ pre {
 .connection-status.disconnected {
   background: var(--gp-warning-bg);
   color: var(--gp-warning-text);
-  border: 1px solid rgba(234, 179, 8, 0.2);
+  border: 1px solid var(--gp-warning-border-soft);
 }
 
 .connection-status.disconnected::before {
@@ -602,7 +762,7 @@ pre {
 .connection-status.error {
   background: var(--gp-error-bg);
   color: var(--gp-error-text);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--gp-error-border-soft);
 }
 
 .connection-status.error::before {
@@ -705,7 +865,7 @@ pre {
 .p-button.p-button-default {
   background: var(--gp-accent) !important;
   border-color: var(--gp-accent) !important;
-  color: #000 !important;
+  color: var(--gp-button-on-accent-text) !important;
 }
 
 .p-button.p-button-default:enabled:hover {

@@ -214,6 +214,102 @@ describe('renderComponent', () => {
   });
 
   // -----------------------------------------------------------------------
+  // F47 / M5-T7: the primevue registry declares 5 components, but only
+  // DataTable + Calculator were in the hard-coded MCP catalog. The chat
+  // bridge calls renderComponent() too, so an agent clicking
+  // `render_component(name: "CityPicker")` returned -32001 (not in
+  // catalog) before F47. Add coverage so the 4 new components stay
+  // reachable.
+  // -----------------------------------------------------------------------
+
+  describe('F47: primevue registry components reachable via render_component', () => {
+    it('renders CityPicker with PascalCase name', () => {
+      const result = renderComponent({
+        name: 'CityPicker',
+        props: {
+          cityOptions: ['Paris', 'London', 'Tokyo'],
+          label: 'Pick a city',
+        },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.componentId.startsWith('ci-')).toBe(true);
+      expect(result.events).toContain('submit');
+    });
+
+    it('rejects CityPicker with fewer than 2 cityOptions', () => {
+      const result = renderComponent({
+        name: 'CityPicker',
+        props: { cityOptions: ['Paris'] },
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result!.error!.code).toBe(GENICUI_ERROR_CODES.props_invalid);
+    });
+
+    it('renders WeatherCard with PascalCase name', () => {
+      const result = renderComponent({
+        name: 'WeatherCard',
+        props: { city: 'Paris', units: 'metric' },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.componentId.startsWith('we-')).toBe(true);
+    });
+
+    it('rejects WeatherCard with invalid units', () => {
+      const result = renderComponent({
+        name: 'WeatherCard',
+        props: { city: 'Paris', units: 'kelvin' },
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result!.error!.code).toBe(GENICUI_ERROR_CODES.props_invalid);
+    });
+
+    it('renders InputPair with PascalCase name', () => {
+      const result = renderComponent({
+        name: 'InputPair',
+        props: { input1: 5, input2: 3, submitLabel: 'Add' },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.componentId.startsWith('in-')).toBe(true);
+      expect(result.events).toContain('submit');
+    });
+
+    it('renders ResultCard with PascalCase name', () => {
+      const result = renderComponent({
+        name: 'ResultCard',
+        props: { input1: 5, input2: 3, sum: 8, operation: 'add' },
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.componentId.startsWith('re-')).toBe(true);
+    });
+
+    it('rejects ResultCard missing required sum', () => {
+      const result = renderComponent({
+        name: 'ResultCard',
+        props: { input1: 5, input2: 3 },
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result!.error!.code).toBe(GENICUI_ERROR_CODES.props_invalid);
+    });
+
+    it('kebab-case component names still fail (resolved only via PascalCase)', () => {
+      const result = renderComponent({
+        name: 'city-picker',
+        props: { cityOptions: ['Paris', 'London'] },
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result!.error!.code).toBe(GENICUI_ERROR_CODES.component_not_found);
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // F16-AC3: Idempotency — same key returns same componentId
   // -----------------------------------------------------------------------
 

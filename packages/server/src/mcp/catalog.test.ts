@@ -24,6 +24,38 @@ describe('getCatalog', () => {
     expect(dataTable!.version).toBe('0.1.0');
   });
 
+  // F47 / M5-T7: the primevue registry declares 5 components in
+  // registry.json, but the hard-coded MCP catalog (this file) used
+  // to only know about DataTable + Calculator. The interactive trio
+  // (InputPair, ResultCard) and the weather flow (CityPicker,
+  // WeatherCard) must all be reachable through render_component so
+  // the chat-bridge path can mount them when an agent calls
+  // `render_component(name: "<Component>")`.
+  it('exposes InputPair, ResultCard, CityPicker, WeatherCard (F47)', () => {
+    const catalog = getCatalog();
+    const expected = ['InputPair', 'ResultCard', 'CityPicker', 'WeatherCard'];
+    for (const name of expected) {
+      const entry = catalog.find((e) => e.name === name);
+      expect(entry).toBeDefined();
+      expect(entry!.registryId).toBe('@genicul-primevue/registry');
+      expect(entry!.propsSchema).toBeDefined();
+      expect(Array.isArray(entry!.events)).toBe(true);
+      expect(Array.isArray(entry!.examples)).toBe(true);
+      expect(entry!.examples.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('InputPair and CityPicker advertise the submit event (F47)', () => {
+    const catalog = getCatalog();
+    const inputPair = catalog.find((e) => e.name === 'InputPair')!;
+    expect(inputPair.events).toContain('submit');
+    const cityPicker = catalog.find((e) => e.name === 'CityPicker')!;
+    expect(cityPicker.events).toContain('submit');
+    // CityPicker requires at least 2 options
+    expect(cityPicker.tags).toContain('city');
+    expect(cityPicker.tags).toContain('weather');
+  });
+
   it('each entry has required fields', () => {
     const catalog = getCatalog();
     for (const entry of catalog) {

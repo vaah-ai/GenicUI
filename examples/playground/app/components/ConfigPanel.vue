@@ -206,8 +206,8 @@ watch(wsState, async (newState, oldState) => {
   align-items: center;
   gap: var(--gp-space-2);
   padding: var(--gp-space-2) var(--gp-space-3);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--gp-error-bg);
+  border: 1px solid var(--gp-error-border-soft);
   border-radius: var(--gp-radius);
   font-size: 0.75rem;
   color: var(--gp-error-text);
@@ -242,7 +242,7 @@ watch(wsState, async (newState, oldState) => {
 }
 
 .error-message-retry:hover {
-  background: rgba(239, 68, 68, 0.15);
+  background: var(--gp-error-bg-strong);
 }
 
 .error-message-retry:focus-visible {

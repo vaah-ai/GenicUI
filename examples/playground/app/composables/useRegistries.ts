@@ -88,13 +88,18 @@ export function useRegistries() {
   /**
    * Aggregate example prompts from the selected registry.
    * Falls back to an empty array if no registry is selected.
+   *
+   * Takes up to 2 prompts per component so every component is
+   * represented in the suggestions panel, not just the first
+   * components alphabetically (which was the old behavior with a
+   * flat cap). The hard ceiling is 10 — beyond that, the chat
+   * panel scrolls and the prompts become a noise risk.
    */
   const examplePrompts = (): string[] => {
     const reg = selected();
     if (!reg) return [];
-    return reg.components
-      .flatMap((c) => c.examplePrompts ?? [])
-      .slice(0, 8); // Cap to 8 to keep hero manageable
+    const perComponent = reg.components.map((c) => (c.examplePrompts ?? []).slice(0, 2));
+    return perComponent.flat().slice(0, 10);
   };
 
   return {

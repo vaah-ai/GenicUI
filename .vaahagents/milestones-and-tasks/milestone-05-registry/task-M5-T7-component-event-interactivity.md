@@ -3,7 +3,7 @@
 > **Milestone:** M5 (Registry: Component Registry + PrimeVue Adapter)
 > **Manifest feature:** F47 (proposed — Component-event interactivity. See Notes below — manifest F{n} assignment pending.)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 5-7 days
 
 ## Description
@@ -177,3 +177,81 @@ The Claude Code subprocess is spawned fire-and-forget per turn via `Bun.spawn` w
 4. **Multiple mounted components** — the synthetic prompt names one `componentId`. Acceptable for v1; the synthetic user bubble shows the right context.
 5. **`DataTable` event parity** — out of scope for this PR but the architecture should not block it. Document as a follow-up.
 6. **Legacy clients** — unknown `user_event` type is ignored by the existing switch (handleEvent falls through), so legacy clients without this PR don't crash — they just don't see the synthetic bubble.
+
+---
+
+## F47-AC7 — Chat column debug toggle (M5-T7-05)
+
+**Status:** ⚪ Not Started (added 2026-09-08 during Playwright UAT review)
+
+**User requirement:** "in chat column can you have a debug switch and if it's enabled than show input, props etc, but if it's disabled than show clean chat."
+
+### Description
+
+Add a debug toggle inside the **chat column header** (next to the existing `Clear chat` button) that gates the developer-facing diagnostic panels inside each `ToolCallAccordion` (`Props`, `Input`, `Result`, `Error` blocks and the per-component `Props` disclosure). When the toggle is OFF, the chat column shows only the assistant's prose, the user/agent bubbles, and the actual interactive component previews — a "clean chat" view intended for screenshots, demos, and non-developer stakeholders. When the toggle is ON (the current behaviour, preserved for UAT and debugging), all the diagnostic blocks remain visible as they are today.
+
+The toggle state is **URL-driven** (`?debug=off`) so demos and screenshots can deep-link a clean view without remembering to flip a switch. When the query param is absent, the toggle defaults to ON so the developer UAT workflow is unchanged out of the box.
+
+### Sub-task breakdown
+
+| SubTask ID   | Title                                                          | Status        | Priority |
+| ------------ | -------------------------------------------------------------- | ------------- | -------- |
+| M5-T7-05     | Chat column debug toggle — gates PROPS / INPUT / RESULT / ERROR blocks per `?debug=off` query param | ⚪ Not Started | Medium   |
+
+#### M5-T7-05 — Debug toggle (header switch + URL override)
+
+- Modify `examples/playground/app/components/ChatPanel.vue` (the column that hosts the chat header + `ChatHistory`):
+  - Add a small `Select` or `Toggle` control in the chat header row, immediately to the left of the `Clear chat` button. Label: `Debug`. Default: ON.
+  - Wire the control to a composable that exposes `isDebug` (a `ComputedRef<boolean>`) and `setDebug(value: boolean)`.
+- Create `examples/playground/app/composables/useDebugMode.ts`:
+  - Read `window.location.search` on mount via `useRoute().query.debug === 'off'` → `false`. Any other value (or missing) → `true`.
+  - Provide `isDebug` (computed) and `setDebug(value: boolean)` that updates the URL via `useRouter().replace({ query: { ...currentQuery, debug: value ? null : 'off' } })` so the setting is shareable.
+  - Module-singleton (mirrors the `useComponents()` hoisting pattern used for `broadcastComponentMountedAll`).
+- Modify `examples/playground/app/components/ToolCallAccordion.vue`:
+  - Accept an `isDebug: boolean` prop (or call `useDebugMode()` directly inside the component — pick whichever keeps the template tidy; current recommendation: import `useDebugMode` for one fewer prop drill).
+  - Gate the three diagnostic blocks:
+    - `<details class="tool-call-component-props">` (the per-component `Props` accordion) — wrap in `v-if="isDebug"`.
+    - `<div class="tool-call-block">` with label `Input` — wrap in `v-if="isDebug"`.
+    - `<div class="tool-call-block">` with label `Result` — wrap in `v-if="isDebug"`.
+    - `<div class="tool-call-block">` with label `Error` — **always visible** (errors stay surfaced in clean mode for transparency; this is a deliberate exception).
+  - The `<header class="tool-call-component-header">` (name + componentId pill) stays visible in both modes — the componentId is the user-visible copy-paste target.
+  - The rendered component preview (the `<RenderedComponent>` body) stays visible in both modes — that's the "clean chat" surface, not the diagnostic blocks.
+- New tests:
+  - `examples/playground/app/composables/__tests__/useDebugMode.test.ts`:
+    - Defaults to `true` when no `?debug` query param is present.
+    - Returns `false` when `?debug=off`.
+    - Returns `true` for any other value (`?debug=on`, `?debug=true`, `?debug=1`).
+    - `setDebug(false)` rewrites the URL to include `debug=off`; `setDebug(true)` removes the param.
+  - `examples/playground/app/components/__tests__/ToolCallAccordion.test.ts` (extend or create):
+    - Renders `Props` accordion + `Input` block + `Result` block when `isDebug=true`.
+    - Hides all three when `isDebug=false`.
+    - Still renders the `Error` block when `isDebug=false` (errors must remain surfaced).
+    - Still renders the component preview + name + componentId in both modes.
+
+### Acceptance criteria
+
+- F47-AC7 — A `Debug` toggle in the chat column header gates the `Props`, `Input`, and `Result` diagnostic blocks inside every `ToolCallAccordion`. Default state is ON (no behaviour change for current UAT workflow). When set OFF, the chat shows only the rendered component previews, the assistant's prose, and any error messages; PROPS, INPUT, and RESULT blocks are hidden. Setting state is reflected in the URL via `?debug=off` and is shareable / reloadable.
+
+### Completion criteria (M5-T7-05)
+
+- [ ] `bun run test` exits green — including new `useDebugMode.test.ts` and `ToolCallAccordion.test.ts` cases
+- [ ] `bun run lint` reports zero errors (zero `any`, ESLint clean)
+- [ ] `bun run build` succeeds
+- [ ] Manual smoke via `examples/playground/start.sh`: load `/` (default ON, all blocks visible) → flip toggle OFF (clean view) → reload page with `?debug=off` (clean view restores from URL) → flip back ON (blocks return)
+- [ ] No new `any` types introduced
+- [ ] No new package boundary created (stays within `examples/playground`)
+
+### Dependencies
+
+- **Requires:** nothing new — purely a client-side UI affordance over existing components.
+- **Blocks:** nothing.
+
+### Why a sub-task on M5-T7, not a new feature?
+
+This was raised during the F47 Playwright UAT review (after M5-T7-04). It's a 1-2 day UI-only change that lands inside the same playground surface M5-T7 ships, so it's a natural fit as `M5-T7-05`. No new feature ID is required unless the manifest renumbering work happens first; for now it lives under F47-AC7.
+
+### Risks / notes
+
+1. **Error block exception** — errors stay visible in clean mode. If the user wants a fully clean view (errors hidden too), it's a one-line follow-up to flip that `v-if`. Default behaviour keeps them visible because silent failure in a demo is worse than visual noise.
+2. **Other diagnostic surfaces** — the sidebar's `Components X mounted` counter, `messages received` counter, and `RenderSurface` (if it returns) are **not** gated by this toggle. Those live in different surfaces; this toggle is intentionally scoped to the chat column only.
+3. **Tests that assert the PROPS/INPUT blocks** — any existing test that mounts `ToolCallAccordion` and asserts the `Props` accordion exists will need `isDebug=true` (the default). The test file `ToolCallAccordion.test.ts` (if it exists) should be checked.
