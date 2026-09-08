@@ -307,6 +307,115 @@ html, html.dark, html.light {
   animation-delay: calc(var(--i, 0) * 60ms);
 }
 
+/* Sleak install pill — single command, copy-to-clipboard.
+ * Sits in the hero as the dominant CTA. No fake telemetry, no multi-runner
+ * comparison; npm/pnpm/yarn links live in the secondary row below.
+ */
+.install-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.5rem 0.625rem 1rem;
+  background: rgba(14, 16, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.875rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 60px -20px rgba(59, 130, 246, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.install-pill:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 70px -20px rgba(59, 130, 246, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.install-prompt {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #10B981;
+  user-select: none;
+}
+
+.install-command {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .install-prompt,
+  .install-command {
+    font-size: 1rem;
+  }
+}
+
+.install-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.install-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.install-copy:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+}
+
+.install-copy:active {
+  transform: scale(0.95);
+}
+
+/* Hero secondary links — quickstart / package managers / GitHub.
+ * Smaller, quieter than the install pill. Single line on mobile.
+ */
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-text-muted, #A1A1AA);
+  text-decoration: none;
+  transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-link:hover {
+  color: white;
+}
+
+.hero-link-arrow {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-link:hover .hero-link-arrow {
+  transform: translateX(2px);
+}
+
 /* Pulse ring dot — used for status indicators (e.g. "live" badges) */
 .landing-pulse {
   animation: pulse-ring 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;

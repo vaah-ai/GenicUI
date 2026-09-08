@@ -11,6 +11,33 @@
  * All copy is real — no lorem ipsum. All buttons route into the IA tree
  * that M5.1-T3 wired up.
  */
+const copied = ref(false)
+let copyTimer: ReturnType<typeof setTimeout> | null = null
+
+async function copyInstall(event: MouseEvent) {
+  const btn = event.currentTarget as HTMLButtonElement
+  const command = btn.dataset.copy ?? ''
+  try {
+    await navigator.clipboard.writeText(command)
+  } catch {
+    // Fallback for non-secure contexts: select-and-copy via temp textarea
+    const ta = document.createElement('textarea')
+    ta.value = command
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+  }
+  copied.value = true
+  if (copyTimer) clearTimeout(copyTimer)
+  copyTimer = setTimeout(() => { copied.value = false }, 1800)
+}
+
+onBeforeUnmount(() => {
+  if (copyTimer) clearTimeout(copyTimer)
+})
 </script>
 
 <template>
@@ -42,40 +69,45 @@
             GenicUI is the missing protocol between any MCP-capable agent and your real UI. Your agent doesn't speak JSON to the user — it renders your checkout flow, your support console, your data tables, your forms. Live, interactive, on the same page as the conversation.
           </p>
 
-          <div class="stagger mt-10 flex flex-wrap items-center justify-center gap-3" style="--i:3">
-            <UButton
-              size="xl"
-              to="/getting-started/introduction"
-              trailing-icon="i-lucide-arrow-right"
-              class="font-medium group"
-            >
-              <template #trailing>
-                <span class="btn-icon-nest">
-                  <UIcon name="i-lucide-arrow-right" class="size-3.5" />
-                </span>
-              </template>
-              Get Started
-            </UButton>
+          <!-- Sleak install header — primary action sits above secondary CTAs.
+               Single command, copy-to-clipboard, pairs a code-style chip with
+               a docs link. No fake telemetry, no multi-runner comparison. -->
+          <div class="stagger mt-12 w-full max-w-xl mx-auto" style="--i:3">
+            <div class="install-pill">
+              <span class="install-prompt" aria-hidden="true">$</span>
+              <code class="install-command">bun add @genicui/core @genicui/server</code>
+              <button
+                type="button"
+                class="install-copy"
+                aria-label="Copy install command to clipboard"
+                data-copy="bun add @genicui/core @genicui/server"
+                @click="copyInstall"
+              >
+                <UIcon v-if="!copied" name="i-lucide-copy" class="size-3.5" />
+                <UIcon v-else name="i-lucide-check" class="size-3.5 text-emerald-400" />
+              </button>
+            </div>
+          </div>
 
-            <UButton
-              color="neutral"
-              icon="i-simple-icons-github"
-              size="xl"
-              to="https://github.com/genicui/genicui"
+          <div class="stagger mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style="--i:4">
+            <NuxtLink to="/getting-started/quickstart" class="hero-link">
+              <UIcon name="i-lucide-book-open" class="size-3.5" />
+              Quickstart guide
+              <UIcon name="i-lucide-arrow-right" class="size-3 hero-link-arrow" />
+            </NuxtLink>
+            <NuxtLink to="/getting-started/installation" class="hero-link">
+              <UIcon name="i-lucide-package" class="size-3.5" />
+              npm · pnpm · yarn
+            </NuxtLink>
+            <a
+              href="https://github.com/genicui/genicui"
               target="_blank"
-              variant="outline"
+              rel="noopener"
+              class="hero-link"
             >
+              <UIcon name="i-simple-icons-github" class="size-3.5" />
               View on GitHub
-            </UButton>
-
-            <UButton
-              color="neutral"
-              size="xl"
-              to="/getting-started/quickstart"
-              variant="ghost"
-            >
-              Quickstart →
-            </UButton>
+            </a>
           </div>
 
           <div class="stagger mt-16 flex items-center gap-6 text-xs font-mono text-[var(--color-text-muted)]" style="--i:4">
@@ -605,50 +637,6 @@
             </div>
           </div>
 
-          <!-- Install — wide -->
-          <div class="bento-wide stagger" style="--i:5">
-            <div class="glass-card p-8 sm:p-10 lg:p-12">
-              <div class="flex items-center justify-between mb-6">
-                <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                  Install in <span class="display-serif">one line.</span>
-                </h3>
-                <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 landing-pulse" />
-                  <span class="text-xs font-mono text-[var(--color-text-muted)]">latest stable</span>
-                </div>
-              </div>
-              <div class="code-window">
-                <div class="code-window-header">
-                  <span class="code-window-dot red" />
-                  <span class="code-window-dot amber" />
-                  <span class="code-window-dot green" />
-                  <span class="code-window-title">~/projects/your-app</span>
-                </div>
-                <div class="p-5 font-mono text-sm sm:text-base space-y-1">
-                  <div class="text-[var(--color-text-muted)]"># pick your runtime</div>
-                  <div>
-                    <span class="text-emerald-400">bun add</span>
-                    <span class="text-white"> @genicui/core @genicui/server</span>
-                  </div>
-                  <div class="text-[var(--color-text-muted)] mt-3"># or use any of these</div>
-                  <div>
-                    <span class="text-blue-400">npm install</span>
-                    <span class="text-white"> @genicui/core @genicui/server</span>
-                  </div>
-                  <div>
-                    <span class="text-violet-400">pnpm add</span>
-                    <span class="text-white"> @genicui/core @genicui/server</span>
-                  </div>
-                  <div class="text-[var(--color-text-muted)] mt-3"># ✓ resolved 47 packages in 1.2s</div>
-                </div>
-              </div>
-              <div class="mt-6 flex flex-wrap items-center gap-2 text-xs font-mono text-[var(--color-text-muted)]">
-                <span class="px-2 py-1 rounded-md bg-white/5 border border-white/10">zero deps in runtime</span>
-                <span class="px-2 py-1 rounded-md bg-white/5 border border-white/10">ESM-first</span>
-                <span class="px-2 py-1 rounded-md bg-white/5 border border-white/10">TypeScript-native</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
