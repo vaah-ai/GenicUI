@@ -45,7 +45,14 @@ useHead({
     { name: 'color-scheme', content: 'light dark' }
   ],
   link: [
-    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
+    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+    // Preload the two variable fonts used by the landing. These are the
+    // only two we can preload reliably — Geist + Geist Mono come from a
+    // fixed CDN URL. Instrument Serif is imported as a Google Fonts CSS
+    // and can't be preloaded directly (no stable hash from the @import),
+    // so it stays on `font-display: swap`.
+    { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.5/files/geist-latin-wght-normal.woff2' },
+    { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.5/files/geist-mono-latin-wght-normal.woff2' }
   ],
   htmlAttrs: {
     lang,

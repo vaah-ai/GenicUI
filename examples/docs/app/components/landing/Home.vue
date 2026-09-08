@@ -43,7 +43,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="landing-root">
     <!-- Hero -->
-    <section class="landing-mesh landing-hero-mesh relative overflow-hidden">
+    <section class="landing-hero-glow relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20">
         <div class="flex flex-col items-center text-center">
           <div
@@ -52,25 +52,31 @@ onBeforeUnmount(() => {
           >
             <span class="orbit-ring orbit-ring-a rounded-full" aria-hidden="true" />
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 landing-pulse" />
-            <span>v0.5 — M5.1 docs site</span>
+            <span>v0.5 · MCP-native · MIT</span>
           </div>
 
-          <!-- Etymology + concrete promise. The Gen + IC + UI line is the
-               most shareable thing on the page — it tells you what we are
-               in three seconds. Headline leads with it, not a fragment. -->
+          <!-- Mechanism-first headline. Line 1 says what the framework does
+               (agent → render_component → live component). Line 2 says where
+               it works (any agent, any framework, any UI surface — chat,
+               IDE, in-app, Slack, browser extension). GenericEtymology is
+               gone — the eyebrow carries project metadata instead. -->
           <h1
-            class="stagger display-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-8 text-white max-w-5xl"
+            class="stagger mt-8 text-white max-w-5xl"
             style="--i:1"
           >
-            Generative + Agentic<br>
-            <span class="text-[var(--color-text-dim)]">=</span> GenicUI.
+            <span class="display-sans block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl">
+              Agents render your components.
+            </span>
+            <span class="display-serif block mt-3 sm:mt-4 text-3xl sm:text-4xl lg:text-5xl text-[var(--color-text-muted,#C4C4C8)]">
+              Any agent. Any framework. Any UI surface.
+            </span>
           </h1>
 
           <p
-            class="stagger mt-6 text-lg sm:text-xl text-[var(--color-text-muted,#A1A1AA)] max-w-2xl leading-relaxed"
+            class="stagger mt-6 text-lg sm:text-xl text-[var(--color-text-muted,#C4C4C8)] max-w-2xl leading-relaxed"
             style="--i:2"
           >
-            The MCP-native protocol that lets any AI agent render your real components — your checkout flow, your support console, your data tables, your forms. Live, interactive, on the same page as the conversation. No copy-paste, no context switch.
+            GenicUI is the protocol that turns a chat into your product. An agent calls one MCP tool — <code class="font-mono text-base sm:text-lg text-violet-300/90">render_component</code> — and your real React, Vue, or Web Component renders inline, in any surface that can host a message thread. No copy-paste. No context switch. No <span class="display-serif">"let me open the app for you."</span>
           </p>
 
           <!-- Sleak install header — primary action sits above secondary CTAs.
@@ -135,7 +141,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- USE CASES — what you actually build with GenicUI -->
-    <section class="landing-mesh relative overflow-hidden">
+    <section class="relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
@@ -535,7 +541,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- The contract — bento grid (technical primitives) -->
-    <section class="landing-mesh relative overflow-hidden">
+    <section class="relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
@@ -645,89 +651,124 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- CTA: what's next -->
-    <section class="landing-mesh relative overflow-hidden">
+    <!-- What's next — 3-step path. Nuxt-style: each step is a glass
+         card with a coloured left border, a step index, the literal
+         command the visitor runs, and a one-line description. A single
+         primary CTA below the cards closes the loop. -->
+    <section class="relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <div class="max-w-4xl mx-auto text-center">
+        <div class="max-w-4xl mx-auto text-center mb-12 sm:mb-16">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-violet)] mb-4">
             What's next
           </p>
           <h2 class="display-sans text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-6">
-            Walk the path <span class="display-serif">most teams take.</span>
+            Ship your UI in any agentic surface,<br class="hidden sm:block">
+            <span class="display-serif">in fifteen minutes.</span>
           </h2>
-          <p class="text-lg text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto mb-10">
-            Install the packages. Register your first component. Render it from a connected agent. The whole loop takes less than fifteen minutes.
+          <p class="text-lg text-[var(--color-text-muted,#C4C4C8)] max-w-2xl mx-auto">
+            Install once. Render in chat. Render in your IDE assistant. Render in Slack. Render in the browser extension. The contract is the same — one MCP tool, one component, one protocol. Three steps below.
           </p>
-          <div class="flex flex-wrap items-center justify-center gap-3">
-            <UButton
-              size="xl"
-              to="/getting-started/quickstart"
-              trailing-icon="i-lucide-arrow-right"
-              class="font-medium group"
-            >
-              <template #trailing>
-                <span class="btn-icon-nest">
-                  <UIcon name="i-lucide-arrow-right" class="size-3.5" />
-                </span>
-              </template>
-              Quickstart — render your first component
-            </UButton>
-            <UButton
-              color="neutral"
-              size="xl"
-              to="/getting-started/installation"
-              variant="outline"
-            >
-              Install the packages
-            </UButton>
-            <UButton
-              color="neutral"
-              size="xl"
-              to="/concepts/overview"
-              variant="ghost"
-            >
-              Architecture overview →
-            </UButton>
-          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- CTA: open source -->
-    <section class="landing-mesh relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:pb-32">
-        <div class="glass-card max-w-4xl mx-auto p-10 sm:p-14 text-center">
-          <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-emerald)] mb-4">
-            Open source
-          </p>
-          <h2 class="display-sans text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
-            MIT-licensed. No telemetry. <span class="display-serif">No lock-in.</span>
-          </h2>
-          <p class="text-base sm:text-lg text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto mb-8">
-            Every wire format, every tool name, every JSON shape lives in the open. No proprietary DSL, no opaque build step, no hidden server. Read the source, fork the framework, ship to production.
-          </p>
-          <div class="flex flex-wrap items-center justify-center gap-3">
-            <UButton
-              color="neutral"
-              size="lg"
-              icon="i-simple-icons-github"
-              to="https://github.com/genicui/genicui"
-              target="_blank"
-              variant="outline"
+        <ol class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 max-w-6xl mx-auto">
+          <li>
+            <NuxtLink
+              to="/getting-started/installation"
+              class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-violet-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
-              Star on GitHub
-            </UButton>
-            <UButton
-              color="neutral"
-              size="lg"
-              icon="i-lucide-book-open"
+              <div class="flex items-start justify-between mb-5">
+                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">Step 01</span>
+                <UIcon name="i-lucide-package" class="size-4 text-violet-300/80" />
+              </div>
+              <div class="rounded-lg bg-black/40 border border-white/[0.06] px-3 py-2 mb-4 font-mono text-[0.78rem] text-emerald-300/90 overflow-hidden text-ellipsis whitespace-nowrap">
+                bun add @genicui/core @genicui/server
+              </div>
+              <h3 class="display-sans text-lg text-white mb-1.5">Install the packages.</h3>
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                Two packages, one command, zero peer-deps. Works with bun, npm, pnpm, yarn.
+              </p>
+              <div class="mt-4 inline-flex items-center gap-1.5 text-xs text-violet-300 group-hover:text-white transition-colors">
+                <span>Read the install guide</span>
+                <UIcon name="i-lucide-arrow-right" class="size-3 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
+              to="/getting-started/quickstart"
+              class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-blue-400/70 transition-all duration-500 hover:translate-y-[-2px]"
+            >
+              <div class="flex items-start justify-between mb-5">
+                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">Step 02</span>
+                <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300/80" />
+              </div>
+              <div class="rounded-lg bg-black/40 border border-white/[0.06] px-3 py-2 mb-4 font-mono text-[0.78rem] text-emerald-300/90 overflow-hidden text-ellipsis whitespace-nowrap">
+                bunx @genicui/cli init
+              </div>
+              <h3 class="display-sans text-lg text-white mb-1.5">Render your first component.</h3>
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                The CLI scaffolds a registry, an MCP server, and a connected agent in 30 seconds.
+              </p>
+              <div class="mt-4 inline-flex items-center gap-1.5 text-xs text-blue-300 group-hover:text-white transition-colors">
+                <span>Follow the quickstart</span>
+                <UIcon name="i-lucide-arrow-right" class="size-3 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
               to="/concepts/architecture"
-              variant="ghost"
+              class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-emerald-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
-              Read the architecture
-            </UButton>
-          </div>
+              <div class="flex items-start justify-between mb-5">
+                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">Step 03</span>
+                <UIcon name="i-lucide-book-open" class="size-4 text-emerald-300/80" />
+              </div>
+              <div class="rounded-lg bg-black/40 border border-white/[0.06] px-3 py-2 mb-4 font-mono text-[0.78rem] text-emerald-300/90 overflow-hidden text-ellipsis whitespace-nowrap">
+                read /concepts/architecture
+              </div>
+              <h3 class="display-sans text-lg text-white mb-1.5">Read the contract.</h3>
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                The six primitives every team wires up once. Skim the bento above; deep-dive here.
+              </p>
+              <div class="mt-4 inline-flex items-center gap-1.5 text-xs text-emerald-300 group-hover:text-white transition-colors">
+                <span>Architecture overview</span>
+                <UIcon name="i-lucide-arrow-right" class="size-3 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </NuxtLink>
+          </li>
+        </ol>
+
+        <div class="mt-12 sm:mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <UButton
+            size="xl"
+            to="/getting-started/quickstart"
+            trailing-icon="i-lucide-arrow-right"
+            class="font-medium group"
+          >
+            <template #trailing>
+              <span class="btn-icon-nest">
+                <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+              </span>
+            </template>
+            Quickstart — render your first component
+          </UButton>
+          <a
+            href="https://github.com/genicui/genicui"
+            target="_blank"
+            rel="noopener"
+            class="hero-link text-sm"
+          >
+            <UIcon name="i-simple-icons-github" class="size-4" />
+            Star on GitHub
+            <UIcon name="i-lucide-arrow-up-right" class="size-3 hero-link-arrow" />
+          </a>
         </div>
+
+        <!-- Open-source line — kept concise. MIT, no telemetry, no lock-in. -->
+        <p class="mt-10 sm:mt-12 text-center text-xs font-mono text-[var(--color-text-muted)]">
+          <span class="text-emerald-400">MIT</span> · no telemetry · no lock-in · <a href="https://github.com/genicui/genicui" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-white">view the source</a>
+        </p>
       </div>
     </section>
   </div>
