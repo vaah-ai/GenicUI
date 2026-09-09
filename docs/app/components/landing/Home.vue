@@ -333,104 +333,144 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="space-y-14 lg:space-y-20">
-          <!-- Use case 1: E-commerce / shopping assistant -->
-          <div class="usecase-grid">
-            <!-- Left: chat log -->
-            <div class="space-y-4">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-blue)]">
-                  Use case 01
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  E-commerce
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Conversational shopping.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user says "show me my cart and apply the summer coupon." The agent calls <code class="text-blue-300/90 font-mono text-sm">render_component</code> with your <code class="text-blue-300/90 font-mono text-sm">CartViewer</code>. Your PrimeVue DataTable appears inline, prefilled with their items, with a working "Apply coupon" button wired to your checkout.
-              </p>
-              <div class="space-y-3 pt-2">
-                <!-- Chat bubble: user -->
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    Show me my cart and apply the SUMMER25 coupon.
-                  </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
-                  </div>
-                </div>
-                <!-- Chat bubble: agent -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
-                  </div>
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Pulled up your cart. Coupon applied — you saved <span class="text-emerald-300 font-medium">$14.20</span>. Ready to check out?
-                  </div>
-                </div>
-              </div>
+          <!-- Use case 1: E-commerce / shopping assistant.
+               Single chat window that stitches user → agent → rendered component
+               into one sequence so the reader sees the full event chain:
+                 user message → agent text reply → render_component → live cart. -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-blue)]">
+                Use case 01
+              </span>
+              <span class="h-px flex-1 bg-white/10" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+                E-commerce
+              </span>
             </div>
 
-            <!-- Right: the rendered component (live-looking mock) -->
-            <div class="glass-card glass-card-tilt p-6 sm:p-8">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-shopping-cart" class="size-4 text-blue-300" />
-                  <span class="text-sm font-medium text-white">Your cart</span>
-                  <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-[var(--color-text-muted)]">3 items</span>
-                </div>
-                <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">cart: a8f2</span>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+              <div class="lg:col-span-2 space-y-4 lg:sticky lg:top-24">
+                <h3 class="display-sans text-2xl sm:text-3xl text-white">
+                  Conversational shopping.
+                </h3>
+                <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                  The user says "show me my cart and apply the summer coupon." The agent calls <code class="text-blue-300/90 font-mono text-sm">render_component</code> with your <code class="text-blue-300/90 font-mono text-sm">CartViewer</code>. Your PrimeVue DataTable appears inline, prefilled with their items, with a working "Apply coupon" button wired to your checkout.
+                </p>
               </div>
-              <div class="space-y-3 mb-5">
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Linen field jacket</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Sand · M</div>
+
+              <!-- Single chat surface — both bubbles + the rendered component. -->
+              <div class="lg:col-span-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden">
+                <!-- Chat header -->
+                <div class="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-white/[0.015]">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500/40 to-cyan-500/40 border border-white/10 flex items-center justify-center">
+                      <UIcon name="i-lucide-sparkles" class="size-3 text-blue-300" />
+                    </div>
+                    <span class="text-xs font-medium text-white/90">Genic assistant</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider">
+                      live demo
+                    </span>
                   </div>
-                  <div class="text-sm font-mono text-white">$148.00</div>
-                </div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Cotton crew tee</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Off-white · L</div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span class="text-[10px] font-mono text-[var(--color-text-muted)]">connected</span>
                   </div>
-                  <div class="text-sm font-mono text-white">$32.00</div>
                 </div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Canvas weekender</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Olive</div>
+
+                <!-- Chat thread -->
+                <div class="px-4 py-5 sm:px-6 sm:py-6 space-y-5">
+                  <!-- Turn 1: user asks -->
+                  <div class="flex items-start gap-3 justify-end">
+                    <div class="max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
+                      Show me my cart and apply the SUMMER25 coupon.
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80 shrink-0">
+                      you
+                    </div>
                   </div>
-                  <div class="text-sm font-mono text-white">$184.00</div>
+
+                  <!-- Turn 2: agent replies -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center shrink-0">
+                      <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
+                    </div>
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
+                      Pulled up your cart. Coupon applied — you saved <span class="text-emerald-300 font-medium">$14.20</span>. Ready to check out?
+                    </div>
+                  </div>
+
+                  <!-- Turn 3: the rendered CartViewer appears inline.
+                       Connector pill makes the render_component call explicit
+                       without breaking the chat-stream rhythm. -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 shrink-0" aria-hidden="true" />
+                    <div class="flex-1 min-w-0 space-y-2">
+                      <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]">
+                        <UIcon name="i-lucide-zap" class="size-3 text-blue-300" />
+                        render_component · <span class="text-blue-300/90">CartViewer</span>
+                      </div>
+                      <!-- The cart component itself -->
+                      <div class="rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5">
+                        <div class="flex items-center justify-between mb-4">
+                          <div class="flex items-center gap-2">
+                            <UIcon name="i-lucide-shopping-cart" class="size-4 text-blue-300" />
+                            <span class="text-sm font-medium text-white">Your cart</span>
+                            <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-[var(--color-text-muted)]">3 items</span>
+                          </div>
+                          <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">cart: a8f2</span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                          <div class="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] p-2.5">
+                            <div class="w-10 h-10 rounded-md bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-white/10 shrink-0" />
+                            <div class="flex-1 min-w-0">
+                              <div class="text-sm text-white truncate">Linen field jacket</div>
+                              <div class="text-xs text-[var(--color-text-muted)]">Sand · M</div>
+                            </div>
+                            <div class="text-sm font-mono text-white shrink-0">$148.00</div>
+                          </div>
+                          <div class="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] p-2.5">
+                            <div class="w-10 h-10 rounded-md bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-white/10 shrink-0" />
+                            <div class="flex-1 min-w-0">
+                              <div class="text-sm text-white truncate">Cotton crew tee</div>
+                              <div class="text-xs text-[var(--color-text-muted)]">Off-white · L</div>
+                            </div>
+                            <div class="text-sm font-mono text-white shrink-0">$32.00</div>
+                          </div>
+                          <div class="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] p-2.5">
+                            <div class="w-10 h-10 rounded-md bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10 shrink-0" />
+                            <div class="flex-1 min-w-0">
+                              <div class="text-sm text-white truncate">Canvas weekender</div>
+                              <div class="text-xs text-[var(--color-text-muted)]">Olive</div>
+                            </div>
+                            <div class="text-sm font-mono text-white shrink-0">$184.00</div>
+                          </div>
+                        </div>
+                        <div class="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 flex items-center justify-between mb-3">
+                          <div class="flex items-center gap-2 text-xs text-emerald-300">
+                            <UIcon name="i-lucide-tag" class="size-3.5" />
+                            <span>SUMMER25 applied</span>
+                          </div>
+                          <span class="text-xs font-mono text-emerald-300">−$14.20</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs text-[var(--color-text-muted)]">Subtotal</span>
+                          <span class="text-sm font-mono text-white">$349.80</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="w-full rounded-lg bg-white text-black font-medium py-2 text-xs hover:bg-white/90 transition flex items-center justify-center gap-2 group"
+                        >
+                          Checkout
+                          <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </button>
+                      </div>
+                      <p class="text-[10px] font-mono text-[var(--color-text-muted)]">
+                        rendered via <span class="text-blue-300/80">render_component</span> · PrimeVue DataTable + Button
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2 text-sm text-emerald-300">
-                  <UIcon name="i-lucide-tag" class="size-4" />
-                  <span>SUMMER25 applied</span>
-                </div>
-                <span class="text-sm font-mono text-emerald-300">−$14.20</span>
-              </div>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-sm text-[var(--color-text-muted)]">Subtotal</span>
-                <span class="text-base font-mono text-white">$349.80</span>
-              </div>
-              <button
-                type="button"
-                class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
-              >
-                Checkout
-                <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
-              </button>
-              <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · PrimeVue DataTable + Button
-              </p>
             </div>
           </div>
 
