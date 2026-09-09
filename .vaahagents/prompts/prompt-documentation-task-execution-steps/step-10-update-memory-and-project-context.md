@@ -22,7 +22,7 @@ Use the `memory` MCP `add_observations` tool with `entityName: "GenicUI — M5.1
 
 If this task established a **pattern** other docs tasks should follow (e.g., the MDC callout syntax, the frontmatter convention, the `nuxt-seo` route rules), update:
 
-- `examples/docs/README.md` (if it exists) — quick-start notes
+- `docs/README.md` (if it exists) — quick-start notes
 - This prompt's `reference-coding-principles.md` — codify the pattern
 - This prompt's `reference-key-files.md` — add new file paths
 

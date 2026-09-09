@@ -12,7 +12,7 @@ Read `reference-coding-principles.md` first — then plan the page tree.
 
 1. **Title** (matches frontmatter `title:`)
 2. **Description** (≤ 160 chars, for SEO + OG)
-3. **IA placement** — which folder under `examples/docs/content/`
+3. **IA placement** — which folder under `docs/content/`
 4. **Outline** — H2 / H3 headings in order
 5. **MDC components** — pre-decide which MDC blocks each section needs
 6. **Code snippets** — list which command/API/JSON examples will appear

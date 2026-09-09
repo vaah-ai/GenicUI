@@ -2,7 +2,7 @@
 
 Public documentation for [GenicUI](https://github.com/your-org/genicui) — the generative agentic UI framework.
 
-This is a [Docus 5.13.0](https://docus.dev/en) layer installed inside the GenicUI monorepo at `examples/docs/`.
+This is a [Docus 5.13.0](https://docus.dev/en) layer installed inside the GenicUI monorepo at `docs/`.
 
 ## Status
 
@@ -10,7 +10,7 @@ This is a [Docus 5.13.0](https://docus.dev/en) layer installed inside the GenicU
 
 | AC | Description | Status |
 | -- | ----------- | ------ |
-| 1 | `examples/docs/` exists with `nuxt.config.ts`, `app/`, `content/`, `package.json` | ✅ |
+| 1 | `docs/` exists with `nuxt.config.ts`, `app/`, `content/`, `package.json` | ✅ |
 | 2 | `nuxt.config.ts` has `extends: ['docus']` | ✅ |
 | 3 | Root `package.json` workspaces include `examples/*` | ✅ |
 | 4 | `bun install` exits 0 | ⏳ |
@@ -30,7 +30,7 @@ bun --filter docs build        # static .output/public/
 ## Structure
 
 ```
-examples/docs/
+docs/
 ├── app/
 │   └── app.config.ts          # brand placeholder (M5.1-T1) → full theme (M5.1-T4)
 ├── content/                   # markdown pages authored in M5.1-T4 onward

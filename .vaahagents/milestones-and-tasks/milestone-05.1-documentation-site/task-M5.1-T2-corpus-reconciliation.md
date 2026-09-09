@@ -91,7 +91,7 @@ This unblocks T3 (Information Architecture) and T8 (API Reference) by giving the
 ## Dependencies
 
 - **Requires:** None (the requirements tree is independent of the doc site scaffold)
-- **Soft dependency:** T1 should have created `examples/docs/` first so the workspace doesn't conflict on the top-level `docs/` directory (this task removes `.vaahagents/requirements/` but creates `.vaahagents/requirements/` — no collision with `examples/docs/`)
+- **Soft dependency:** T1 scaffolds under `examples/docs/` while this task migrates the live requirements tree out of top-level `docs/` into `.vaahagents/requirements/`. Once T2 lands, T1's workspace can be relocated to top-level `docs/` (done as a follow-up move, not part of T1).
 - **Blocks:** T3 (IA reads from the canonical tree), T8 (API Reference cites per-package features from `.vaahagents/requirements/specs/features/`)
 
 ## Documentation References

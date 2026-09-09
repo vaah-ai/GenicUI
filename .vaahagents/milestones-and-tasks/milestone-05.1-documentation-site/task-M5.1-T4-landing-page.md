@@ -34,22 +34,22 @@ Author the public landing page (`content/index.md`) and configure the global lay
 
 ### Steps
 
-1. Author `examples/docs/content/index.md` (the landing page):
+1. Author `docs/content/index.md` (the landing page):
    - `::u-page-hero` with title, subtitle, install snippet (highlighted with `code-block`), two CTA buttons
    - `::u-page-grid` with 4 `::u-page-card` entries (icons + title + description)
    - `::code-group` with three `:::code-block` entries (Vue / vanilla / framework-agnostic)
    - "What's next?" section linking to `/getting-started/quickstart`
-2. Configure `examples/docs/app/app.config.ts`:
+2. Configure `docs/app/app.config.ts`:
    - `site.name = 'GenicUI'`
    - `site.url = 'https://genicui.dev'` (placeholder; T12 sets the real domain)
    - `ui.primary = '#3B82F6'` (placeholder palette; commit values in T4)
    - `ui.icons = ['lucide']`
-3. Configure `examples/docs/app/components/AppHeader.vue` (or use Docus's `UHeader`):
+3. Configure `docs/app/components/AppHeader.vue` (or use Docus's `UHeader`):
    - Logo + site name
    - Top nav: Getting Started · Concepts · Guides · API · Cookbook · Deployment
    - GitHub icon button
    - Dark-mode toggle
-4. Configure `examples/docs/app/components/AppFooter.vue`:
+4. Configure `docs/app/components/AppFooter.vue`:
    - Three columns: docs sitemap · community (Discord, GitHub) · legal (license, code-of-conduct)
    - "Built with [Docus](https://docus.dev)" credit
 5. Add skip-link component (`a.skip-link[href="#main"]`) to `app.vue`

@@ -16,7 +16,7 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 
 - **`{{TASK_ID}}`** _(dynamic)_ — Task ID from M5.1 (M5.1-T1 … M5.1-T12).
 - **`{{FEATURE_BRANCH}}`** _(dynamic)_ — Git branch. Pattern: `feature/M5.1-T{n}-short-description` from `develop`.
-- **`{{DOCS_SITE_DIR}}`** _(static)_ — `examples/docs/` — Docus 5.13.0 layer (sibling to `examples/playground/`).
+- **`{{DOCS_SITE_DIR}}`** _(static)_ — `docs/` — Docus 5.13.0 layer (sibling to `examples/playground/`).
 - **`{{CORPUS_DIR}}`** _(static)_ — `.vaahagents/requirements/` — reconciled source corpus (F68+).
 - **`{{SPECS_DIR}}`** _(static)_ — `.vaahagents/requirements/specs/` — locked feature specs.
 - **`{{PACKAGES_DIR}}`** _(static)_ — `packages/` — source-of-truth for API reference (core, server, client, vite-plugin, agent-bridge).
@@ -74,7 +74,7 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 
 ### GenicUI Patterns
 
-- **Workspace layout:** `examples/docs/` is the docs site. Top-level `docs/` is the legacy requirements tree — never write docs there.
+- **Workspace layout:** `docs/` is the docs site. Top-level `docs/` is the legacy requirements tree — never write docs there.
 - **No PoC:** Per `CLAUDE.md`, `poc/` is proof-of-concept only. Doc-site code is fresh against Docus 5.13.0 + Nuxt UI v4 (MIT).
 - **Naming:** kebab-case for files and routes (`getting-started/introduction.md`).
 - **Content collections:** Docus bundles Nuxt Content v3 — use `queryCollection()` (never legacy `queryContent()`).
@@ -86,7 +86,7 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 - **Git commit convention:** `docs(M5.1-T{n}): Brief description` with bullet body and `Refs: .vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-M5.1-T{n}-*.md`.
 - **Git branch convention:** `feature/M5.1-T{n}-short-description` from `develop` (Gitflow).
 - **Trust boundary:** N/A — static content, no MCP/WS input, no registry input. No `additionalProperties: false` surface needed.
-- **No new `packages/*` deps.** Doc-site work lives entirely under `examples/docs/`.
+- **No new `packages/*` deps.** Doc-site work lives entirely under `docs/`.
 
 ### Blast Radius
 
