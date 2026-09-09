@@ -45,7 +45,11 @@ onBeforeUnmount(() => {
     <!-- Hero -->
     <section class="landing-hero-glow relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20">
-        <div class="flex flex-col items-center text-center">
+        <!-- Two-column hero at lg+: text on the left, surface composite on the right.
+             Below lg: single column, stacked vertically (text first, composite below). -->
+        <div class="flex flex-col items-center text-center lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 lg:text-left">
+          <!-- Left column at lg+: headline, sub-paragraph, install pill, hero-links, trust row. -->
+          <div class="flex flex-col items-center text-center w-full lg:col-span-5 lg:items-start lg:text-left">
           <div
             class="stagger relative inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-400/30 bg-violet-500/10 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-violet-200"
             style="--i:0"
@@ -136,7 +140,11 @@ onBeforeUnmount(() => {
               Framework-agnostic
             </span>
           </div>
+          </div>
 
+          <!-- Right column at lg+: the 4-surface composite. Below lg: stacks
+               below the text column. -->
+          <div class="w-full lg:col-span-7">
           <!-- 4-surface composite — hero proof-of-claim visual.
                Four real product surface chromes (chat / IDE / browser
                extension / in-app sidebar) fanned at different angles.
@@ -305,6 +313,7 @@ onBeforeUnmount(() => {
             <p class="mt-6 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--color-text-muted,#71717A)]">
               chat · IDE · browser · in-app — same protocol
             </p>
+          </div>
           </div>
         </div>
       </div>

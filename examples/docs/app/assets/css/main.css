@@ -125,18 +125,9 @@
   100% { transform: rotate(0deg); }
 }
 
-/* Drift the SVG noise overlay so it doesn't look like a static sticker.
- * Uses `steps()` so the grain stays discrete (avoids the "slowly
- * swirling fog" artifact of linear interpolation on a tiled noise pattern).
- */
-@keyframes noise-drift {
-  0%   { transform: translate(0, 0); }
-  20%  { transform: translate(-2%, 1%); }
-  40%  { transform: translate(1%, -2%); }
-  60%  { transform: translate(-1%, -1%); }
-  80%  { transform: translate(2%, 2%); }
-  100% { transform: translate(0, 0); }
-}
+/* noise-drift keyframe removed: the texture overlay is now static. The
+ * previous animated translate produced a visible shimmer at the footer's
+ * top edge that read as cheap, low-quality motion. */
 
 /* Override Tailwind defaults — push the landing away from the standard
  * light-mode SaaS look. We force dark mode on the landing regardless of
@@ -420,11 +411,16 @@ html, body {
   overflow: hidden;
 }
 
-/* Noise texture overlay — physical paper/film grain. Scoped to the
- * landing-root (not `position: fixed` page-wide) so it never paints
- * on top of the Docus header or sidebar. `pointer-events: none`
- * keeps it click-through; `mix-blend-mode: overlay` blends over
- * dark surfaces and disappears on light.
+/* Noise texture overlay — static film grain. Scoped to the landing-root
+ * (not `position: fixed` page-wide) so it never paints on top of the
+ * Docus header or sidebar. `pointer-events: none` keeps it click-through;
+ * `mix-blend-mode: overlay` blends over dark surfaces and disappears on
+ * light.
+ *
+ * Animation was removed: the `noise-drift` translate read as a visible
+ * shimmer at the footer's top edge because the texture extends to the
+ * full landing-root height. Static grain keeps the Ethereal Glass
+ * texture without the cheap-looking motion.
  */
 .landing-root::after {
   content: '';
@@ -435,7 +431,6 @@ html, body {
   opacity: 0.08;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
-  animation: noise-drift 8s steps(8) infinite;
 }
 
 /* Code window — terminal chrome */
@@ -724,4 +719,31 @@ body:has(.landing-root) #header {
   -webkit-backdrop-filter: blur(20px);
   border-bottom-color: rgba(255, 255, 255, 0.06) !important;
   color: #FAFAFA;
+}
+
+/* Docus UFooter on the landing — paint it dark to match the dark canvas.
+ *
+ * Without this, UFooter inherits the global light color mode (Docus
+ * defaults to light), which produces a bright cyan/teal band at the
+ * bottom of the landing page that breaks the dark visual identity.
+ * We override the slots UFooter renders with [data-slot=...] attrs.
+ */
+body:has(.landing-root) footer[data-slot="root"] {
+  background-color: rgba(8, 9, 10, 0.65) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #FAFAFA;
+}
+body:has(.landing-root) footer[data-slot="root"] [data-slot="left"],
+body:has(.landing-root) footer[data-slot="root"] [data-slot="center"],
+body:has(.landing-root) footer[data-slot="root"] [data-slot="right"] {
+  color: rgba(255, 255, 255, 0.55);
+}
+body:has(.landing-root) footer[data-slot="root"] button {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+body:has(.landing-root) footer[data-slot="root"] button:hover {
+  color: #FAFAFA !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
