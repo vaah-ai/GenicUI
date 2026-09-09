@@ -474,137 +474,180 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Use case 2: Customer support triage — IDE assistant chrome -->
-          <div class="usecase-grid">
-            <!-- Right first on mobile, left on desktop (alternate) -->
-            <div class="glass-card p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-violet-400/60">
-              <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                <UIcon name="i-simple-icons-visualstudiocode" class="size-3.5 text-violet-300" />
-                <span class="font-mono text-[10px] text-white/60">VS Code · support-assistant.tsx</span>
-                <UIcon name="i-lucide-ellipsis" class="size-3 text-white/40 ml-auto" />
-              </div>
-              <div class="p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-5">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider">
-                      urgent
-                    </span>
-                    <span class="text-sm font-medium text-white">Ticket #C-2847</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">3m ago</span>
-                </div>
-                <h4 class="text-lg text-white mb-2">Payment failed for order #1092</h4>
-                <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] mb-5 leading-relaxed">
-                  Customer reports Visa ending 4291 declined twice. Tried again, same error. Three prior tickets this month.
-                </p>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-                    Customer history
-                  </div>
-                  <div class="space-y-1.5 text-sm">
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Lifetime value</span>
-                      <span class="font-mono text-white">$2,840</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Prior tickets (30d)</span>
-                      <span class="font-mono text-white">3</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Plan</span>
-                      <span class="font-mono text-white">Pro · annual</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                  >
-                    <UIcon name="i-lucide-check" class="size-4 text-emerald-400" />
-                    Resolve
-                  </button>
-                  <button
-                    type="button"
-                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                  >
-                    <UIcon name="i-lucide-arrow-up-right" class="size-4 text-amber-400" />
-                    Escalate
-                  </button>
-                </div>
-                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                  rendered via <span class="text-blue-300/80">render_component</span> · TicketCard in IDE assistant
-                </p>
-              </div>
+          <!-- Use case 2: Customer support triage — IDE assistant chrome.
+               Stitched chat in a VS Code–styled window: user → IDE assistant
+               text reply → render_component TicketCard with Resolve / Escalate. -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-violet)]">
+                Use case 02
+              </span>
+              <span class="h-px flex-1 bg-white/10" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+                Support triage · IDE
+              </span>
             </div>
 
-            <div class="space-y-4 order-1 lg:order-2">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-violet)]">
-                  Use case 02
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Support triage · IDE
-                </span>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+              <div class="lg:col-span-2 space-y-4 lg:sticky lg:top-24">
+                <h3 class="display-sans text-2xl sm:text-3xl text-white">
+                  Triage tickets <span class="display-serif">in</span> your IDE.
+                </h3>
+                <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                  The agent pulls a customer's history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons — inline in your IDE assistant pane. No second tab, no tab-switch.
+                </p>
               </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Triage tickets <span class="display-serif">in</span> your IDE.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The agent pulls a customer's history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons — inline in your IDE assistant pane. No second tab, no tab-switch.
-              </p>
-              <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    Handle the most urgent payment ticket.
+
+              <div class="lg:col-span-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4 border-t-violet-400/60">
+                <!-- Chat header (VS Code style) -->
+                <div class="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-black/30">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <UIcon name="i-simple-icons-visualstudiocode" class="size-3.5 text-violet-300 shrink-0" />
+                    <span class="text-xs font-medium text-white/90 truncate">VS Code · support-assistant</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider hidden sm:inline-block">
+                      live demo
+                    </span>
                   </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span class="text-[10px] font-mono text-[var(--color-text-muted)]">connected</span>
                   </div>
                 </div>
-                <div class="flex items-start gap-3">
-                  <UIcon name="i-simple-icons-visualstudiocode" class="size-7 rounded-lg bg-violet-500/15 border border-violet-400/30 p-1.5 text-violet-300 shrink-0" />
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-violet-500/10 border border-violet-400/20 px-4 py-2.5 text-sm text-white/90">
-                    IDE assistant: triage summary in. Customer is high-LTV, third payment issue this month. I'd recommend escalating — want me to route it to billing?
+
+                <!-- Chat thread -->
+                <div class="px-4 py-5 sm:px-6 sm:py-6 space-y-5">
+                  <!-- Turn 1: user -->
+                  <div class="flex items-start gap-3 justify-end">
+                    <div class="max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
+                      Handle the most urgent payment ticket.
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80 shrink-0">
+                      you
+                    </div>
+                  </div>
+
+                  <!-- Turn 2: IDE assistant reply -->
+                  <div class="flex items-start gap-3">
+                    <UIcon name="i-simple-icons-visualstudiocode" class="size-8 rounded-lg bg-violet-500/15 border border-violet-400/30 p-1.5 text-violet-300 shrink-0" />
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-md bg-violet-500/10 border border-violet-400/20 px-4 py-2.5 text-sm text-white/90">
+                      Triage summary in. Customer is high-LTV, third payment issue this month. I'd recommend escalating — want me to route it to billing?
+                    </div>
+                  </div>
+
+                  <!-- Turn 3: render_component TicketCard -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 shrink-0" aria-hidden="true" />
+                    <div class="flex-1 min-w-0 space-y-2">
+                      <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]">
+                        <UIcon name="i-lucide-zap" class="size-3 text-violet-300" />
+                        render_component · <span class="text-violet-300/90">TicketCard</span>
+                      </div>
+                      <div class="rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5">
+                        <div class="flex items-center justify-between mb-3">
+                          <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider">
+                              urgent
+                            </span>
+                            <span class="text-sm font-medium text-white">Ticket #C-2847</span>
+                          </div>
+                          <span class="text-[10px] font-mono text-[var(--color-text-muted)]">3m ago</span>
+                        </div>
+                        <h4 class="text-base text-white mb-1.5">Payment failed for order #1092</h4>
+                        <p class="text-xs text-[var(--color-text-muted,#A1A1AA)] mb-4 leading-relaxed">
+                          Customer reports Visa ending 4291 declined twice. Three prior tickets this month.
+                        </p>
+                        <div class="rounded-lg bg-white/[0.03] border border-white/[0.06] p-3 mb-4">
+                          <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+                            Customer history
+                          </div>
+                          <div class="space-y-1 text-xs">
+                            <div class="flex items-center justify-between">
+                              <span class="text-white/80">Lifetime value</span>
+                              <span class="font-mono text-white">$2,840</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                              <span class="text-white/80">Prior tickets (30d)</span>
+                              <span class="font-mono text-white">3</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                              <span class="text-white/80">Plan</span>
+                              <span class="font-mono text-white">Pro · annual</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            class="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
+                          >
+                            <UIcon name="i-lucide-check" class="size-3.5 text-emerald-400" />
+                            Resolve
+                          </button>
+                          <button
+                            type="button"
+                            class="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
+                          >
+                            <UIcon name="i-lucide-arrow-up-right" class="size-3.5 text-amber-400" />
+                            Escalate
+                          </button>
+                        </div>
+                      </div>
+                      <p class="text-[10px] font-mono text-[var(--color-text-muted)]">
+                        rendered via <span class="text-blue-300/80">render_component</span> · TicketCard in IDE assistant
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Use case 3: Data analytics — Slack/Discord channel chrome. Same
-               KpiDashboard on the right, but the chat-bubble pair is
-               replaced by a channel-rail + thread that visually places
-               the conversation inside a Slack-style window. -->
-          <div class="usecase-grid">
-            <div class="space-y-4">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-emerald)]">
-                  Use case 03
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Analytics · Slack
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Numbers, in the same thread as the team.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user asks <em>"how is revenue trending this week?"</em> in the <code class="font-mono text-sm text-emerald-300/90">#analytics</code> channel. The agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> inline as a thread reply — chart, top accounts, drill-down controls — fully visible to everyone who follows the conversation.
-              </p>
+          <!-- Use case 3: Data analytics — Slack channel chrome.
+               Stitched chat in a Slack window: PM asks → Genic Bot replies →
+               render_component KpiDashboard thread reply (chart, KPIs, top
+               accounts). The Slack naming + timestamps stay so the user
+               recognizes the environment. -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-emerald)]">
+                Use case 03
+              </span>
+              <span class="h-px flex-1 bg-white/10" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+                Analytics · Slack
+              </span>
+            </div>
 
-              <!-- Slack-style chrome wrapper around the chat bubbles -->
-              <div class="glass-card p-0 overflow-hidden border-t-4 border-t-emerald-400/60">
-                <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                  <UIcon name="i-simple-icons-slack" class="size-3.5 text-emerald-300" />
-                  <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · #analytics</span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+              <div class="lg:col-span-2 space-y-4 lg:sticky lg:top-24">
+                <h3 class="display-sans text-2xl sm:text-3xl text-white">
+                  Numbers, in the same thread as the team.
+                </h3>
+                <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                  The user asks <em>"how is revenue trending this week?"</em> in the <code class="font-mono text-sm text-emerald-300/90">#analytics</code> channel. The agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> inline as a thread reply — chart, top accounts, drill-down controls — fully visible to everyone who follows the conversation.
+                </p>
+              </div>
+
+              <div class="lg:col-span-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4 border-t-emerald-400/60">
+                <!-- Slack chrome header -->
+                <div class="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-black/30">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <UIcon name="i-simple-icons-slack" class="size-3.5 text-emerald-300 shrink-0" />
+                    <span class="font-mono text-[11px] text-white/70 truncate">genicui · <span class="text-white/90">#analytics</span></span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider hidden sm:inline-block">
+                      live demo
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span class="text-[10px] font-mono text-[var(--color-text-muted)]">online</span>
+                  </div>
                 </div>
-                <div class="p-3 space-y-3">
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/85 shrink-0">
+
+                <div class="px-4 py-5 sm:px-6 sm:py-6 space-y-5">
+                  <!-- Turn 1: PM asks in channel -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/85 shrink-0">
                       PM
                     </div>
                     <div class="min-w-0">
@@ -612,12 +655,16 @@ onBeforeUnmount(() => {
                         <span class="text-xs font-medium text-white">Priya M.</span>
                         <span class="text-[10px] text-white/40 font-mono">14:02</span>
                       </div>
-                      <div class="text-sm text-white/85">How is revenue trending this week vs last?</div>
+                      <div class="rounded-lg bg-white/5 border border-white/10 px-3.5 py-2 text-sm text-white/90 inline-block">
+                        How is revenue trending this week vs last?
+                      </div>
                     </div>
                   </div>
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center shrink-0">
-                      <UIcon name="i-lucide-sparkles" class="size-3.5 text-violet-300" />
+
+                  <!-- Turn 2: Genic Bot replies with summary + inline sparkline -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-md bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center shrink-0">
+                      <UIcon name="i-lucide-sparkles" class="size-4 text-violet-300" />
                     </div>
                     <div class="min-w-0">
                       <div class="flex items-center gap-2 mb-0.5">
@@ -625,200 +672,203 @@ onBeforeUnmount(() => {
                         <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">APP</span>
                         <span class="text-[10px] text-white/40 font-mono">14:02</span>
                       </div>
-                      <div class="text-sm text-white/90 mb-2">
+                      <div class="rounded-lg bg-violet-500/10 border border-violet-400/20 px-3.5 py-2.5 text-sm text-white/90 inline-block">
                         Up <span class="text-emerald-300 font-medium">+12.4%</span> week-over-week. Strongest day was Wednesday — 3 new enterprise accounts. Posting the dashboard:
                       </div>
-                      <div class="rounded-lg border border-white/[0.08] bg-black/40 p-2.5">
-                        <div class="flex items-center justify-between mb-2">
-                          <UIcon name="i-lucide-chart-line" class="size-3.5 text-emerald-300" />
-                          <span class="text-[10px] font-mono text-emerald-300">+12.4% wow</span>
+                    </div>
+                  </div>
+
+                  <!-- Turn 3: render_component KpiDashboard thread reply -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 shrink-0" aria-hidden="true" />
+                    <div class="flex-1 min-w-0 space-y-2">
+                      <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]">
+                        <UIcon name="i-lucide-zap" class="size-3 text-emerald-300" />
+                        render_component · <span class="text-emerald-300/90">KpiDashboard</span>
+                      </div>
+                      <div class="rounded-xl border border-white/[0.08] bg-black/30 p-4 sm:p-5">
+                        <div class="flex items-center justify-between mb-4">
+                          <div class="flex items-center gap-2">
+                            <UIcon name="i-lucide-chart-line" class="size-4 text-emerald-300" />
+                            <span class="text-sm font-medium text-white">Weekly revenue</span>
+                          </div>
+                          <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-300">+12.4%</span>
                         </div>
-                        <svg viewBox="0 0 100 28" class="w-full h-7" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="slackSpark" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#10B981" stop-opacity="0.45" />
-                              <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
-                            </linearGradient>
-                          </defs>
-                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5 L100,28 L0,28 Z" fill="url(#slackSpark)" />
-                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
-                        </svg>
-                        <div class="grid grid-cols-3 gap-1.5 mt-2">
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">rev</div>
-                            <div class="text-xs font-mono text-white">$48.2k</div>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                          <div class="rounded-lg bg-white/[0.04] px-2.5 py-2">
+                            <div class="text-[9px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">This week</div>
+                            <div class="text-sm font-mono text-white">$48.2k</div>
                           </div>
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">orders</div>
-                            <div class="text-xs font-mono text-white">312</div>
+                          <div class="rounded-lg bg-white/[0.04] px-2.5 py-2">
+                            <div class="text-[9px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">Orders</div>
+                            <div class="text-sm font-mono text-white">312</div>
                           </div>
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">aov</div>
-                            <div class="text-xs font-mono text-white">$154.40</div>
+                          <div class="rounded-lg bg-white/[0.04] px-2.5 py-2">
+                            <div class="text-[9px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">AOV</div>
+                            <div class="text-sm font-mono text-white">$154.40</div>
                           </div>
+                        </div>
+                        <div class="rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 mb-4">
+                          <svg viewBox="0 0 320 80" class="w-full h-16" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="spark-uc3" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                              </linearGradient>
+                            </defs>
+                            <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12 L320,80 L0,80 Z" fill="url(#spark-uc3)" />
+                            <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                          <div class="flex items-center justify-between mt-1.5 text-[9px] font-mono text-[var(--color-text-muted)]">
+                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                          </div>
+                        </div>
+                        <div class="space-y-1.5">
+                          <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)]">
+                            Top accounts (this week)
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-white/80 truncate">Northwind Co.</span>
+                            <span class="font-mono text-white">$8,420</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-white/80 truncate">Acme Industrial</span>
+                            <span class="font-mono text-white">$5,180</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-white/80 truncate">Pioneer Labs</span>
+                            <span class="font-mono text-white">$3,940</span>
+                          </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center gap-3 text-[10px] font-mono text-white/50">
+                          <span class="hover:text-white cursor-pointer">↳ Reply in thread</span>
+                          <span class="hover:text-white cursor-pointer">Drill in</span>
+                          <span class="hover:text-white cursor-pointer">Export CSV</span>
                         </div>
                       </div>
-                      <div class="mt-2 flex items-center gap-3 text-[10px] font-mono text-white/40">
-                        <span class="hover:text-white cursor-pointer">↳ Reply in thread</span>
-                        <span class="hover:text-white cursor-pointer">Drill in</span>
-                        <span class="hover:text-white cursor-pointer">Export CSV</span>
-                      </div>
+                      <p class="text-[10px] font-mono text-[var(--color-text-muted)]">
+                        rendered via <span class="text-blue-300/80">render_component</span> · KpiDashboard with drill-down actions
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="glass-card glass-card-tilt p-6 sm:p-8">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-chart-line" class="size-4 text-emerald-300" />
-                  <span class="text-sm font-medium text-white">Weekly revenue</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-[10px] font-mono">
-                  <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">+12.4%</span>
-                </div>
-              </div>
-              <div class="grid grid-cols-3 gap-3 mb-5">
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">This week</div>
-                  <div class="text-lg font-mono text-white">$48.2k</div>
-                </div>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Orders</div>
-                  <div class="text-lg font-mono text-white">312</div>
-                </div>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">AOV</div>
-                  <div class="text-lg font-mono text-white">$154.40</div>
-                </div>
-              </div>
-              <!-- Inline SVG sparkline -->
-              <div class="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4 mb-5">
-                <svg viewBox="0 0 320 80" class="w-full h-20" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
-                      <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12 L320,80 L0,80 Z" fill="url(#spark)" />
-                  <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <div class="flex items-center justify-between mt-2 text-[10px] font-mono text-[var(--color-text-muted)]">
-                  <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)]">
-                  Top accounts (this week)
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Northwind Co.</span>
-                  <span class="font-mono text-white">$8,420</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Acme Industrial</span>
-                  <span class="font-mono text-white">$5,180</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Pioneer Labs</span>
-                  <span class="font-mono text-white">$3,940</span>
-                </div>
-              </div>
-              <p class="mt-4 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · KpiDashboard with drill-down actions
-              </p>
             </div>
           </div>
 
           <!-- Use case 4: Form assistance — browser-extension popup chrome.
-               Same ClaimForm on the right, but the chat-bubble pair is
-               wrapped in a Chrome-style popup frame (toolbar, search
-               bar, compact sidebar layout). -->
-          <div class="usecase-grid">
-            <div class="glass-card glass-card-tilt p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-amber-400/60">
-              <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                <UIcon name="i-lucide-chrome" class="size-3.5 text-amber-300" />
-                <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · claim-form</span>
-                <UIcon name="i-lucide-settings" class="size-3 text-white/40" />
-              </div>
-              <div class="p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-5">
-                  <div class="flex items-center gap-2">
-                    <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />
-                    <span class="text-sm font-medium text-white">Insurance claim</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">step 2 / 4</span>
-                </div>
-                <div class="space-y-4 mb-5">
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Incident type</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                      <span>Auto collision</span>
-                      <UIcon name="i-lucide-chevron-down" class="size-4 text-[var(--color-text-muted)]" />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Date of incident</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                      <span>Sept 4, 2026</span>
-                      <UIcon name="i-lucide-calendar" class="size-4 text-[var(--color-text-muted)]" />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Description</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white/80 min-h-[88px]">
-                      Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-amber-300" />
-                    <span class="text-xs text-amber-200/90">Agent prefilled this from your chat. <span class="underline">Review & continue</span></span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
-                >
-                  Continue to step 3
-                  <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
-                </button>
-                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                  rendered via <span class="text-blue-300/80">render_component</span> · ClaimForm via browser extension
-                </p>
-              </div>
+               Stitched chat in a Chrome-styled window: user describes → agent
+               replies → render_component ClaimForm pre-populated inline. -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-amber)]">
+                Use case 04
+              </span>
+              <span class="h-px flex-1 bg-white/10" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+                Form · browser extension
+              </span>
             </div>
 
-            <div class="space-y-4 order-1 lg:order-2">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-amber)]">
-                  Use case 04
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Form · browser extension
-                </span>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+              <div class="lg:col-span-2 space-y-4 lg:sticky lg:top-24">
+                <h3 class="display-sans text-2xl sm:text-3xl text-white">
+                  Fill the form <span class="display-serif">for</span> the user.
+                </h3>
+                <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
+                  The user describes what happened in plain language. The agent maps it to your schema, renders the real form pre-populated, and hands control back. The user reviews, edits, and submits — and the structured values flow back to the agent on submit.
+                </p>
               </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Fill the form <span class="display-serif">for</span> the user.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user describes what happened in plain language. The agent maps it to your schema, renders the real form pre-populated, and hands control back. The user reviews, edits, and submits — and the structured values flow back to the agent on submit.
-              </p>
-              <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    I was rear-ended on Market St last Thursday. Help me file the claim.
+
+              <div class="lg:col-span-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4 border-t-amber-400/60">
+                <!-- Chrome-style popup header -->
+                <div class="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-black/30">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <UIcon name="i-lucide-chrome" class="size-3.5 text-amber-300 shrink-0" />
+                    <span class="font-mono text-[11px] text-white/70 truncate">genicui · <span class="text-white/90">claim-form</span></span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider hidden sm:inline-block">
+                      live demo
+                    </span>
                   </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span class="text-[10px] font-mono text-[var(--color-text-muted)]">connected</span>
                   </div>
                 </div>
-                <div class="flex items-start gap-3">
-                  <UIcon name="i-lucide-chrome" class="size-7 rounded-lg bg-amber-500/15 border border-amber-400/30 p-1.5 text-amber-300 shrink-0" />
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-amber-500/10 border border-amber-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Extension: claim form prefilled. Three fields left to confirm before you submit — say <em>"continue"</em> or tap the button on the popup.
+
+                <div class="px-4 py-5 sm:px-6 sm:py-6 space-y-5">
+                  <!-- Turn 1: user describes incident -->
+                  <div class="flex items-start gap-3 justify-end">
+                    <div class="max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
+                      I was rear-ended on Market St last Thursday. Help me file the claim.
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80 shrink-0">
+                      you
+                    </div>
+                  </div>
+
+                  <!-- Turn 2: extension agent replies -->
+                  <div class="flex items-start gap-3">
+                    <UIcon name="i-lucide-chrome" class="size-8 rounded-lg bg-amber-500/15 border border-amber-400/30 p-1.5 text-amber-300 shrink-0" />
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-md bg-amber-500/10 border border-amber-400/20 px-4 py-2.5 text-sm text-white/90">
+                      Got it. I've prefilled the form from your description — three fields left to confirm before you submit. Say <em>"continue"</em> or tap the button on the popup.
+                    </div>
+                  </div>
+
+                  <!-- Turn 3: render_component ClaimForm inline -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 shrink-0" aria-hidden="true" />
+                    <div class="flex-1 min-w-0 space-y-2">
+                      <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]">
+                        <UIcon name="i-lucide-zap" class="size-3 text-amber-300" />
+                        render_component · <span class="text-amber-300/90">ClaimForm</span>
+                      </div>
+                      <div class="rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5">
+                        <div class="flex items-center justify-between mb-4">
+                          <div class="flex items-center gap-2">
+                            <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />
+                            <span class="text-sm font-medium text-white">Insurance claim</span>
+                          </div>
+                          <span class="text-[10px] font-mono text-[var(--color-text-muted)]">step 2 / 4</span>
+                        </div>
+                        <div class="space-y-3 mb-4">
+                          <div>
+                            <label class="block text-[10px] font-mono text-[var(--color-text-muted)] mb-1.5 uppercase tracking-wider">Incident type</label>
+                            <div class="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white flex items-center justify-between">
+                              <span>Auto collision</span>
+                              <UIcon name="i-lucide-chevron-down" class="size-3.5 text-[var(--color-text-muted)]" />
+                            </div>
+                          </div>
+                          <div>
+                            <label class="block text-[10px] font-mono text-[var(--color-text-muted)] mb-1.5 uppercase tracking-wider">Date of incident</label>
+                            <div class="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white flex items-center justify-between">
+                              <span>Sept 4, 2026</span>
+                              <UIcon name="i-lucide-calendar" class="size-3.5 text-[var(--color-text-muted)]" />
+                            </div>
+                          </div>
+                          <div>
+                            <label class="block text-[10px] font-mono text-[var(--color-text-muted)] mb-1.5 uppercase tracking-wider">Description</label>
+                            <div class="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white/80 min-h-[64px]">
+                              Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2">
+                            <UIcon name="i-lucide-sparkles" class="size-3.5 text-amber-300" />
+                            <span class="text-xs text-amber-200/90">Agent prefilled this from your chat. <span class="underline">Review & continue</span></span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="w-full rounded-lg bg-white text-black font-medium py-2 text-xs hover:bg-white/90 transition flex items-center justify-center gap-2 group"
+                        >
+                          Continue to step 3
+                          <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </button>
+                      </div>
+                      <p class="text-[10px] font-mono text-[var(--color-text-muted)]">
+                        rendered via <span class="text-blue-300/80">render_component</span> · ClaimForm via browser extension
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
