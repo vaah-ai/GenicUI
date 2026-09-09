@@ -165,7 +165,7 @@ Every concept in `.vaahagents/requirements/specs/` has a home:
 
 | AC | Status | Evidence |
 |---|---|---|
-| AC1 — 9 sections + `index.md` | ✅ | `find examples/docs/content -maxdepth 1 -type d` returns 9 dirs + `index.md` |
+| AC1 — 9 sections + `index.md` | ✅ | `find docs/content -maxdepth 1 -type d` returns 9 dirs + `index.md` |
 | AC2 — Every section has `.navigation.yml` | ✅ | All 9 sections have one |
 | AC3 — Frontmatter complete (title/desc/nav.icon) | ✅ | 0 failures across 38 pages |
 | AC4 — Every page body has `::note` | ✅ | All T3-authored pages have one |

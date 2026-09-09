@@ -28,7 +28,7 @@ Author the API Reference section — the most-used section of any doc site. Six 
 - Read every `packages/*/src/index.ts` to enumerate public exports exactly (the canonical source of truth — never infer from the README)
 - Read `packages/server/src/mcp/` to find the 4 tool handler files; extract the TypeBox input/output schemas from each
 - Read `registries/primevue/src/` to find the PrimeVue DataTable schema and event definitions
-- Decide on TypeDoc configuration: `typedoc.json` at the workspace root, output to `examples/docs/scripts/typedoc-output/`, post-process to MDC
+- Decide on TypeDoc configuration: `typedoc.json` at the workspace root, output to `docs/scripts/typedoc-output/`, post-process to MDC
 - The `@genicui/server` API surface is *not* TypeScript exports — it's the **MCP tool JSON-RPC schema**. Documenting this means importing the TypeBox schemas into markdown via MDC's `:import` directive or hand-curating them; either way, the truth source is `packages/server/src/mcp/`
 
 ### Steps
@@ -36,8 +36,8 @@ Author the API Reference section — the most-used section of any doc site. Six 
 1. Configure TypeDoc at workspace root (`typedoc.json`):
    - `entryPoints`: `packages/core/src/index.ts`, `packages/client/src/index.ts`, `packages/vite-plugin/src/index.ts`, `packages/agent-bridge/src/index.ts`
    - Note: `@genicui/server` is NOT included — it's documented via MCP tool schemas (see step 4)
-   - Output: `examples/docs/scripts/typedoc-output/`
-2. Add a post-process script (`examples/docs/scripts/typedoc-to-mdc.ts`) that converts TypeDoc HTML/Markdown into Docus-friendly MDC with the `code-block` syntax + `:icon` annotations
+   - Output: `docs/scripts/typedoc-output/`
+2. Add a post-process script (`docs/scripts/typedoc-to-mdc.ts`) that converts TypeDoc HTML/Markdown into Docus-friendly MDC with the `code-block` syntax + `:icon` annotations
 3. Generate TypeDoc output: `bunx typedoc`; commit the output as a CI artifact (regenerated per release)
 4. Author `content/4.api/1.core.md`:
    - Frontmatter: title "Core API", description "Public exports from `@genicui/core`.", `navigation.icon: lucide-box`
@@ -107,7 +107,7 @@ Author the API Reference section — the most-used section of any doc site. Six 
 - [ ] `typedoc.json` committed
 - [ ] Post-processor script `typedoc-to-mdc.ts` committed
 - [ ] CI workflow `.github/workflows/docs-api-ref.yml` merged
-- [ ] Generated TypeDoc baseline committed under `examples/docs/scripts/typedoc-output/`
+- [ ] Generated TypeDoc baseline committed under `docs/scripts/typedoc-output/`
 
 ## Testing Checklist
 

@@ -30,10 +30,10 @@ Configure the cross-cutting concerns that turn the doc site from a wall of links
 
 ### Steps
 
-1. Configure search in `examples/docs/app/app.config.ts`:
+1. Configure search in `docs/app/app.config.ts`:
    - `search: { provider: 'fuse', options: { keys: ['title', 'description', 'content'], threshold: 0.3 } }`
    - Verify the search box appears in the header
-2. Configure SEO defaults in `examples/docs/app/app.config.ts`:
+2. Configure SEO defaults in `docs/app/app.config.ts`:
    - `site: { name: 'GenicUI', url: 'https://genicui.dev' }`
    - `seo: { titleTemplate: '%s · GenicUI', description: 'MCP-native generative agentic UI framework.' }`
 3. Verify `useSeoMeta` works on every page (`title`, `description`, `ogTitle`, `ogDescription`, `ogImage`, `twitterCard`)
@@ -47,7 +47,7 @@ Configure the cross-cutting concerns that turn the doc site from a wall of links
    - Verify every page is included
 7. Generate `robots.txt`:
    - Allow all, point sitemap
-8. Add Vercel rewrite (in `vercel.json` at the project root, not just inside `examples/docs/`):
+8. Add Vercel rewrite (in `vercel.json` at the project root, not just inside `docs/`):
    - `{ "source": "/(.*)", "headers": [{ "key": "Accept", "value": "text/markdown" }], "destination": "/raw/$1.md" }`
    - OR configure via Docus's built-in middleware (preferred; check Docus 5.13.0 docs)
 9. Run `bun --filter docs build`; verify the static output contains:

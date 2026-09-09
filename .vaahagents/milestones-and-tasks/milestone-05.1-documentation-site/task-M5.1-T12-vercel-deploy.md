@@ -8,11 +8,11 @@
 
 ## Description
 
-Wire up Vercel deployment for the doc site at `examples/docs/`. Vercel provides preview-per-PR via GitHub integration, production deploys on merge to `main`, and the `Accept: text/markdown` header rewrite (independently validates the Vercel choice over Cloudflare for this artifact). This task links the Vercel project, configures the build, and runs the milestone's integration smoke test.
+Wire up Vercel deployment for the doc site at `docs/`. Vercel provides preview-per-PR via GitHub integration, production deploys on merge to `main`, and the `Accept: text/markdown` header rewrite (independently validates the Vercel choice over Cloudflare for this artifact). This task links the Vercel project, configures the build, and runs the milestone's integration smoke test.
 
 ## Task Goals
 
-- Create / link a Vercel project pointing at `examples/docs/`
+- Create / link a Vercel project pointing at `docs/`
 - Configure build command (`bun --filter docs build`) and output directory (`.output/public`)
 - Configure GitHub integration: preview deploy on every PR, production deploy on merge to `main`
 - Add the Vercel project badge to the README and to the landing page
@@ -24,7 +24,7 @@ Wire up Vercel deployment for the doc site at `examples/docs/`. Vercel provides 
 ### Pre-Implementation Analysis
 
 - Vercel project must be linked via Vercel CLI or dashboard. Verify the Vercel team / account with the user before linking
-- Root directory for the Vercel project = `examples/docs/` (NOT the repo root, because that contains the entire monorepo)
+- Root directory for the Vercel project = `docs/` (NOT the repo root, because that contains the entire monorepo)
 - Build command: `bun --filter docs build` (uses the workspace filter; requires `bun install` first)
 - Output directory: `.output/public` (Docus static output)
 - Env vars: none required for the static site; `SITE_URL` is set at build time via Docus's `app.config.ts`
@@ -33,8 +33,8 @@ Wire up Vercel deployment for the doc site at `examples/docs/`. Vercel provides 
 ### Steps
 
 1. Install Vercel CLI: `bun add -g vercel` (or use `npx vercel`)
-2. `cd examples/docs && vercel link` — link to existing project or create a new one (project name = `genicui-docs`)
-3. Author `examples/docs/vercel.json`:
+2. `cd docs && vercel link` — link to existing project or create a new one (project name = `genicui-docs`)
+3. Author `docs/vercel.json`:
    ```json
    {
      "$schema": "https://openapi.vercel.sh/vercel.json",
@@ -85,7 +85,7 @@ Wire up Vercel deployment for the doc site at `examples/docs/`. Vercel provides 
 ## Acceptance Criteria
 
 - AC1: `vercel link` succeeds; project `genicui-docs` is linked to the workspace
-- AC2: `examples/docs/vercel.json` is committed with correct build command and output directory
+- AC2: `docs/vercel.json` is committed with correct build command and output directory
 - AC3: `vercel deploy --prod` exits 0
 - AC4: Production URL returns 200 for `/`, `/docs/getting-started/introduction`, `/llms.txt`, `/llms-full.txt`, `/sitemap.xml`, `/robots.txt`
 - AC5: `curl -H "Accept: text/markdown" <url>` returns raw markdown (Vercel-specific behavior verified)
@@ -151,7 +151,7 @@ Wire up Vercel deployment for the doc site at `examples/docs/`. Vercel provides 
 
 - **Vercel CLI may require interactive auth.** If running in a non-interactive environment, use `vercel login --github` or a pre-generated token.
 - **`vercel link` is one-time per workspace.** After linking, all subsequent `vercel deploy` commands use the linked project.
-- **Root directory matters.** Vercel must use `examples/docs/` as the root, not the repo root. Configure this in the Vercel dashboard or via `vercel.json`.
+- **Root directory matters.** Vercel must use `docs/` as the root, not the repo root. Configure this in the Vercel dashboard or via `vercel.json`.
 - **Domain is placeholder until user registers `genicui.dev`.** Without a custom domain, the production URL is `https://genicui-docs.vercel.app`. Document this; do NOT ship with a placeholder URL.
 - **Preview deploys are the killer feature.** Every PR gets its own URL; reviewers can click through to see the docs change live. Document this in the PR template.
 - **Lighthouse is a hard target for production.** Verify before tagging the release; otherwise the production deploy gets demoted to a preview.

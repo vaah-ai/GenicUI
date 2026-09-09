@@ -8,12 +8,12 @@
 
 ## Description
 
-Scaffold a Docus 5.13.0 layer inside the GenicUI monorepo at `examples/docs/`, wire it into the root `package.json` workspaces, and verify a blank landing page renders on `localhost:3000`. Docus is a Nuxt 4 layer (NOT a CLI-only tool and NOT v3) installed via `bunx create-docus`. Nuxt UI v4 (MIT, no Pro license needed) provides the component primitives.
+Scaffold a Docus 5.13.0 layer inside the GenicUI monorepo at `docs/`, wire it into the root `package.json` workspaces, and verify a blank landing page renders on `localhost:3000`. Docus is a Nuxt 4 layer (NOT a CLI-only tool and NOT v3) installed via `bunx create-docus`. Nuxt UI v4 (MIT, no Pro license needed) provides the component primitives.
 
 ## Task Goals
 
-- Create `examples/docs/` containing a working Docus layer that extends from the upstream `docus` Nuxt 4 layer
-- Add `examples/docs` to root `package.json` workspaces
+- Create `docs/` containing a working Docus layer that extends from the upstream `docus` Nuxt 4 layer
+- Add `docs` to root `package.json` workspaces
 - Configure Nuxt UI v4 with the GenicUI brand placeholder (full theming in T4)
 - Verify `bun --filter docs dev` boots and serves a placeholder landing page
 - Verify `bun --filter docs build` produces a static output in `.output/public/`
@@ -24,15 +24,15 @@ Scaffold a Docus 5.13.0 layer inside the GenicUI monorepo at `examples/docs/`, w
 
 - Re-confirm Docus 5.13.0 is current (`bunx create-docus` pulls latest; pin in `package.json`)
 - Verify Nuxt 4 + Nuxt UI v4 compatibility (Nuxt UI v4 unified Pro into the free MIT package as of late 2025 — confirms no license fee)
-- Decide workspace layout: `examples/docs/` (sibling to `examples/playground/`) preferred over top-level `docs/` because top-level `docs/` is the live requirements tree being migrated in T2
-- Verify root `package.json` has `"workspaces": ["packages/*", "registries/*", "examples/*"]` (or add it — current workspace declaration may only cover `packages/*` and `registries/*`)
+- Workspace layout: Docus scaffolded under `examples/docs/` initially; relocated to top-level `docs/` after T2 completed the requirements migration to `.vaahagents/requirements/` (so the top-level `docs/` slot was free). Sibling to `examples/playground/`. Bun filter name stays `genicui-docs` regardless of path.
+- Verify root `package.json` has `"workspaces": ["packages/*", "registries/*", "examples/*"]` (add `"docs"` to the array once the move is complete)
 
 ### Steps
 
-1. From project root: `bunx create-docus examples/docs` — generates Docus scaffold
+1. From project root: `bunx create-docus docs` — generates Docus scaffold
 2. Inspect generated `nuxt.config.ts` — confirm `extends: ['docus']` is present
 3. Update `package.json` workspaces to include `examples/*` (or extend if it already covers `packages/*` and `registries/*`)
-4. Add `@nuxt/ui` v4 to `examples/docs/package.json` dependencies
+4. Add `@nuxt/ui` v4 to `docs/package.json` dependencies
 5. Create `app/app.config.ts` with site name `"GenicUI"`, theme placeholder, brand color (placeholder — T4 fills in)
 6. Replace the default landing with a placeholder (`title: GenicUI`, `subtitle: Documentation placeholder`, link to `/docs/getting-started/introduction` even though that route doesn't exist yet)
 7. Run `bun install` from project root; verify `bun --filter docs dev` boots on `localhost:3000` and the landing renders
@@ -47,7 +47,7 @@ Scaffold a Docus 5.13.0 layer inside the GenicUI monorepo at `examples/docs/`, w
 
 ## Acceptance Criteria
 
-- AC1: `examples/docs/` exists, contains `nuxt.config.ts`, `app/`, `content/`, `package.json`
+- AC1: `docs/` exists, contains `nuxt.config.ts`, `app/`, `content/`, `package.json`
 - AC2: `nuxt.config.ts` has `extends: ['docus']`
 - AC3: Root `package.json` workspaces include `examples/*`
 - AC4: `bun install` exits 0 from project root
@@ -75,7 +75,7 @@ Scaffold a Docus 5.13.0 layer inside the GenicUI monorepo at `examples/docs/`, w
 
 | SubTask ID | Title | Status | Test Required | Priority |
 |---|---|---|---|---|
-| M5.1-T1-01 | Run `bunx create-docus examples/docs` and inspect scaffold | ⚪ Not Started | ❌ No | Critical |
+| M5.1-T1-01 | Run `bunx create-docus docs` and inspect scaffold | ⚪ Not Started | ❌ No | Critical |
 | M5.1-T1-02 | Wire workspace + install Nuxt UI v4 | ⚪ Not Started | ❌ No | Critical |
 | M5.1-T1-03 | Create `app.config.ts` with brand placeholders | ⚪ Not Started | ❌ No | Critical |
 | M5.1-T1-04 | Replace default landing with placeholder | ⚪ Not Started | ❌ No | Critical |

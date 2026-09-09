@@ -18,4 +18,4 @@ title: Tech Stack
 - Never add `@nuxt/ui-pro` — verify `bun pm ls` shows none.
 - Never downgrade Nuxt Content to satisfy Nuxt UI — pick latest NC v3 Docus bundles.
 - Never import from `poc/`.
-- Never add deps to `packages/*` — docs-only deps go in `examples/docs/package.json`.
+- Never add deps to `packages/*` — docs-only deps go in `docs/package.json`.

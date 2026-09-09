@@ -16,7 +16,7 @@ Run through this checklist **before** committing:
 - [ ] No `console.log` / `debugger` left in any new file.
 - [ ] No `poc/` references in any new file.
 - [ ] No `TODO`/`FIXME` markers left (use the task issue tracker instead).
-- [ ] No edits to `packages/*` source — docs work stays under `examples/docs/`.
+- [ ] No edits to `packages/*` source — docs work stays under `docs/`.
 - [ ] Frontmatter present on every new page (`title`, `description`).
 - [ ] Internal links resolve; external links alive.
 - [ ] Lighthouse ≥ target scores on every new page (or `manual-verified`).
@@ -30,7 +30,7 @@ Show the audit results + the diff summary. **Wait for explicit user acknowledgme
 ## Git Commit
 
 ```bash
-git add examples/docs/ .vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-{{TASK_ID}}-*.md
+git add docs/ .vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-{{TASK_ID}}-*.md
 git status   # verify only intended files
 git commit -m "docs(M5.1-T{n}): <imperative summary>
 

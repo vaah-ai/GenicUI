@@ -40,7 +40,7 @@ This is the structural backbone of the site — done well, T4–T10 become incre
 
 ### Steps
 
-1. Create `examples/docs/content/` directory tree:
+1. Create `docs/content/` directory tree:
    ```
    1.getting-started/
    2.concepts/
@@ -52,7 +52,7 @@ This is the structural backbone of the site — done well, T4–T10 become incre
    8.community/
    9.migration/
    ```
-2. Create `examples/docs/content/index.md` (placeholder landing — T4 fills it)
+2. Create `docs/content/index.md` (placeholder landing — T4 fills it)
 3. For each section directory, create `1.first-page.md`, `2.second-page.md`, … with frontmatter:
    ```yaml
    ---
@@ -71,7 +71,7 @@ This is the structural backbone of the site — done well, T4–T10 become incre
      - 1.first-page
      - 2.second-page
    ```
-5. Author `examples/docs/content/.navigation.yml` for top-level order
+5. Author `docs/content/.navigation.yml` for top-level order
 6. Run `bun --filter docs dev` and walk every left-rail entry; verify all ~30–50 pages render with placeholder content
 7. Run `bun --filter docs build`; verify the static output contains a route for every page
 8. Document the IA in `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md` (project memory, not a published page)
@@ -86,14 +86,14 @@ This is the structural backbone of the site — done well, T4–T10 become incre
 
 ## Acceptance Criteria
 
-- AC1: `examples/docs/content/` contains all 9 section directories + `index.md`
+- AC1: `docs/content/` contains all 9 section directories + `index.md`
 - AC2: Every section directory has a `.navigation.yml` with at least one child entry
 - AC3: Every page file has valid frontmatter (`title`, `description`, `navigation.icon`)
 - AC4: Every page body contains a `::note` placeholder (no empty pages)
 - AC5: `bun --filter docs dev` boots; left rail shows all 9 sections in order; every section expands to show its children
 - AC6: Every page route returns 200 in `bun --filter docs build` output (verify with a curl on the local server)
 - AC7: No page has prose beyond the placeholder (prose is T4–T10's job — verifying this task did not creep)
-- AC8: `examples/docs/content/.navigation.yml` is the only top-level `.navigation.yml`; per-section files are scoped to their directories
+- AC8: `docs/content/.navigation.yml` is the only top-level `.navigation.yml`; per-section files are scoped to their directories
 - AC9: Numeric prefixes are consistent within each section (no `1.foo.md` and `2.foo.md` swapped)
 - AC10: IA tree document at `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md` exists and lists every page
 

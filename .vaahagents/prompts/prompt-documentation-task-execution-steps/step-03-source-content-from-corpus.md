@@ -10,7 +10,7 @@ Sourcing depends on which task you are authoring:
 
 | Task | Source from |
 |---|---|
-| M5.1-T1, T3, T11, T12 | Code/config under `examples/docs/` + `package.json` |
+| M5.1-T1, T3, T11, T12 | Code/config under `docs/` + `package.json` |
 | M5.1-T2 | `.vaahagents/requirements/` (full corpus reconciliation) |
 | M5.1-T4 (Landing) | Memory + `README.md` at repo root |
 | M5.1-T5 (Getting Started) | `README.md` + 1–2 representative examples in `examples/playground/` |
