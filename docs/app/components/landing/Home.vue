@@ -862,10 +862,6 @@ onBeforeUnmount(() => {
             <span class="text-[10px] tracking-[0.18em] text-white/40">0{{ i + 1 }}</span>
             <span>{{ item.shortLabel }}</span>
           </button>
-
-          <span class="basis-full text-center text-[10px] font-mono text-[var(--color-text-muted)] mt-1">
-            Use <kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">←</kbd><kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">→</kbd> to switch tabs
-          </span>
         </div>
 
         <!-- Intro banner — single row, eyebrow + headline + 1-line blurb.
