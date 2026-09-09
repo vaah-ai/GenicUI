@@ -136,6 +136,176 @@ onBeforeUnmount(() => {
               Framework-agnostic
             </span>
           </div>
+
+          <!-- 4-surface composite — hero proof-of-claim visual.
+               Four real product surface chromes (chat / IDE / browser
+               extension / in-app sidebar) fanned at different angles.
+               IDE editor on top (+4deg, z-50). Cards are positioned
+               via grid areas so each one lives in a distinct quadrant
+               of the composite — no overlap. Mobile collapses to a
+               single centred IDE card. The `render_component` chip
+               floats between IDE (source) and Chat (target). -->
+          <div class="stagger mt-20 sm:mt-24 w-full max-w-5xl mx-auto" style="--i:5">
+            <div class="surface-stack relative h-[420px] sm:h-[460px] lg:h-[480px] mx-auto" style="max-width: 920px;">
+
+              <!-- Chat panel — top-left quadrant -->
+              <div
+                class="surface-card hidden md:block"
+                style="left: 0; top: 0; width: 46%; z-index: 30; transform: rotate(-4deg) translateZ(20px);"
+              >
+                <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-violet-400/60">
+                  <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-white/50">chat · claude</span>
+                  </div>
+                  <div class="p-3 space-y-2">
+                    <div class="flex items-start gap-2 justify-end">
+                      <div class="rounded-xl rounded-tr-sm bg-white/10 px-2.5 py-1 text-[10px] sm:text-[11px] text-white max-w-[80%]">
+                        show me cart + SUMMER25
+                      </div>
+                      <div class="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500/40 to-pink-500/40 shrink-0" />
+                    </div>
+                    <div class="flex items-start gap-2">
+                      <UIcon name="i-lucide-sparkles" class="size-3.5 text-blue-300 mt-1 shrink-0" />
+                      <div class="rounded-xl rounded-tl-sm bg-blue-500/15 border border-blue-400/20 px-2.5 py-1 text-[10px] sm:text-[11px] text-white/90">
+                        Cart rendered · coupon applied
+                      </div>
+                    </div>
+                    <!-- mini CartViewer -->
+                    <div class="rounded-md border border-white/[0.08] bg-black/40 p-2 mt-1.5">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <UIcon name="i-lucide-shopping-cart" class="size-3 text-blue-300" />
+                        <span class="text-[9px] font-mono text-emerald-400">$349.80</span>
+                      </div>
+                      <div class="space-y-1 text-[9px]">
+                        <div class="flex items-center justify-between"><span class="text-white/70">Linen jacket</span><span class="font-mono text-white/85">$148</span></div>
+                        <div class="flex items-center justify-between"><span class="text-white/70">Cotton tee</span><span class="font-mono text-white/85">$32</span></div>
+                        <div class="flex items-center justify-between"><span class="text-white/70">Weekender</span><span class="font-mono text-white/85">$184</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- IDE editor — center-right, on top +4deg, z-50. Offset
+                   right so it doesn't sit dead-centre and overlap chat. -->
+              <div
+                class="surface-card hidden md:block"
+                style="right: 8%; top: 12%; width: 52%; z-index: 50; transform: rotate(3deg) translateZ(60px);"
+              >
+                <div class="code-window">
+                  <div class="code-window-header">
+                    <span class="code-window-dot red" />
+                    <span class="code-window-dot amber" />
+                    <span class="code-window-dot green" />
+                    <span class="code-window-title">cart-viewer.tsx · registry.json</span>
+                    <UIcon name="i-lucide-ellipsis" class="size-3 text-white/40" />
+                  </div>
+                  <div class="p-3 sm:p-4 font-mono text-[10px] sm:text-xs leading-relaxed text-white/85">
+                    <div class="flex gap-3 sm:gap-4">
+                      <!-- file tree -->
+                      <div class="hidden lg:block w-28 shrink-0 border-r border-white/[0.06] pr-3">
+                        <div class="text-[10px] uppercase tracking-widest text-white/30 mb-2">registry</div>
+                        <div class="space-y-1 text-white/55">
+                          <div class="flex items-center gap-1.5"><UIcon name="i-lucide-folder" class="size-3 text-blue-300" /> components</div>
+                          <div class="flex items-center gap-1.5 pl-3"><UIcon name="i-lucide-file-code" class="size-3 text-emerald-300" /> CartViewer</div>
+                          <div class="flex items-center gap-1.5 pl-3"><UIcon name="i-lucide-file-code" class="size-3 text-violet-300" /> TicketCard</div>
+                          <div class="flex items-center gap-1.5 pl-3"><UIcon name="i-lucide-file-code" class="size-3 text-amber-300" /> ClaimForm</div>
+                        </div>
+                      </div>
+                      <!-- editor + terminal -->
+                      <div class="flex-1 min-w-0">
+                        <div class="space-y-0.5 mb-3">
+                          <div><span class="text-violet-400">export const</span> <span class="text-blue-300">registry</span> = {'{'}</div>
+                          <div class="pl-3"><span class="text-emerald-300">"CartViewer"</span>: {'{'}<span class="text-amber-200">"schema"</span>: <span class="text-violet-300">PrimeVue</span>{'}'},</div>
+                          <div class="pl-3"><span class="text-emerald-300">"TicketCard"</span>: {'{'}<span class="text-amber-200">"schema"</span>: <span class="text-violet-300">Form</span>{'}'},</div>
+                          <div class="pl-3"><span class="text-emerald-300">"KpiDashboard"</span>: {'{'}<span class="text-amber-200">"schema"</span>: <span class="text-violet-300">Chart</span>{'}'}</div>
+                          <div>{'}'};</div>
+                        </div>
+                        <div class="rounded-md bg-black/60 border border-emerald-500/20 px-2.5 py-1.5 flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 landing-pulse" />
+                          <span class="text-emerald-300 truncate">$ render_component CartViewer</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Browser extension popup — middle-right, +2deg, z-20 -->
+              <div
+                class="surface-card hidden lg:block"
+                style="right: 0; top: 48%; width: 30%; z-index: 20; transform: rotate(4deg) translateZ(0);"
+              >
+                <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-blue-400/60">
+                  <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                    <UIcon name="i-lucide-chrome" class="size-3 text-blue-300" />
+                    <span class="font-mono text-[10px] text-white/50 truncate flex-1">amazon.com/cart</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  </div>
+                  <div class="p-3">
+                    <div class="text-[10px] uppercase tracking-widest text-white/40 font-mono mb-2">genicui · sidebar</div>
+                    <div class="rounded-md bg-white/[0.03] border border-white/[0.08] p-2">
+                      <div class="text-[10px] text-white/85 font-medium mb-1">Your cart</div>
+                      <div class="text-[9px] text-white/55 mb-1.5">3 items · $349.80</div>
+                      <button class="w-full rounded-md bg-white text-black text-[10px] font-medium py-1">Apply SUMMER25</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- In-app sidebar — bottom-left, -2deg, z-40 -->
+              <div
+                class="surface-card hidden md:block"
+                style="left: 4%; bottom: 0; width: 42%; z-index: 40; transform: rotate(-2deg) translateZ(40px);"
+              >
+                <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-amber-400/60">
+                  <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                    <UIcon name="i-lucide-layout-dashboard" class="size-3 text-amber-300" />
+                    <span class="font-mono text-[10px] text-white/50">dashboard · in-app</span>
+                  </div>
+                  <div class="flex">
+                    <div class="w-14 border-r border-white/[0.06] py-2 px-1.5 space-y-1 text-[9px] text-white/50">
+                      <div class="rounded bg-white/[0.08] px-1.5 py-1 text-white/85">Reports</div>
+                      <div class="px-1.5 py-1">Customers</div>
+                      <div class="px-1.5 py-1">Billing</div>
+                      <div class="px-1.5 py-1">Settings</div>
+                    </div>
+                    <div class="flex-1 p-2.5">
+                      <div class="text-[9px] font-mono uppercase tracking-widest text-white/40 mb-1">weekly revenue</div>
+                      <div class="text-base text-white font-mono leading-none mb-1">$48.2k</div>
+                      <div class="text-[9px] text-emerald-300 font-mono mb-1.5">+12.4% wow</div>
+                      <!-- mini sparkline -->
+                      <svg viewBox="0 0 100 28" class="w-full h-7" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="heroSpark" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#10B981" stop-opacity="0.45" />
+                            <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5 L100,28 L0,28 Z" fill="url(#heroSpark)" />
+                        <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Animated render_component chip — floats in the seam
+                   between chat (top-left) and IDE (right). Visually
+                   "travels" from IDE source to Chat target. -->
+              <div
+                class="hero-chip absolute top-[28%] left-[42%] hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 border border-violet-400/40 backdrop-blur-md font-mono text-[10px] text-violet-200 z-[60]"
+              >
+                <UIcon name="i-lucide-zap" class="size-3 text-amber-300" />
+                render_component
+              </div>
+
+            </div>
+            <p class="mt-6 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--color-text-muted,#71717A)]">
+              chat · IDE · browser · in-app — same protocol
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -257,61 +427,68 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Use case 2: Customer support triage -->
+          <!-- Use case 2: Customer support triage — IDE assistant chrome -->
           <div class="usecase-grid">
             <!-- Right first on mobile, left on desktop (alternate) -->
-            <div class="glass-card p-6 sm:p-8 order-2 lg:order-1">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider">
-                    urgent
-                  </span>
-                  <span class="text-sm font-medium text-white">Ticket #C-2847</span>
-                </div>
-                <span class="text-[10px] font-mono text-[var(--color-text-muted)]">3m ago</span>
+            <div class="glass-card p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-violet-400/60">
+              <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                <UIcon name="i-simple-icons-visualstudiocode" class="size-3.5 text-violet-300" />
+                <span class="font-mono text-[10px] text-white/60">VS Code · support-assistant.tsx</span>
+                <UIcon name="i-lucide-ellipsis" class="size-3 text-white/40 ml-auto" />
               </div>
-              <h4 class="text-lg text-white mb-2">Payment failed for order #1092</h4>
-              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] mb-5 leading-relaxed">
-                Customer reports Visa ending 4291 declined twice. Tried again, same error. Three prior tickets this month.
-              </p>
-              <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
-                <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-                  Customer history
+              <div class="p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-5">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider">
+                      urgent
+                    </span>
+                    <span class="text-sm font-medium text-white">Ticket #C-2847</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">3m ago</span>
                 </div>
-                <div class="space-y-1.5 text-sm">
-                  <div class="flex items-center justify-between">
-                    <span class="text-white/80">Lifetime value</span>
-                    <span class="font-mono text-white">$2,840</span>
+                <h4 class="text-lg text-white mb-2">Payment failed for order #1092</h4>
+                <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] mb-5 leading-relaxed">
+                  Customer reports Visa ending 4291 declined twice. Tried again, same error. Three prior tickets this month.
+                </p>
+                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
+                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+                    Customer history
                   </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-white/80">Prior tickets (30d)</span>
-                    <span class="font-mono text-white">3</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-white/80">Plan</span>
-                    <span class="font-mono text-white">Pro · annual</span>
+                  <div class="space-y-1.5 text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-white/80">Lifetime value</span>
+                      <span class="font-mono text-white">$2,840</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-white/80">Prior tickets (30d)</span>
+                      <span class="font-mono text-white">3</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-white/80">Plan</span>
+                      <span class="font-mono text-white">Pro · annual</span>
+                    </div>
                   </div>
                 </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
+                  >
+                    <UIcon name="i-lucide-check" class="size-4 text-emerald-400" />
+                    Resolve
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
+                  >
+                    <UIcon name="i-lucide-arrow-up-right" class="size-4 text-amber-400" />
+                    Escalate
+                  </button>
+                </div>
+                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
+                  rendered via <span class="text-blue-300/80">render_component</span> · TicketCard in IDE assistant
+                </p>
               </div>
-              <div class="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                >
-                  <UIcon name="i-lucide-check" class="size-4 text-emerald-400" />
-                  Resolve
-                </button>
-                <button
-                  type="button"
-                  class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                >
-                  <UIcon name="i-lucide-arrow-up-right" class="size-4 text-amber-400" />
-                  Escalate
-                </button>
-              </div>
-              <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · TicketCard with submit action
-              </p>
             </div>
 
             <div class="space-y-4 order-1 lg:order-2">
@@ -321,14 +498,14 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="h-px flex-1 bg-white/10" />
                 <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Support triage
+                  Support triage · IDE
                 </span>
               </div>
               <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Triage tickets without leaving the chat.
+                Triage tickets <span class="display-serif">in</span> your IDE.
               </h3>
               <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The agent pulls a customer's history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons. The support agent clicks once and the action goes back through the agent as a structured event — no copy-paste, no context switch.
+                The agent pulls a customer's history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons — inline in your IDE assistant pane. No second tab, no tab-switch.
               </p>
               <div class="space-y-3 pt-2">
                 <div class="flex items-start gap-3 justify-end">
@@ -340,18 +517,19 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
-                  </div>
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Triage summary in. Customer is high-LTV, third payment issue this month. I'd recommend escalating — want me to route it to billing?
+                  <UIcon name="i-simple-icons-visualstudiocode" class="size-7 rounded-lg bg-violet-500/15 border border-violet-400/30 p-1.5 text-violet-300 shrink-0" />
+                  <div class="max-w-md rounded-2xl rounded-tl-md bg-violet-500/10 border border-violet-400/20 px-4 py-2.5 text-sm text-white/90">
+                    IDE assistant: triage summary in. Customer is high-LTV, third payment issue this month. I'd recommend escalating — want me to route it to billing?
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Use case 3: Data analytics -->
+          <!-- Use case 3: Data analytics — Slack/Discord channel chrome. Same
+               KpiDashboard on the right, but the chat-bubble pair is
+               replaced by a channel-rail + thread that visually places
+               the conversation inside a Slack-style window. -->
           <div class="usecase-grid">
             <div class="space-y-4">
               <div class="flex items-center gap-3 mb-6">
@@ -360,30 +538,85 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="h-px flex-1 bg-white/10" />
                 <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Analytics
+                  Analytics · Slack
                 </span>
               </div>
               <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Numbers, not paragraphs.
+                Numbers, in the same thread as the team.
               </h3>
               <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user asks "what's our weekly revenue?" Instead of a text answer, the agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> with a 7-day chart, a top-customers table, and drill-down controls. Hover, sort, export — every interaction is on the wire back to the agent.
+                The user asks <em>"how is revenue trending this week?"</em> in the <code class="font-mono text-sm text-emerald-300/90">#analytics</code> channel. The agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> inline as a thread reply — chart, top accounts, drill-down controls — fully visible to everyone who follows the conversation.
               </p>
-              <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    How is revenue trending this week vs last?
-                  </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
-                  </div>
+
+              <!-- Slack-style chrome wrapper around the chat bubbles -->
+              <div class="glass-card p-0 overflow-hidden border-t-4 border-t-emerald-400/60">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                  <UIcon name="i-simple-icons-slack" class="size-3.5 text-emerald-300" />
+                  <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · #analytics</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 </div>
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
+                <div class="p-3 space-y-3">
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/85 shrink-0">
+                      PM
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2 mb-0.5">
+                        <span class="text-xs font-medium text-white">Priya M.</span>
+                        <span class="text-[10px] text-white/40 font-mono">14:02</span>
+                      </div>
+                      <div class="text-sm text-white/85">How is revenue trending this week vs last?</div>
+                    </div>
                   </div>
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Up <span class="text-emerald-300 font-medium">+12.4%</span> week-over-week. Strongest day was Wednesday — 3 new enterprise accounts. Drill in?
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center shrink-0">
+                      <UIcon name="i-lucide-sparkles" class="size-3.5 text-violet-300" />
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2 mb-0.5">
+                        <span class="text-xs font-medium text-white">Genic Bot</span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">APP</span>
+                        <span class="text-[10px] text-white/40 font-mono">14:02</span>
+                      </div>
+                      <div class="text-sm text-white/90 mb-2">
+                        Up <span class="text-emerald-300 font-medium">+12.4%</span> week-over-week. Strongest day was Wednesday — 3 new enterprise accounts. Posting the dashboard:
+                      </div>
+                      <div class="rounded-lg border border-white/[0.08] bg-black/40 p-2.5">
+                        <div class="flex items-center justify-between mb-2">
+                          <UIcon name="i-lucide-chart-line" class="size-3.5 text-emerald-300" />
+                          <span class="text-[10px] font-mono text-emerald-300">+12.4% wow</span>
+                        </div>
+                        <svg viewBox="0 0 100 28" class="w-full h-7" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="slackSpark" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="#10B981" stop-opacity="0.45" />
+                              <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                            </linearGradient>
+                          </defs>
+                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5 L100,28 L0,28 Z" fill="url(#slackSpark)" />
+                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        <div class="grid grid-cols-3 gap-1.5 mt-2">
+                          <div class="rounded bg-white/[0.04] px-2 py-1">
+                            <div class="text-[8px] font-mono uppercase text-white/40">rev</div>
+                            <div class="text-xs font-mono text-white">$48.2k</div>
+                          </div>
+                          <div class="rounded bg-white/[0.04] px-2 py-1">
+                            <div class="text-[8px] font-mono uppercase text-white/40">orders</div>
+                            <div class="text-xs font-mono text-white">312</div>
+                          </div>
+                          <div class="rounded bg-white/[0.04] px-2 py-1">
+                            <div class="text-[8px] font-mono uppercase text-white/40">aov</div>
+                            <div class="text-xs font-mono text-white">$154.40</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mt-2 flex items-center gap-3 text-[10px] font-mono text-white/40">
+                        <span class="hover:text-white cursor-pointer">↳ Reply in thread</span>
+                        <span class="hover:text-white cursor-pointer">Drill in</span>
+                        <span class="hover:text-white cursor-pointer">Export CSV</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -452,52 +685,62 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Use case 4: Form assistance -->
+          <!-- Use case 4: Form assistance — browser-extension popup chrome.
+               Same ClaimForm on the right, but the chat-bubble pair is
+               wrapped in a Chrome-style popup frame (toolbar, search
+               bar, compact sidebar layout). -->
           <div class="usecase-grid">
-            <div class="glass-card glass-card-tilt p-6 sm:p-8 order-2 lg:order-1">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />
-                  <span class="text-sm font-medium text-white">Insurance claim</span>
-                </div>
-                <span class="text-[10px] font-mono text-[var(--color-text-muted)]">step 2 / 4</span>
+            <div class="glass-card glass-card-tilt p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-amber-400/60">
+              <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
+                <UIcon name="i-lucide-chrome" class="size-3.5 text-amber-300" />
+                <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · claim-form</span>
+                <UIcon name="i-lucide-settings" class="size-3 text-white/40" />
               </div>
-              <div class="space-y-4 mb-5">
-                <div>
-                  <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Incident type</label>
-                  <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                    <span>Auto collision</span>
-                    <UIcon name="i-lucide-chevron-down" class="size-4 text-[var(--color-text-muted)]" />
+              <div class="p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-5">
+                  <div class="flex items-center gap-2">
+                    <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />
+                    <span class="text-sm font-medium text-white">Insurance claim</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">step 2 / 4</span>
+                </div>
+                <div class="space-y-4 mb-5">
+                  <div>
+                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Incident type</label>
+                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
+                      <span>Auto collision</span>
+                      <UIcon name="i-lucide-chevron-down" class="size-4 text-[var(--color-text-muted)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Date of incident</label>
+                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
+                      <span>Sept 4, 2026</span>
+                      <UIcon name="i-lucide-calendar" class="size-4 text-[var(--color-text-muted)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Description</label>
+                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white/80 min-h-[88px]">
+                      Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
+                    <UIcon name="i-lucide-sparkles" class="size-4 text-amber-300" />
+                    <span class="text-xs text-amber-200/90">Agent prefilled this from your chat. <span class="underline">Review & continue</span></span>
                   </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Date of incident</label>
-                  <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                    <span>Sept 4, 2026</span>
-                    <UIcon name="i-lucide-calendar" class="size-4 text-[var(--color-text-muted)]" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Description</label>
-                  <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white/80 min-h-[88px]">
-                    Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
-                  <UIcon name="i-lucide-sparkles" class="size-4 text-amber-300" />
-                  <span class="text-xs text-amber-200/90">Agent prefilled this from your chat. <span class="underline">Review & continue</span></span>
-                </div>
+                <button
+                  type="button"
+                  class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
+                >
+                  Continue to step 3
+                  <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
+                  rendered via <span class="text-blue-300/80">render_component</span> · ClaimForm via browser extension
+                </p>
               </div>
-              <button
-                type="button"
-                class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
-              >
-                Continue to step 3
-                <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
-              </button>
-              <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · ClaimForm with submit action
-              </p>
             </div>
 
             <div class="space-y-4 order-1 lg:order-2">
@@ -507,7 +750,7 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="h-px flex-1 bg-white/10" />
                 <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Form assistance
+                  Form · browser extension
                 </span>
               </div>
               <h3 class="display-sans text-2xl sm:text-3xl text-white">
@@ -526,11 +769,9 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
-                  </div>
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Got it. I've prefilled the claim form from your message — review and continue when you're ready.
+                  <UIcon name="i-lucide-chrome" class="size-7 rounded-lg bg-amber-500/15 border border-amber-400/30 p-1.5 text-amber-300 shrink-0" />
+                  <div class="max-w-md rounded-2xl rounded-tl-md bg-amber-500/10 border border-amber-400/20 px-4 py-2.5 text-sm text-white/90">
+                    Extension: claim form prefilled. Three fields left to confirm before you submit — say <em>"continue"</em> or tap the button on the popup.
                   </div>
                 </div>
               </div>

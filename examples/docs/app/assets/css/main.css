@@ -238,6 +238,54 @@ html, body {
   }
 }
 
+/* Hero floating chip — travels between IDE (source) and Chat (target)
+ * on a small arc. Using translate (GPU-safe) only. The chip has its
+ * own absolute positioning; the keyframe provides the motion path.
+ */
+@keyframes orbit-chip {
+  0%   { transform: translate(-30px, 40px); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(20px, -10px); opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translate(-30px, 40px); opacity: 0; }
+}
+
+.hero-chip {
+  animation: orbit-chip 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Surface stack — hero composite (4 surface chromes fanned at
+ * different depths). `perspective` lives on the parent so children
+ * with `transform-style: preserve-3d` can hover-lift into real depth.
+ *
+ * Used by the hero `.surface-stack` block. Children are `.surface-card`
+ * with inline `transform: rotate(...) translateZ(...)`.
+ */
+.surface-stack {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+
+.surface-card {
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .surface-card:hover {
+    transform: translateZ(60px) scale(1.04);
+  }
+}
+
+/* Reduced motion: snap to flat, no hover lift */
+@media (prefers-reduced-motion: reduce) {
+  .surface-card { transition: none; }
+  .surface-card:hover { transform: none; }
+}
+
 /* Orbiting glow rings — used on hero badges to suggest depth.
  * Two rings, opposite directions. `prefers-reduced-motion` halts them.
  */
@@ -631,7 +679,9 @@ html, body {
   .landing-root::after,
   .install-pill::before,
   .orbit-ring-a,
-  .orbit-ring-b {
+  .orbit-ring-b,
+  .surface-card,
+  .hero-chip {
     animation: none;
     opacity: 1;
     filter: none;
