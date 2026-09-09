@@ -835,7 +835,7 @@ onBeforeUnmount(() => {
         <div
           role="tablist"
           aria-label="Case studies"
-          class="flex items-center gap-2 overflow-x-auto pb-1 mb-6"
+          class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
         >
           <button
             v-for="(item, i) in caseTabs"
@@ -863,33 +863,31 @@ onBeforeUnmount(() => {
             <span>{{ item.shortLabel }}</span>
           </button>
 
-          <span class="ml-auto hidden sm:inline-flex items-center gap-2 text-[10px] font-mono text-[var(--color-text-muted)] shrink-0">
-            <kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">←</kbd>
-            <kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">→</kbd>
-            <span>to switch</span>
+          <span class="basis-full text-center text-[10px] font-mono text-[var(--color-text-muted)] mt-1">
+            Use <kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">←</kbd><kbd class="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03]">→</kbd> to switch tabs
           </span>
         </div>
 
         <!-- Intro banner — single row, eyebrow + headline + 1-line blurb.
              Tightened from the previous 6-line paragraph block so the
              section's vertical real estate goes to the chat, not the copy. -->
-        <div class="mb-5 space-y-2">
-          <div class="flex items-center gap-3">
+        <div class="mb-5 space-y-3 text-center">
+          <div class="flex items-center justify-center gap-3">
             <span
               class="font-mono text-[10px] tracking-[0.2em] uppercase"
               :class="caseTabs[activeCase].eyebrowClass"
             >
               Use case 0{{ activeCase + 1 }}
             </span>
-            <span class="h-px flex-1 bg-white/10" />
+            <span class="h-px w-8 bg-white/10" />
             <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
               {{ caseTabs[activeCase].category }}
             </span>
           </div>
           <template v-for="(item, i) in caseTabs" :key="`intro-${item.id}`">
-            <div v-show="activeCase === i" class="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-6 gap-y-2">
-              <h3 class="display-sans text-xl sm:text-2xl text-white shrink-0" v-html="item.headline" />
-              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed" v-html="item.body" />
+            <div v-show="activeCase === i" class="space-y-2">
+              <h3 class="display-sans text-xl sm:text-2xl text-white" v-html="item.headline" />
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed mx-auto max-w-xl" v-html="item.body" />
             </div>
           </template>
         </div>
