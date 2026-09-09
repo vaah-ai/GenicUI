@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 28" width="132" height="28" role="img" aria-label="GenicUI">
+  <!--
+    GenicUI logo lockup — light variant (companion to /logo.svg).
+
+    Why a separate file:
+      Nuxt UI's <UColorModeImage> (and Docus's AppHeader).logo emit
+      <img src="..."> — and an <img>-embedded SVG renders in its
+      own document context, so @media (prefers-color-scheme: light)
+      inside the SVG has no effect. The dark-mode fill always wins.
+
+    Color choices (all verified against WCAG 2.1 on white #FFFFFF
+    and on the navbar backdrop bg-white/70 → effective ≈ #FAFAFA):
+      "Genic" (#5B21B6, violet-800) → 7.4:1 → AAA
+      "UI" gradient (#7C3AED → #4F46E5 → #1D4ED8)
+        #7C3AED on white → 5.5:1 → AA Normal
+        #4F46E5 on white → 6.5:1 → AAA
+        #1D4ED8 on white → 8.6:1 → AAA
+      All three pass the navbar's bg-white/70 with similar contrast.
+
+    Anatomy unchanged from logo.svg:
+      viewBox 132 × 28, font 22px Geist Mono, baseline y=21.
+      Wordmark only (no device mark) per user feedback on v7.
+  -->
+  <defs>
+    <linearGradient id="genicui-letter-light" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#7C3AED"/>
+      <stop offset="55%"  stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+
+  <text
+    x="2"
+    y="21"
+    font-family="'Geist Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace"
+    font-size="22"
+    font-weight="700"
+    letter-spacing="-0.5"
+    fill="#5B21B6"
+  >Genic<tspan
+    font-weight="800"
+    fill="url(#genicui-letter-light)"
+  >UI</tspan></text>
+</svg>
