@@ -780,7 +780,7 @@ onBeforeUnmount(() => {
     <!-- USE CASES — what you actually build with GenicUI -->
     <section class="relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div class="max-w-4xl mx-auto text-center mb-8 sm:mb-10">
+        <div class="max-w-3xl mx-auto text-center mb-8 sm:mb-10">
           <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-3">
             What you build
           </p>
@@ -805,9 +805,18 @@ onBeforeUnmount(() => {
           empty right column below the chat panel whenever the intro column
           was shorter than the chat (UC03's KpiDashboard is ~720px tall;
           UC01's intro paragraph is ~250px). Stacking intro above a
-          full-width chat removes that dead space and lets the chat use
-          the full content width — important because UC03's sparkline +
-          KPIs read better with more horizontal room.
+          full-width chat removes that dead space.
+
+          Why max-w-3xl (~768px): with the section header centered on a
+          1280px page, the chat panel was reading 1280px wide too — the cart
+          rows in UC01 felt sparse, the KPIs in UC03 had too much horizontal
+          space between them, and the eye lost the chat-as-narrative thread.
+          768px is the canonical "comfortable reading column" width from the
+          Bringhurst / Lupton type-scale tables; it keeps each chat turn as
+          one or two lines of natural prose and gives the panel chrome room
+          to breathe without the surface feeling empty. The outer section
+          stays at max-w-7xl so the dark backdrop extends to the viewport
+          edges, and the column sits as a focused island.
 
           Accessibility: pill buttons are real <button> elements with role="tab",
           a labelled tablist parent, and ArrowLeft/ArrowRight/End/Home keyboard
@@ -822,6 +831,7 @@ onBeforeUnmount(() => {
           thread below) is collapsed into a single surface that swaps on
           tab activation.
         -->
+        <div class="max-w-3xl mx-auto">
         <div
           role="tablist"
           aria-label="Case studies"
@@ -927,6 +937,7 @@ onBeforeUnmount(() => {
               <UIcon name="i-lucide-arrow-right" class="size-3" />
             </button>
           </div>
+        </div>
         </div>
       </div>
     </section>
