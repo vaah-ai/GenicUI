@@ -11,8 +11,468 @@
  * All copy is real — no lorem ipsum. All buttons route into the IA tree
  * that M5.1-T3 wired up.
  */
+import { h, nextTick, ref } from 'vue'
 const copied = ref(false)
 let copyTimer: ReturnType<typeof setTimeout> | null = null
+
+// Active tab in the "What you build" case studies. Four cases are
+// rendered into a single shared surface (tabs on top, intro as a
+// banner, themed chat full-width below) to compress the page height —
+// the four stacked stitched-chat blocks previously pushed the bento
+// grid far below the fold.
+const activeCase = ref(0)
+const caseCount = 4
+const nextCase = () => { activeCase.value = (activeCase.value + 1) % caseCount }
+const prevCase = () => { activeCase.value = (activeCase.value - 1 + caseCount) % caseCount }
+
+// Refs to each tab button so onCaseKeydown can move focus along with
+// the activeCase state. WAI-ARIA tabs pattern: focus and selection
+// move together on ArrowLeft / ArrowRight / Home / End.
+const tabRefs = ref<HTMLButtonElement[]>([])
+
+function onCaseKeydown(event: KeyboardEvent, index: number) {
+  let next: number | null = null
+  if (event.key === 'ArrowRight') next = (index + 1) % caseCount
+  else if (event.key === 'ArrowLeft') next = (index - 1 + caseCount) % caseCount
+  else if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = caseCount - 1
+  if (next === null) return
+  event.preventDefault()
+  activeCase.value = next
+  // Move focus to the newly active tab — WAI-ARIA tabs pattern keeps
+  // focus and selection in lockstep so the visible focus ring always
+  // sits on the active tab. Without this the focus ring stays on the
+  // tab the user pressed arrow on, leaving the screen reading as
+  // "focused ≠ active" — which is what the M5.1-T5 UAT caught.
+  nextTick(() => tabRefs.value[next!]?.focus())
+}
+
+// Reusable chrome header (chat surface top bar). Each environment
+// gets its own icon + title + status indicator so the four cases
+// stay visually distinct.
+const chromeHeader = (icon: string, titlePrefix: string, titleHighlight: string, accent: string, statusLabel: string) =>
+  h('div', { class: 'flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-black/30' }, [
+    h('div', { class: 'flex items-center gap-2 min-w-0' }, [
+      h(resolveComponent('UIcon'), { name: icon, class: `size-3.5 ${accent} shrink-0` }),
+      h('span', { class: 'font-mono text-[11px] text-white/70 truncate' }, [
+        titlePrefix,
+        h('span', { class: 'text-white/90' }, titleHighlight)
+      ]),
+      h('span', { class: 'px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider hidden sm:inline-block' }, 'live demo')
+    ]),
+    h('div', { class: 'flex items-center gap-1.5 shrink-0' }, [
+      h('span', { class: 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' }),
+      h('span', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, statusLabel)
+    ])
+  ])
+
+const sparkAvatar = (gradient: string) =>
+  h('div', { class: `w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border border-white/10 flex items-center justify-center shrink-0` }, [
+    h(resolveComponent('UIcon'), { name: 'i-lucide-sparkles', class: 'size-4 text-blue-300' })
+  ])
+
+const youAvatar = () =>
+  h('div', { class: 'w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80 shrink-0' }, 'you')
+
+// ── UC01: E-commerce shopping assistant (chat / no chrome) ────────────
+const uc01Header = () =>
+  h('div', { class: 'flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-white/[0.015]' }, [
+    h('div', { class: 'flex items-center gap-2' }, [
+      h('div', { class: 'w-6 h-6 rounded-full bg-gradient-to-br from-blue-500/40 to-cyan-500/40 border border-white/10 flex items-center justify-center' }, [
+        h(resolveComponent('UIcon'), { name: 'i-lucide-sparkles', class: 'size-3 text-blue-300' })
+      ]),
+      h('span', { class: 'text-xs font-medium text-white/90' }, 'Genic assistant'),
+      h('span', { class: 'px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-[var(--color-text-muted)] uppercase tracking-wider' }, 'live demo')
+    ]),
+    h('div', { class: 'flex items-center gap-1.5' }, [
+      h('span', { class: 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' }),
+      h('span', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, 'connected')
+    ])
+  ])
+
+const uc01Thread = () =>
+  h('div', { class: 'px-4 py-5 sm:px-6 sm:py-6 space-y-5' }, [
+    // Turn 1 — user
+    h('div', { class: 'flex items-start gap-3 justify-end' }, [
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white' }, 'Show me my cart and apply the SUMMER25 coupon.'),
+      youAvatar()
+    ]),
+    // Turn 2 — agent
+    h('div', { class: 'flex items-start gap-3' }, [
+      sparkAvatar('from-blue-500/30 to-cyan-500/30'),
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90' }, [
+        'Pulled up your cart. Coupon applied — you saved ',
+        h('span', { class: 'text-emerald-300 font-medium' }, '$14.20'),
+        '. Ready to check out?'
+      ])
+    ]),
+    // Turn 3 — render_component + cart
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 shrink-0', 'aria-hidden': 'true' }),
+      h('div', { class: 'flex-1 min-w-0 space-y-2' }, [
+        h('div', { class: 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          h(resolveComponent('UIcon'), { name: 'i-lucide-zap', class: 'size-3 text-blue-300' }),
+          ' render_component · ',
+          h('span', { class: 'text-blue-300/90' }, 'CartViewer')
+        ]),
+        h('div', { class: 'rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5' }, [
+          h('div', { class: 'flex items-center justify-between mb-4' }, [
+            h('div', { class: 'flex items-center gap-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-shopping-cart', class: 'size-4 text-blue-300' }),
+              h('span', { class: 'text-sm font-medium text-white' }, 'Your cart'),
+              h('span', { class: 'px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-[var(--color-text-muted)]' }, '3 items')
+            ]),
+            h('span', { class: 'text-[10px] font-mono text-emerald-400 uppercase tracking-wider' }, 'cart: a8f2')
+          ]),
+          h('div', { class: 'space-y-2 mb-4' }, [
+            cartRow('from-amber-500/20 to-orange-500/20', 'Linen field jacket', 'Sand · M', '$148.00'),
+            cartRow('from-violet-500/20 to-pink-500/20', 'Cotton crew tee', 'Off-white · L', '$32.00'),
+            cartRow('from-emerald-500/20 to-cyan-500/20', 'Canvas weekender', 'Olive', '$184.00')
+          ]),
+          h('div', { class: 'rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 flex items-center justify-between mb-3' }, [
+            h('div', { class: 'flex items-center gap-2 text-xs text-emerald-300' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-tag', class: 'size-3.5' }),
+              h('span', null, 'SUMMER25 applied')
+            ]),
+            h('span', { class: 'text-xs font-mono text-emerald-300' }, '−$14.20')
+          ]),
+          h('div', { class: 'flex items-center justify-between mb-3' }, [
+            h('span', { class: 'text-xs text-[var(--color-text-muted)]' }, 'Subtotal'),
+            h('span', { class: 'text-sm font-mono text-white' }, '$349.80')
+          ]),
+          h('button', { type: 'button', class: 'w-full rounded-lg bg-white text-black font-medium py-2 text-xs hover:bg-white/90 transition flex items-center justify-center gap-2 group' }, [
+            'Checkout',
+            h(resolveComponent('UIcon'), { name: 'i-lucide-arrow-right', class: 'size-3.5 transition-transform group-hover:translate-x-0.5' })
+          ])
+        ]),
+        h('p', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          'rendered via ',
+          h('span', { class: 'text-blue-300/80' }, 'render_component'),
+          ' · PrimeVue DataTable + Button'
+        ])
+      ])
+    ])
+  ])
+
+function cartRow(thumbGradient: string, name: string, sub: string, price: string) {
+  return h('div', { class: 'flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] p-2.5' }, [
+    h('div', { class: `w-10 h-10 rounded-md bg-gradient-to-br ${thumbGradient} border border-white/10 shrink-0` }),
+    h('div', { class: 'flex-1 min-w-0' }, [
+      h('div', { class: 'text-sm text-white truncate' }, name),
+      h('div', { class: 'text-xs text-[var(--color-text-muted)]' }, sub)
+    ]),
+    h('div', { class: 'text-sm font-mono text-white shrink-0' }, price)
+  ])
+}
+
+// ── UC02: Support triage — VS Code IDE assistant pane ──────────────────
+const uc02Header = () =>
+  chromeHeader('i-simple-icons-visualstudiocode', 'VS Code · ', 'support-assistant', 'text-violet-300', 'connected')
+
+const uc02Thread = () =>
+  h('div', { class: 'px-4 py-5 sm:px-6 sm:py-6 space-y-5' }, [
+    h('div', { class: 'flex items-start gap-3 justify-end' }, [
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white' }, 'Handle the most urgent payment ticket.'),
+      youAvatar()
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h(resolveComponent('UIcon'), { name: 'i-simple-icons-visualstudiocode', class: 'size-8 rounded-lg bg-violet-500/15 border border-violet-400/30 p-1.5 text-violet-300 shrink-0' }),
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tl-md bg-violet-500/10 border border-violet-400/20 px-4 py-2.5 text-sm text-white/90' }, 'Triage summary in. Customer is high-LTV, third payment issue this month. I’d recommend escalating — want me to route it to billing?')
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 shrink-0', 'aria-hidden': 'true' }),
+      h('div', { class: 'flex-1 min-w-0 space-y-2' }, [
+        h('div', { class: 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          h(resolveComponent('UIcon'), { name: 'i-lucide-zap', class: 'size-3 text-violet-300' }),
+          ' render_component · ',
+          h('span', { class: 'text-violet-300/90' }, 'TicketCard')
+        ]),
+        h('div', { class: 'rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5' }, [
+          h('div', { class: 'flex items-center justify-between mb-3' }, [
+            h('div', { class: 'flex items-center gap-2' }, [
+              h('span', { class: 'px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider' }, 'urgent'),
+              h('span', { class: 'text-sm font-medium text-white' }, 'Ticket #C-2847')
+            ]),
+            h('span', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, '3m ago')
+          ]),
+          h('h4', { class: 'text-base text-white mb-1.5' }, 'Payment failed for order #1092'),
+          h('p', { class: 'text-xs text-[var(--color-text-muted,#A1A1AA)] mb-4 leading-relaxed' }, 'Customer reports Visa ending 4291 declined twice. Three prior tickets this month.'),
+          h('div', { class: 'rounded-lg bg-white/[0.03] border border-white/[0.06] p-3 mb-4' }, [
+            h('div', { class: 'text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2' }, 'Customer history'),
+            h('div', { class: 'space-y-1 text-xs' }, [
+              historyRow('Lifetime value', '$2,840'),
+              historyRow('Prior tickets (30d)', '3'),
+              historyRow('Plan', 'Pro · annual')
+            ])
+          ]),
+          h('div', { class: 'grid grid-cols-2 gap-2' }, [
+            h('button', { type: 'button', class: 'rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white hover:bg-white/10 transition flex items-center justify-center gap-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-check', class: 'size-3.5 text-emerald-400' }), 'Resolve'
+            ]),
+            h('button', { type: 'button', class: 'rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white hover:bg-white/10 transition flex items-center justify-center gap-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-arrow-up-right', class: 'size-3.5 text-amber-400' }), 'Escalate'
+            ])
+          ])
+        ]),
+        h('p', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          'rendered via ',
+          h('span', { class: 'text-blue-300/80' }, 'render_component'),
+          ' · TicketCard in IDE assistant'
+        ])
+      ])
+    ])
+  ])
+
+function historyRow(label: string, value: string) {
+  return h('div', { class: 'flex items-center justify-between' }, [
+    h('span', { class: 'text-white/80' }, label),
+    h('span', { class: 'font-mono text-white' }, value)
+  ])
+}
+
+// ── UC03: Analytics — Slack #analytics ────────────────────────────────
+const uc03Header = () =>
+  chromeHeader('i-simple-icons-slack', 'genicui · ', '#analytics', 'text-emerald-300', 'online')
+
+const uc03Thread = () =>
+  h('div', { class: 'px-4 py-5 sm:px-6 sm:py-6 space-y-5' }, [
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 h-8 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/85 shrink-0' }, 'PM'),
+      h('div', { class: 'min-w-0' }, [
+        h('div', { class: 'flex items-center gap-2 mb-0.5' }, [
+          h('span', { class: 'text-xs font-medium text-white' }, 'Priya M.'),
+          h('span', { class: 'text-[10px] text-white/40 font-mono' }, '14:02')
+        ]),
+        h('div', { class: 'rounded-lg bg-white/5 border border-white/10 px-3.5 py-2 text-sm text-white/90 inline-block' }, 'How is revenue trending this week vs last?')
+      ])
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 h-8 rounded-md bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center shrink-0' }, [
+        h(resolveComponent('UIcon'), { name: 'i-lucide-sparkles', class: 'size-4 text-violet-300' })
+      ]),
+      h('div', { class: 'min-w-0' }, [
+        h('div', { class: 'flex items-center gap-2 mb-0.5' }, [
+          h('span', { class: 'text-xs font-medium text-white' }, 'Genic Bot'),
+          h('span', { class: 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' }, 'APP'),
+          h('span', { class: 'text-[10px] text-white/40 font-mono' }, '14:02')
+        ]),
+        h('div', { class: 'rounded-lg bg-violet-500/10 border border-violet-400/20 px-3.5 py-2.5 text-sm text-white/90 inline-block' }, [
+          'Up ',
+          h('span', { class: 'text-emerald-300 font-medium' }, '+12.4%'),
+          ' week-over-week. Strongest day was Wednesday — 3 new enterprise accounts. Posting the dashboard:'
+        ])
+      ])
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 shrink-0', 'aria-hidden': 'true' }),
+      h('div', { class: 'flex-1 min-w-0 space-y-2' }, [
+        h('div', { class: 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          h(resolveComponent('UIcon'), { name: 'i-lucide-zap', class: 'size-3 text-emerald-300' }),
+          ' render_component · ',
+          h('span', { class: 'text-emerald-300/90' }, 'KpiDashboard')
+        ]),
+        h('div', { class: 'rounded-xl border border-white/[0.08] bg-black/30 p-4 sm:p-5' }, [
+          h('div', { class: 'flex items-center justify-between mb-4' }, [
+            h('div', { class: 'flex items-center gap-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-chart-line', class: 'size-4 text-emerald-300' }),
+              h('span', { class: 'text-sm font-medium text-white' }, 'Weekly revenue')
+            ]),
+            h('span', { class: 'px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-300' }, '+12.4%')
+          ]),
+          h('div', { class: 'grid grid-cols-3 gap-2 mb-4' }, [
+            kpiTile('This week', '$48.2k'),
+            kpiTile('Orders', '312'),
+            kpiTile('AOV', '$154.40')
+          ]),
+          h('div', { class: 'rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 mb-4' }, [
+            h('svg', { viewBox: '0 0 320 80', class: 'w-full h-16', preserveAspectRatio: 'none', innerHTML: `
+              <defs>
+                <linearGradient id="spark-uc3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12 L320,80 L0,80 Z" fill="url(#spark-uc3)" />
+              <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            ` }),
+            h('div', { class: 'flex items-center justify-between mt-1.5 text-[9px] font-mono text-[var(--color-text-muted)]' }, [
+              h('span', null, 'Mon'), h('span', null, 'Tue'), h('span', null, 'Wed'),
+              h('span', null, 'Thu'), h('span', null, 'Fri'), h('span', null, 'Sat'), h('span', null, 'Sun')
+            ])
+          ]),
+          h('div', { class: 'space-y-1.5' }, [
+            h('div', { class: 'text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)]' }, 'Top accounts (this week)'),
+            accountRow('Northwind Co.', '$8,420'),
+            accountRow('Acme Industrial', '$5,180'),
+            accountRow('Pioneer Labs', '$3,940')
+          ]),
+          h('div', { class: 'mt-3 pt-3 border-t border-white/[0.06] flex items-center gap-3 text-[10px] font-mono text-white/50' }, [
+            h('span', { class: 'hover:text-white cursor-pointer' }, '↳ Reply in thread'),
+            h('span', { class: 'hover:text-white cursor-pointer' }, 'Drill in'),
+            h('span', { class: 'hover:text-white cursor-pointer' }, 'Export CSV')
+          ])
+        ]),
+        h('p', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          'rendered via ',
+          h('span', { class: 'text-blue-300/80' }, 'render_component'),
+          ' · KpiDashboard with drill-down actions'
+        ])
+      ])
+    ])
+  ])
+
+function kpiTile(label: string, value: string) {
+  return h('div', { class: 'rounded-lg bg-white/[0.04] px-2.5 py-2' }, [
+    h('div', { class: 'text-[9px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5' }, label),
+    h('div', { class: 'text-sm font-mono text-white' }, value)
+  ])
+}
+
+function accountRow(name: string, value: string) {
+  return h('div', { class: 'flex items-center justify-between text-xs' }, [
+    h('span', { class: 'text-white/80 truncate' }, name),
+    h('span', { class: 'font-mono text-white' }, value)
+  ])
+}
+
+// ── UC04: Form — browser-extension popup ───────────────────────────────
+const uc04Header = () =>
+  chromeHeader('i-lucide-chrome', 'genicui · ', 'claim-form', 'text-amber-300', 'connected')
+
+const uc04Thread = () =>
+  h('div', { class: 'px-4 py-5 sm:px-6 sm:py-6 space-y-5' }, [
+    h('div', { class: 'flex items-start gap-3 justify-end' }, [
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white' }, 'I was rear-ended on Market St last Thursday. Help me file the claim.'),
+      youAvatar()
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h(resolveComponent('UIcon'), { name: 'i-lucide-chrome', class: 'size-8 rounded-lg bg-amber-500/15 border border-amber-400/30 p-1.5 text-amber-300 shrink-0' }),
+      h('div', { class: 'max-w-[80%] rounded-2xl rounded-tl-md bg-amber-500/10 border border-amber-400/20 px-4 py-2.5 text-sm text-white/90' }, [
+        'Got it. I’ve prefilled the form from your description — three fields left to confirm before you submit. Say ',
+        h('em', null, '“continue”'),
+        ' or tap the button on the popup.'
+      ])
+    ]),
+    h('div', { class: 'flex items-start gap-3' }, [
+      h('div', { class: 'w-8 shrink-0', 'aria-hidden': 'true' }),
+      h('div', { class: 'flex-1 min-w-0 space-y-2' }, [
+        h('div', { class: 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          h(resolveComponent('UIcon'), { name: 'i-lucide-zap', class: 'size-3 text-amber-300' }),
+          ' render_component · ',
+          h('span', { class: 'text-amber-300/90' }, 'ClaimForm')
+        ]),
+        h('div', { class: 'rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5' }, [
+          h('div', { class: 'flex items-center justify-between mb-4' }, [
+            h('div', { class: 'flex items-center gap-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-file-pen-line', class: 'size-4 text-amber-300' }),
+              h('span', { class: 'text-sm font-medium text-white' }, 'Insurance claim')
+            ]),
+            h('span', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, 'step 2 / 4')
+          ]),
+          h('div', { class: 'space-y-3 mb-4' }, [
+            fieldGroup('Incident type', 'Auto collision', 'i-lucide-chevron-down'),
+            fieldGroup('Date of incident', 'Sept 4, 2026', 'i-lucide-calendar'),
+            h('div', null, [
+              h('label', { class: 'block text-[10px] font-mono text-[var(--color-text-muted)] mb-1.5 uppercase tracking-wider' }, 'Description'),
+              h('div', { class: 'rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white/80 min-h-[64px]' }, 'Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...')
+            ]),
+            h('div', { class: 'flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2' }, [
+              h(resolveComponent('UIcon'), { name: 'i-lucide-sparkles', class: 'size-3.5 text-amber-300' }),
+              h('span', { class: 'text-xs text-amber-200/90' }, [
+                'Agent prefilled this from your chat. ',
+                h('span', { class: 'underline' }, 'Review & continue')
+              ])
+            ])
+          ]),
+          h('button', { type: 'button', class: 'w-full rounded-lg bg-white text-black font-medium py-2 text-xs hover:bg-white/90 transition flex items-center justify-center gap-2 group' }, [
+            'Continue to step 3',
+            h(resolveComponent('UIcon'), { name: 'i-lucide-arrow-right', class: 'size-3.5 transition-transform group-hover:translate-x-0.5' })
+          ])
+        ]),
+        h('p', { class: 'text-[10px] font-mono text-[var(--color-text-muted)]' }, [
+          'rendered via ',
+          h('span', { class: 'text-blue-300/80' }, 'render_component'),
+          ' · ClaimForm via browser extension'
+        ])
+      ])
+    ])
+  ])
+
+function fieldGroup(label: string, value: string, icon: string) {
+  return h('div', null, [
+    h('label', { class: 'block text-[10px] font-mono text-[var(--color-text-muted)] mb-1.5 uppercase tracking-wider' }, label),
+    h('div', { class: 'rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white flex items-center justify-between' }, [
+      h('span', null, value),
+      h(resolveComponent('UIcon'), { name: icon, class: 'size-3.5 text-[var(--color-text-muted)]' })
+    ])
+  ])
+}
+
+// Tab metadata + panel renderers. Each entry exposes:
+//   id                — stable id used for tab/panel element ids
+//   shortLabel        — text on the pill button (e.g. "E-commerce")
+//   dotClass          — accent dot color (active state styling lives in tab)
+//   activeText        — text-color tweak on the active pill (matches accent)
+//   eyebrowClass      — color of the "Use case 0n" eyebrow on the left
+//   topBorderClass    — accent border-t-{color}/60 on the chat surface
+//   category          — right-side eyebrow ("Analytics · Slack")
+//   headline          — h3 markup with the case's headline
+//   body              — p markup with the case's intro paragraph
+//   header / thread   — VNode render functions for the chrome + 3-turn thread
+const caseTabs = [
+  {
+    id: 'ecommerce',
+    shortLabel: 'E-commerce',
+    dotClass: 'bg-blue-400',
+    activeText: '',
+    eyebrowClass: 'text-[var(--color-accent-blue)]',
+    topBorderClass: '',
+    category: 'E-commerce',
+    headline: 'Conversational shopping.',
+    body: 'The user says “show me my cart and apply the summer coupon.” The agent calls <code class="text-blue-300/90 font-mono text-sm">render_component</code> with your <code class="text-blue-300/90 font-mono text-sm">CartViewer</code>. Your PrimeVue DataTable appears inline, prefilled with their items, with a working “Apply coupon” button wired to your checkout.',
+    header: uc01Header,
+    thread: uc01Thread
+  },
+  {
+    id: 'ide-triage',
+    shortLabel: 'IDE triage',
+    dotClass: 'bg-violet-400',
+    activeText: '',
+    eyebrowClass: 'text-[var(--color-accent-violet)]',
+    topBorderClass: 'border-t-violet-400/60',
+    category: 'Support triage · IDE',
+    headline: 'Triage tickets <span class="display-serif">in</span> your IDE.',
+    body: 'The agent pulls a customer’s history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons — inline in your IDE assistant pane. No second tab, no tab-switch.',
+    header: uc02Header,
+    thread: uc02Thread
+  },
+  {
+    id: 'slack-analytics',
+    shortLabel: 'Slack analytics',
+    dotClass: 'bg-emerald-400',
+    activeText: '',
+    eyebrowClass: 'text-[var(--color-accent-emerald)]',
+    topBorderClass: 'border-t-emerald-400/60',
+    category: 'Analytics · Slack',
+    headline: 'Numbers, in the same thread as the team.',
+    body: 'The user asks <em>“how is revenue trending this week?”</em> in the <code class="font-mono text-sm text-emerald-300/90">#analytics</code> channel. The agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> inline as a thread reply — chart, top accounts, drill-down controls — fully visible to everyone who follows the conversation.',
+    header: uc03Header,
+    thread: uc03Thread
+  },
+  {
+    id: 'browser-form',
+    shortLabel: 'Browser form',
+    dotClass: 'bg-amber-400',
+    activeText: '',
+    eyebrowClass: 'text-[var(--color-accent-amber)]',
+    topBorderClass: 'border-t-amber-400/60',
+    category: 'Form · browser extension',
+    headline: 'Fill the form <span class="display-serif">for</span> the user.',
+    body: 'The user describes what happened in plain language. The agent maps it to your schema, renders the real form pre-populated, and hands control back. The user reviews, edits, and submits — and the structured values flow back to the agent on submit.',
+    header: uc04Header,
+    thread: uc04Thread
+  }
+]
 
 async function copyInstall(event: MouseEvent) {
   const btn = event.currentTarget as HTMLButtonElement
@@ -319,471 +779,159 @@ onBeforeUnmount(() => {
 
     <!-- USE CASES — what you actually build with GenicUI -->
     <section class="relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
-          <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div class="max-w-3xl mx-auto text-center mb-8 sm:mb-10">
+          <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-3">
             What you build
           </p>
-          <h2 class="display-sans text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
+          <h2 class="display-sans text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
             From <span class="display-serif">"let me check"</span><br class="hidden sm:block"> to a real, working UI.
           </h2>
-          <p class="mt-6 text-lg text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto">
-            Today, an agent in a chat panel tells the user <em>"I've pulled up your cart"</em> and shows a paragraph. With GenicUI, the agent renders the actual cart — interactive, connected, owned by your component library. Here are the flows teams ship first.
+          <p class="mt-4 text-base text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto">
+            Today, an agent tells the user <em>"I've pulled up your cart"</em> and shows a paragraph. With GenicUI, the agent renders the actual cart — interactive, connected, owned by your library. Pick a flow.
           </p>
         </div>
 
-        <div class="space-y-14 lg:space-y-20">
-          <!-- Use case 1: E-commerce / shopping assistant -->
-          <div class="usecase-grid">
-            <!-- Left: chat log -->
-            <div class="space-y-4">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-blue)]">
-                  Use case 01
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  E-commerce
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Conversational shopping.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user says "show me my cart and apply the summer coupon." The agent calls <code class="text-blue-300/90 font-mono text-sm">render_component</code> with your <code class="text-blue-300/90 font-mono text-sm">CartViewer</code>. Your PrimeVue DataTable appears inline, prefilled with their items, with a working "Apply coupon" button wired to your checkout.
-              </p>
-              <div class="space-y-3 pt-2">
-                <!-- Chat bubble: user -->
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    Show me my cart and apply the SUMMER25 coupon.
-                  </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
-                  </div>
-                </div>
-                <!-- Chat bubble: agent -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/10 flex items-center justify-center">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-blue-300" />
-                  </div>
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-blue-500/10 border border-blue-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Pulled up your cart. Coupon applied — you saved <span class="text-emerald-300 font-medium">$14.20</span>. Ready to check out?
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!--
+          Case studies — tabbed.
 
-            <!-- Right: the rendered component (live-looking mock) -->
-            <div class="glass-card glass-card-tilt p-6 sm:p-8">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-shopping-cart" class="size-4 text-blue-300" />
-                  <span class="text-sm font-medium text-white">Your cart</span>
-                  <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-[var(--color-text-muted)]">3 items</span>
-                </div>
-                <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">cart: a8f2</span>
-              </div>
-              <div class="space-y-3 mb-5">
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Linen field jacket</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Sand · M</div>
-                  </div>
-                  <div class="text-sm font-mono text-white">$148.00</div>
-                </div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Cotton crew tee</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Off-white · L</div>
-                  </div>
-                  <div class="text-sm font-mono text-white">$32.00</div>
-                </div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10" />
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">Canvas weekender</div>
-                    <div class="text-xs text-[var(--color-text-muted)]">Olive</div>
-                  </div>
-                  <div class="text-sm font-mono text-white">$184.00</div>
-                </div>
-              </div>
-              <div class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2 text-sm text-emerald-300">
-                  <UIcon name="i-lucide-tag" class="size-4" />
-                  <span>SUMMER25 applied</span>
-                </div>
-                <span class="text-sm font-mono text-emerald-300">−$14.20</span>
-              </div>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-sm text-[var(--color-text-muted)]">Subtotal</span>
-                <span class="text-base font-mono text-white">$349.80</span>
-              </div>
-              <button
-                type="button"
-                class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
-              >
-                Checkout
-                <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
-              </button>
-              <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · PrimeVue DataTable + Button
-              </p>
-            </div>
+          Why tabs: with all four stitched-chat blocks stacked, the section
+          was ~3200px tall and pushed the bento grid and the rest of the page
+          well below the fold. Tabs compress the surface area to one active
+          case at a time so the visitor sees the breadth (4 environments) at
+          a glance and can drill into any one of them.
+
+          Why stacked (not side-by-side): the previous 5-column grid left an
+          empty right column below the chat panel whenever the intro column
+          was shorter than the chat (UC03's KpiDashboard is ~720px tall;
+          UC01's intro paragraph is ~250px). Stacking intro above a
+          full-width chat removes that dead space.
+
+          Why max-w-3xl (~768px): with the section header centered on a
+          1280px page, the chat panel was reading 1280px wide too — the cart
+          rows in UC01 felt sparse, the KPIs in UC03 had too much horizontal
+          space between them, and the eye lost the chat-as-narrative thread.
+          768px is the canonical "comfortable reading column" width from the
+          Bringhurst / Lupton type-scale tables; it keeps each chat turn as
+          one or two lines of natural prose and gives the panel chrome room
+          to breathe without the surface feeling empty. The outer section
+          stays at max-w-7xl so the dark backdrop extends to the viewport
+          edges, and the column sits as a focused island.
+
+          Accessibility: pill buttons are real <button> elements with role="tab",
+          a labelled tablist parent, and ArrowLeft/ArrowRight/End/Home keyboard
+          nav matching the WAI-ARIA tabs pattern. Focus follows selection on
+          arrow keys (nextTick + tabRefs.focus()), so the visible focus ring
+          always sits on the active tab. The active panel uses role="tabpanel"
+          with id wired so AT can announce the switch.
+
+          Per-case markup stays inline (not v-html) so the visual fidelity
+          of the original stitched-chat designs is preserved verbatim —
+          only the framing (eyebrow + headline + paragraph above, 3-turn
+          thread below) is collapsed into a single surface that swaps on
+          tab activation.
+        -->
+        <div class="max-w-3xl mx-auto">
+        <div
+          role="tablist"
+          aria-label="Case studies"
+          class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
+        >
+          <button
+            v-for="(item, i) in caseTabs"
+            :key="item.id"
+            :ref="el => { if (el) tabRefs[i] = el as HTMLButtonElement }"
+            type="button"
+            role="tab"
+            :id="`case-tab-${item.id}`"
+            :aria-selected="activeCase === i"
+            :aria-controls="`case-panel-${item.id}`"
+            :tabindex="activeCase === i ? 0 : -1"
+            class="shrink-0 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-medium font-mono uppercase tracking-wider transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            :class="activeCase === i
+              ? `bg-white/[0.06] border-white/20 text-white ${item.activeText}`
+              : 'border-white/10 text-[var(--color-text-muted)] hover:text-white hover:border-white/15'"
+            @click="activeCase = i"
+            @keydown="onCaseKeydown($event, i)"
+          >
+            <span
+              class="inline-block size-1.5 rounded-full"
+              :class="item.dotClass"
+              aria-hidden="true"
+            />
+            <span class="text-[10px] tracking-[0.18em] text-white/40">0{{ i + 1 }}</span>
+            <span>{{ item.shortLabel }}</span>
+          </button>
+        </div>
+
+        <!-- Intro banner — single row, eyebrow + headline + 1-line blurb.
+             Tightened from the previous 6-line paragraph block so the
+             section's vertical real estate goes to the chat, not the copy. -->
+        <div class="mb-5 space-y-3 text-center">
+          <div class="flex items-center justify-center gap-3">
+            <span
+              class="font-mono text-[10px] tracking-[0.2em] uppercase"
+              :class="caseTabs[activeCase].eyebrowClass"
+            >
+              Use case 0{{ activeCase + 1 }}
+            </span>
+            <span class="h-px w-8 bg-white/10" />
+            <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+              {{ caseTabs[activeCase].category }}
+            </span>
           </div>
-
-          <!-- Use case 2: Customer support triage — IDE assistant chrome -->
-          <div class="usecase-grid">
-            <!-- Right first on mobile, left on desktop (alternate) -->
-            <div class="glass-card p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-violet-400/60">
-              <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                <UIcon name="i-simple-icons-visualstudiocode" class="size-3.5 text-violet-300" />
-                <span class="font-mono text-[10px] text-white/60">VS Code · support-assistant.tsx</span>
-                <UIcon name="i-lucide-ellipsis" class="size-3 text-white/40 ml-auto" />
-              </div>
-              <div class="p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-5">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono text-rose-300 uppercase tracking-wider">
-                      urgent
-                    </span>
-                    <span class="text-sm font-medium text-white">Ticket #C-2847</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">3m ago</span>
-                </div>
-                <h4 class="text-lg text-white mb-2">Payment failed for order #1092</h4>
-                <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] mb-5 leading-relaxed">
-                  Customer reports Visa ending 4291 declined twice. Tried again, same error. Three prior tickets this month.
-                </p>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-                    Customer history
-                  </div>
-                  <div class="space-y-1.5 text-sm">
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Lifetime value</span>
-                      <span class="font-mono text-white">$2,840</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Prior tickets (30d)</span>
-                      <span class="font-mono text-white">3</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-white/80">Plan</span>
-                      <span class="font-mono text-white">Pro · annual</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                  >
-                    <UIcon name="i-lucide-check" class="size-4 text-emerald-400" />
-                    Resolve
-                  </button>
-                  <button
-                    type="button"
-                    class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition flex items-center justify-center gap-2"
-                  >
-                    <UIcon name="i-lucide-arrow-up-right" class="size-4 text-amber-400" />
-                    Escalate
-                  </button>
-                </div>
-                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                  rendered via <span class="text-blue-300/80">render_component</span> · TicketCard in IDE assistant
-                </p>
-              </div>
+          <template v-for="(item, i) in caseTabs" :key="`intro-${item.id}`">
+            <div v-show="activeCase === i" class="space-y-2">
+              <h3 class="display-sans text-xl sm:text-2xl text-white" v-html="item.headline" />
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed mx-auto max-w-xl" v-html="item.body" />
             </div>
+          </template>
+        </div>
 
-            <div class="space-y-4 order-1 lg:order-2">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-violet)]">
-                  Use case 02
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Support triage · IDE
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Triage tickets <span class="display-serif">in</span> your IDE.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The agent pulls a customer's history, summarizes the issue, and renders a fully contextual <code class="text-violet-300/90 font-mono text-sm">TicketCard</code> with Resolve / Escalate buttons — inline in your IDE assistant pane. No second tab, no tab-switch.
-              </p>
-              <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    Handle the most urgent payment ticket.
-                  </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <UIcon name="i-simple-icons-visualstudiocode" class="size-7 rounded-lg bg-violet-500/15 border border-violet-400/30 p-1.5 text-violet-300 shrink-0" />
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-violet-500/10 border border-violet-400/20 px-4 py-2.5 text-sm text-white/90">
-                    IDE assistant: triage summary in. Customer is high-LTV, third payment issue this month. I'd recommend escalating — want me to route it to billing?
-                  </div>
-                </div>
-              </div>
+        <!-- Themed chat surface — full width. One panel per case; only the
+             active one is visible. Switching keeps the same outer
+             rounded-2xl + accent top-border so the four cases read
+             as one family with environment-specific chrome. -->
+        <div class="space-y-3">
+          <template v-for="(item, i) in caseTabs" :key="`panel-${item.id}`">
+            <div
+              v-show="activeCase === i"
+              role="tabpanel"
+              :id="`case-panel-${item.id}`"
+              :aria-labelledby="`case-tab-${item.id}`"
+              :class="['rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4', item.topBorderClass]"
+            >
+              <!-- Chrome header (varies per environment) -->
+              <component :is="item.header" />
+
+              <!-- Three-turn thread -->
+              <component :is="item.thread" />
             </div>
+          </template>
+
+          <!-- Tab nav controls (mobile-friendly) -->
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
+              @click="prevCase"
+            >
+              <UIcon name="i-lucide-arrow-left" class="size-3" />
+              <span>previous</span>
+            </button>
+            <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+              {{ activeCase + 1 }} / {{ caseCount }}
+            </span>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
+              @click="nextCase"
+            >
+              <span>next</span>
+              <UIcon name="i-lucide-arrow-right" class="size-3" />
+            </button>
           </div>
-
-          <!-- Use case 3: Data analytics — Slack/Discord channel chrome. Same
-               KpiDashboard on the right, but the chat-bubble pair is
-               replaced by a channel-rail + thread that visually places
-               the conversation inside a Slack-style window. -->
-          <div class="usecase-grid">
-            <div class="space-y-4">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-emerald)]">
-                  Use case 03
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Analytics · Slack
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Numbers, in the same thread as the team.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user asks <em>"how is revenue trending this week?"</em> in the <code class="font-mono text-sm text-emerald-300/90">#analytics</code> channel. The agent renders a real <code class="text-emerald-300/90 font-mono text-sm">KpiDashboard</code> inline as a thread reply — chart, top accounts, drill-down controls — fully visible to everyone who follows the conversation.
-              </p>
-
-              <!-- Slack-style chrome wrapper around the chat bubbles -->
-              <div class="glass-card p-0 overflow-hidden border-t-4 border-t-emerald-400/60">
-                <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                  <UIcon name="i-simple-icons-slack" class="size-3.5 text-emerald-300" />
-                  <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · #analytics</span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                </div>
-                <div class="p-3 space-y-3">
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/85 shrink-0">
-                      PM
-                    </div>
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-2 mb-0.5">
-                        <span class="text-xs font-medium text-white">Priya M.</span>
-                        <span class="text-[10px] text-white/40 font-mono">14:02</span>
-                      </div>
-                      <div class="text-sm text-white/85">How is revenue trending this week vs last?</div>
-                    </div>
-                  </div>
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center shrink-0">
-                      <UIcon name="i-lucide-sparkles" class="size-3.5 text-violet-300" />
-                    </div>
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-2 mb-0.5">
-                        <span class="text-xs font-medium text-white">Genic Bot</span>
-                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">APP</span>
-                        <span class="text-[10px] text-white/40 font-mono">14:02</span>
-                      </div>
-                      <div class="text-sm text-white/90 mb-2">
-                        Up <span class="text-emerald-300 font-medium">+12.4%</span> week-over-week. Strongest day was Wednesday — 3 new enterprise accounts. Posting the dashboard:
-                      </div>
-                      <div class="rounded-lg border border-white/[0.08] bg-black/40 p-2.5">
-                        <div class="flex items-center justify-between mb-2">
-                          <UIcon name="i-lucide-chart-line" class="size-3.5 text-emerald-300" />
-                          <span class="text-[10px] font-mono text-emerald-300">+12.4% wow</span>
-                        </div>
-                        <svg viewBox="0 0 100 28" class="w-full h-7" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="slackSpark" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#10B981" stop-opacity="0.45" />
-                              <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
-                            </linearGradient>
-                          </defs>
-                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5 L100,28 L0,28 Z" fill="url(#slackSpark)" />
-                          <path d="M0,20 L15,18 L30,19 L45,14 L60,11 L75,9 L90,6 L100,5" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
-                        </svg>
-                        <div class="grid grid-cols-3 gap-1.5 mt-2">
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">rev</div>
-                            <div class="text-xs font-mono text-white">$48.2k</div>
-                          </div>
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">orders</div>
-                            <div class="text-xs font-mono text-white">312</div>
-                          </div>
-                          <div class="rounded bg-white/[0.04] px-2 py-1">
-                            <div class="text-[8px] font-mono uppercase text-white/40">aov</div>
-                            <div class="text-xs font-mono text-white">$154.40</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="mt-2 flex items-center gap-3 text-[10px] font-mono text-white/40">
-                        <span class="hover:text-white cursor-pointer">↳ Reply in thread</span>
-                        <span class="hover:text-white cursor-pointer">Drill in</span>
-                        <span class="hover:text-white cursor-pointer">Export CSV</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="glass-card glass-card-tilt p-6 sm:p-8">
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-chart-line" class="size-4 text-emerald-300" />
-                  <span class="text-sm font-medium text-white">Weekly revenue</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-[10px] font-mono">
-                  <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">+12.4%</span>
-                </div>
-              </div>
-              <div class="grid grid-cols-3 gap-3 mb-5">
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">This week</div>
-                  <div class="text-lg font-mono text-white">$48.2k</div>
-                </div>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Orders</div>
-                  <div class="text-lg font-mono text-white">312</div>
-                </div>
-                <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                  <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)] mb-1">AOV</div>
-                  <div class="text-lg font-mono text-white">$154.40</div>
-                </div>
-              </div>
-              <!-- Inline SVG sparkline -->
-              <div class="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4 mb-5">
-                <svg viewBox="0 0 320 80" class="w-full h-20" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
-                      <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12 L320,80 L0,80 Z" fill="url(#spark)" />
-                  <path d="M0,55 L40,48 L80,52 L120,40 L160,35 L200,28 L240,30 L280,18 L320,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <div class="flex items-center justify-between mt-2 text-[10px] font-mono text-[var(--color-text-muted)]">
-                  <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <div class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)]">
-                  Top accounts (this week)
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Northwind Co.</span>
-                  <span class="font-mono text-white">$8,420</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Acme Industrial</span>
-                  <span class="font-mono text-white">$5,180</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-white/80 truncate">Pioneer Labs</span>
-                  <span class="font-mono text-white">$3,940</span>
-                </div>
-              </div>
-              <p class="mt-4 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                rendered via <span class="text-blue-300/80">render_component</span> · KpiDashboard with drill-down actions
-              </p>
-            </div>
-          </div>
-
-          <!-- Use case 4: Form assistance — browser-extension popup chrome.
-               Same ClaimForm on the right, but the chat-bubble pair is
-               wrapped in a Chrome-style popup frame (toolbar, search
-               bar, compact sidebar layout). -->
-          <div class="usecase-grid">
-            <div class="glass-card glass-card-tilt p-0 overflow-hidden order-2 lg:order-1 border-t-4 border-t-amber-400/60">
-              <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
-                <UIcon name="i-lucide-chrome" class="size-3.5 text-amber-300" />
-                <span class="font-mono text-[10px] text-white/60 truncate flex-1">genicui · claim-form</span>
-                <UIcon name="i-lucide-settings" class="size-3 text-white/40" />
-              </div>
-              <div class="p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-5">
-                  <div class="flex items-center gap-2">
-                    <UIcon name="i-lucide-file-pen-line" class="size-4 text-amber-300" />
-                    <span class="text-sm font-medium text-white">Insurance claim</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-[var(--color-text-muted)]">step 2 / 4</span>
-                </div>
-                <div class="space-y-4 mb-5">
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Incident type</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                      <span>Auto collision</span>
-                      <UIcon name="i-lucide-chevron-down" class="size-4 text-[var(--color-text-muted)]" />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Date of incident</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white flex items-center justify-between">
-                      <span>Sept 4, 2026</span>
-                      <UIcon name="i-lucide-calendar" class="size-4 text-[var(--color-text-muted)]" />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-mono text-[var(--color-text-muted)] mb-1.5">Description</label>
-                    <div class="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white/80 min-h-[88px]">
-                      Rear-ended at low speed on Market St. No injuries. Other driver admitted fault; police report #2026-MKT-0411...
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
-                    <UIcon name="i-lucide-sparkles" class="size-4 text-amber-300" />
-                    <span class="text-xs text-amber-200/90">Agent prefilled this from your chat. <span class="underline">Review & continue</span></span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="w-full rounded-xl bg-white text-black font-medium py-2.5 text-sm hover:bg-white/90 transition flex items-center justify-center gap-2 group"
-                >
-                  Continue to step 3
-                  <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
-                </button>
-                <p class="mt-3 text-center text-[10px] font-mono text-[var(--color-text-muted)]">
-                  rendered via <span class="text-blue-300/80">render_component</span> · ClaimForm via browser extension
-                </p>
-              </div>
-            </div>
-
-            <div class="space-y-4 order-1 lg:order-2">
-              <div class="flex items-center gap-3 mb-6">
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-accent-amber)]">
-                  Use case 04
-                </span>
-                <span class="h-px flex-1 bg-white/10" />
-                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                  Form · browser extension
-                </span>
-              </div>
-              <h3 class="display-sans text-2xl sm:text-3xl text-white">
-                Fill the form <span class="display-serif">for</span> the user.
-              </h3>
-              <p class="text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
-                The user describes what happened in plain language. The agent maps it to your schema, renders the real form pre-populated, and hands control back. The user reviews, edits, and submits — and the structured values flow back to the agent on submit.
-              </p>
-              <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3 justify-end">
-                  <div class="max-w-md rounded-2xl rounded-tr-md bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white">
-                    I was rear-ended on Market St last Thursday. Help me file the claim.
-                  </div>
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 border border-white/10 flex items-center justify-center text-[10px] font-mono text-white/80">
-                    you
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <UIcon name="i-lucide-chrome" class="size-7 rounded-lg bg-amber-500/15 border border-amber-400/30 p-1.5 text-amber-300 shrink-0" />
-                  <div class="max-w-md rounded-2xl rounded-tl-md bg-amber-500/10 border border-amber-400/20 px-4 py-2.5 text-sm text-white/90">
-                    Extension: claim form prefilled. Three fields left to confirm before you submit — say <em>"continue"</em> or tap the button on the popup.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
         </div>
       </div>
     </section>
