@@ -11,13 +11,13 @@
  * All copy is real — no lorem ipsum. All buttons route into the IA tree
  * that M5.1-T3 wired up.
  */
-import { h } from 'vue'
+import { h, nextTick, ref } from 'vue'
 const copied = ref(false)
 let copyTimer: ReturnType<typeof setTimeout> | null = null
 
 // Active tab in the "What you build" case studies. Four cases are
-// rendered into a single shared surface (tabs on top, intro on the
-// left, themed chat on the right) to compress the page height —
+// rendered into a single shared surface (tabs on top, intro as a
+// banner, themed chat full-width below) to compress the page height —
 // the four stacked stitched-chat blocks previously pushed the bento
 // grid far below the fold.
 const activeCase = ref(0)
@@ -25,20 +25,26 @@ const caseCount = 4
 const nextCase = () => { activeCase.value = (activeCase.value + 1) % caseCount }
 const prevCase = () => { activeCase.value = (activeCase.value - 1 + caseCount) % caseCount }
 
+// Refs to each tab button so onCaseKeydown can move focus along with
+// the activeCase state. WAI-ARIA tabs pattern: focus and selection
+// move together on ArrowLeft / ArrowRight / Home / End.
+const tabRefs = ref<HTMLButtonElement[]>([])
+
 function onCaseKeydown(event: KeyboardEvent, index: number) {
-  if (event.key === 'ArrowRight') {
-    event.preventDefault()
-    activeCase.value = (index + 1) % caseCount
-  } else if (event.key === 'ArrowLeft') {
-    event.preventDefault()
-    activeCase.value = (index - 1 + caseCount) % caseCount
-  } else if (event.key === 'Home') {
-    event.preventDefault()
-    activeCase.value = 0
-  } else if (event.key === 'End') {
-    event.preventDefault()
-    activeCase.value = caseCount - 1
-  }
+  let next: number | null = null
+  if (event.key === 'ArrowRight') next = (index + 1) % caseCount
+  else if (event.key === 'ArrowLeft') next = (index - 1 + caseCount) % caseCount
+  else if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = caseCount - 1
+  if (next === null) return
+  event.preventDefault()
+  activeCase.value = next
+  // Move focus to the newly active tab — WAI-ARIA tabs pattern keeps
+  // focus and selection in lockstep so the visible focus ring always
+  // sits on the active tab. Without this the focus ring stays on the
+  // tab the user pressed arrow on, leaving the screen reading as
+  // "focused ≠ active" — which is what the M5.1-T5 UAT caught.
+  nextTick(() => tabRefs.value[next!]?.focus())
 }
 
 // Reusable chrome header (chat surface top bar). Each environment
@@ -773,16 +779,16 @@ onBeforeUnmount(() => {
 
     <!-- USE CASES — what you actually build with GenicUI -->
     <section class="relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <div class="max-w-4xl mx-auto text-center mb-16 sm:mb-20">
-          <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div class="max-w-4xl mx-auto text-center mb-8 sm:mb-10">
+          <p class="font-mono text-xs tracking-[0.2em] uppercase text-[var(--color-accent-blue)] mb-3">
             What you build
           </p>
-          <h2 class="display-sans text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
+          <h2 class="display-sans text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
             From <span class="display-serif">"let me check"</span><br class="hidden sm:block"> to a real, working UI.
           </h2>
-          <p class="mt-6 text-lg text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto">
-            Today, an agent in a chat panel tells the user <em>"I've pulled up your cart"</em> and shows a paragraph. With GenicUI, the agent renders the actual cart — interactive, connected, owned by your component library. Here are the flows teams ship first.
+          <p class="mt-4 text-base text-[var(--color-text-muted,#A1A1AA)] max-w-2xl mx-auto">
+            Today, an agent tells the user <em>"I've pulled up your cart"</em> and shows a paragraph. With GenicUI, the agent renders the actual cart — interactive, connected, owned by your library. Pick a flow.
           </p>
         </div>
 
@@ -795,25 +801,36 @@ onBeforeUnmount(() => {
           case at a time so the visitor sees the breadth (4 environments) at
           a glance and can drill into any one of them.
 
+          Why stacked (not side-by-side): the previous 5-column grid left an
+          empty right column below the chat panel whenever the intro column
+          was shorter than the chat (UC03's KpiDashboard is ~720px tall;
+          UC01's intro paragraph is ~250px). Stacking intro above a
+          full-width chat removes that dead space and lets the chat use
+          the full content width — important because UC03's sparkline +
+          KPIs read better with more horizontal room.
+
           Accessibility: pill buttons are real <button> elements with role="tab",
           a labelled tablist parent, and ArrowLeft/ArrowRight/End/Home keyboard
-          nav matching the WAI-ARIA tabs pattern. The active panel uses
-          role="tabpanel" and id is wired so AT can announce the switch.
+          nav matching the WAI-ARIA tabs pattern. Focus follows selection on
+          arrow keys (nextTick + tabRefs.focus()), so the visible focus ring
+          always sits on the active tab. The active panel uses role="tabpanel"
+          with id wired so AT can announce the switch.
 
           Per-case markup stays inline (not v-html) so the visual fidelity
           of the original stitched-chat designs is preserved verbatim —
-          only the framing (eyebrow + headline + paragraph on the left,
-          3-turn thread on the right) is collapsed into a single surface
-          that swaps on tab activation.
+          only the framing (eyebrow + headline + paragraph above, 3-turn
+          thread below) is collapsed into a single surface that swaps on
+          tab activation.
         -->
         <div
           role="tablist"
           aria-label="Case studies"
-          class="flex items-center gap-2 overflow-x-auto pb-1 mb-8 sm:mb-10"
+          class="flex items-center gap-2 overflow-x-auto pb-1 mb-6"
         >
           <button
             v-for="(item, i) in caseTabs"
             :key="item.id"
+            :ref="el => { if (el) tabRefs[i] = el as HTMLButtonElement }"
             type="button"
             role="tab"
             :id="`case-tab-${item.id}`"
@@ -843,76 +860,72 @@ onBeforeUnmount(() => {
           </span>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
-          <!-- Left: intro column swaps with the active case -->
-          <div class="lg:col-span-2 space-y-4 lg:sticky lg:top-24">
-            <div class="flex items-center gap-3">
-              <span
-                class="font-mono text-[10px] tracking-[0.2em] uppercase"
-                :class="caseTabs[activeCase].eyebrowClass"
-              >
-                Use case 0{{ activeCase + 1 }}
-              </span>
-              <span class="h-px flex-1 bg-white/10" />
-              <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
-                {{ caseTabs[activeCase].category }}
-              </span>
-            </div>
-
-            <!-- One intro per case. v-show (not v-if) so switching is instant
-                 and Vue keeps each panel mounted — preserves scroll-anchor
-                 memory if the user toggles back. -->
-            <template v-for="(item, i) in caseTabs" :key="`intro-${item.id}`">
-              <div v-show="activeCase === i">
-                <h3 class="display-sans text-2xl sm:text-3xl text-white" v-html="item.headline" />
-                <p class="mt-4 text-[var(--color-text-muted,#A1A1AA)] leading-relaxed" v-html="item.body" />
-              </div>
-            </template>
+        <!-- Intro banner — single row, eyebrow + headline + 1-line blurb.
+             Tightened from the previous 6-line paragraph block so the
+             section's vertical real estate goes to the chat, not the copy. -->
+        <div class="mb-5 space-y-2">
+          <div class="flex items-center gap-3">
+            <span
+              class="font-mono text-[10px] tracking-[0.2em] uppercase"
+              :class="caseTabs[activeCase].eyebrowClass"
+            >
+              Use case 0{{ activeCase + 1 }}
+            </span>
+            <span class="h-px flex-1 bg-white/10" />
+            <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-muted)]">
+              {{ caseTabs[activeCase].category }}
+            </span>
           </div>
-
-          <!-- Right: themed chat surface. One panel per case; only the
-               active one is visible. Switching keeps the same outer
-               rounded-2xl + accent top-border so the four cases read
-               as one family with environment-specific chrome. -->
-          <div class="lg:col-span-3 space-y-3">
-            <template v-for="(item, i) in caseTabs" :key="`panel-${item.id}`">
-              <div
-                v-show="activeCase === i"
-                role="tabpanel"
-                :id="`case-panel-${item.id}`"
-                :aria-labelledby="`case-tab-${item.id}`"
-                :class="['rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4', item.topBorderClass]"
-              >
-                <!-- Chrome header (varies per environment) -->
-                <component :is="item.header" />
-
-                <!-- Three-turn thread -->
-                <component :is="item.thread" />
-              </div>
-            </template>
-
-            <!-- Tab nav controls (mobile-friendly) -->
-            <div class="flex items-center justify-between gap-3 pt-1">
-              <button
-                type="button"
-                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
-                @click="prevCase"
-              >
-                <UIcon name="i-lucide-arrow-left" class="size-3" />
-                <span>previous</span>
-              </button>
-              <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
-                {{ activeCase + 1 }} / {{ caseCount }}
-              </span>
-              <button
-                type="button"
-                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
-                @click="nextCase"
-              >
-                <span>next</span>
-                <UIcon name="i-lucide-arrow-right" class="size-3" />
-              </button>
+          <template v-for="(item, i) in caseTabs" :key="`intro-${item.id}`">
+            <div v-show="activeCase === i" class="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-6 gap-y-2">
+              <h3 class="display-sans text-xl sm:text-2xl text-white shrink-0" v-html="item.headline" />
+              <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed" v-html="item.body" />
             </div>
+          </template>
+        </div>
+
+        <!-- Themed chat surface — full width. One panel per case; only the
+             active one is visible. Switching keeps the same outer
+             rounded-2xl + accent top-border so the four cases read
+             as one family with environment-specific chrome. -->
+        <div class="space-y-3">
+          <template v-for="(item, i) in caseTabs" :key="`panel-${item.id}`">
+            <div
+              v-show="activeCase === i"
+              role="tabpanel"
+              :id="`case-panel-${item.id}`"
+              :aria-labelledby="`case-tab-${item.id}`"
+              :class="['rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden border-t-4', item.topBorderClass]"
+            >
+              <!-- Chrome header (varies per environment) -->
+              <component :is="item.header" />
+
+              <!-- Three-turn thread -->
+              <component :is="item.thread" />
+            </div>
+          </template>
+
+          <!-- Tab nav controls (mobile-friendly) -->
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
+              @click="prevCase"
+            >
+              <UIcon name="i-lucide-arrow-left" class="size-3" />
+              <span>previous</span>
+            </button>
+            <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+              {{ activeCase + 1 }} / {{ caseCount }}
+            </span>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-mono text-[var(--color-text-muted)] hover:text-white transition"
+              @click="nextCase"
+            >
+              <span>next</span>
+              <UIcon name="i-lucide-arrow-right" class="size-3" />
+            </button>
           </div>
         </div>
       </div>
