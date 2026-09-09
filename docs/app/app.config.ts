@@ -17,7 +17,20 @@
 // Never reference @nuxt/ui-pro — Nuxt UI v4 MIT ships Pro features in the
 // unified open-source package.
 
+// Header logo lockup — device mark + "GenicUI" wordmark.
+// Self-contained SVG (`docs/public/logo.svg`) so it renders identically in
+// light + dark mode. The Docus AppHeaderLogo reads `header.logo.light/dark`
+// and emits a <UColorModeImage>; pointing both keys at the same file is the
+// supported pattern for mode-neutral marks.
 export default defineAppConfig({
+  header: {
+    title: 'GenicUI',
+    logo: {
+      light: '/logo.svg',
+      dark: '/logo.svg',
+      alt: 'GenicUI'
+    }
+  },
   ui: {
     colors: {
       primary: 'violet',
@@ -40,6 +53,16 @@ export default defineAppConfig({
       slots: {
         title: 'text-4xl sm:text-5xl lg:text-6xl text-pretty tracking-tight font-bold text-highlighted text-balance',
         description: 'text-base sm:text-lg text-muted text-balance mt-4'
+      }
+    },
+    // Header — slightly stronger dark glass so the brand-colored wordmark
+    // has a clean, predictable backdrop in dark mode (the page is near-black
+    // and the wordmark uses violet-300, which needs ≥4.5:1 contrast).
+    // The blur is heavier than the page noise so the header reads as a
+    // distinct "bar" rather than blending into the hero gradient.
+    header: {
+      slots: {
+        root: 'backdrop-blur-md bg-white/70 dark:bg-[#0A0A0B]/85 border-b border-neutral-200/60 dark:border-white/[0.06]'
       }
     }
   },

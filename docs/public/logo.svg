@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 28" width="132" height="28" role="img" aria-label="GenicUI">
+  <!--
+    GenicUI logo lockup — v8.
+
+    User feedback on v7: "remove the logo device, in create the font size of GenicUI".
+
+    What this version is:
+      - Wordmark only — no device mark, no mark glyphs at all.
+      - The brand now lives entirely in the type. The gradient on
+        "UI" + the heavier weight carries the visual identity.
+      - Font size raised from 18px → 22px so the lockup has more
+        presence in the navbar at the standard 24px-tall header
+        (was visually undersized at 18px).
+
+    Anatomy:
+      - viewBox 132 × 28 (was 168 × 28 in v7).
+      - One <text> element, "Genic" in mode-aware violet + a
+        <tspan fill="url(#genicui-letter)" font-weight="800"> for
+        "UI" — the brand gradient is the only color accent.
+      - Letter spacing tightened to -0.5 since the larger size
+        increases the apparent tracking.
+      - Single baseline y=21 (was 20) so the larger glyphs sit
+        cleanly inside the 28-tall viewBox without clipping the
+        descenders or ascender of 'G'.
+
+    Mode awareness unchanged: violet-300 on dark glass,
+    violet-700 on light backgrounds. Both pass 4.5:1.
+  -->
+
+  <defs>
+    <linearGradient id="genicui-letter" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#A78BFA"/>
+      <stop offset="55%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+
+    <style>
+      .genicui-word { fill: #C4B5FD; }     /* violet-300 dark */
+      @media (prefers-color-scheme: light) {
+        .genicui-word { fill: #6D28D9; }   /* violet-700 light */
+      }
+    </style>
+  </defs>
+
+  <!--
+    WORDMARK — "GenicUI" in Geist Mono.
+      "Genic"  → mode-aware violet, weight 700
+      "UI"     → brand-gradient fill, weight 800 (heavier)
+    Font size: 22px (was 18px in v7) for stronger navbar presence.
+    Letter spacing: -0.5 (tightened for the larger size).
+  -->
+  <text
+    class="genicui-word"
+    x="2"
+    y="21"
+    font-family="'Geist Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace"
+    font-size="22"
+    font-weight="700"
+    letter-spacing="-0.5"
+  >Genic<tspan
+    font-weight="800"
+    fill="url(#genicui-letter)"
+  >UI</tspan></text>
+</svg>

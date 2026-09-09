@@ -59,34 +59,35 @@ onBeforeUnmount(() => {
             <span>v0.5 · MCP-native · MIT</span>
           </div>
 
-          <!-- Mechanism-first headline. Line 1 says what the framework does
-               (agent → render_component → live component). Line 2 says where
-               it works (any agent, any framework, any UI surface — chat,
-               IDE, in-app, Slack, browser extension). GenericEtymology is
-               gone — the eyebrow carries project metadata instead. -->
+          <!-- Headline — one sentence + a single italic accent. The
+               accent phrase "not paragraphs" mirrors the page-wide
+               pattern used by the use-case and "What's next" headlines:
+               "Triage tickets *in* your IDE.", "Fill the form *for*
+               the user.", "Six primitives. *Compose them* however you
+               like." — a single short phrase in display-serif italic.
+               The anti-pattern ("let me open the app for you.") used
+               to live at the end of the subhead; it's now folded into
+               the headline's claim. -->
           <h1
-            class="stagger mt-8 text-white max-w-5xl"
+            class="stagger mt-5 text-white max-w-5xl"
             style="--i:1"
           >
-            <span class="display-sans block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl">
-              Agents render your components.
-            </span>
-            <span class="display-serif block mt-3 sm:mt-4 text-3xl sm:text-4xl lg:text-5xl text-[var(--color-text-muted,#C4C4C8)]">
-              Any agent. Any framework. Any UI surface.
+            <span class="display-sans block text-4xl sm:text-5xl lg:text-6xl text-balance">
+              Agents render your UI, <span class="display-serif">not paragraphs</span>.
             </span>
           </h1>
 
           <p
-            class="stagger mt-6 text-lg sm:text-xl text-[var(--color-text-muted,#C4C4C8)] max-w-2xl leading-relaxed"
+            class="stagger mt-5 text-lg sm:text-xl text-[var(--color-text-muted,#C4C4C8)] max-w-2xl leading-relaxed"
             style="--i:2"
           >
-            GenicUI is the protocol that turns a chat into your product. An agent calls one MCP tool — <code class="font-mono text-base sm:text-lg text-violet-300/90">render_component</code> — and your real React, Vue, or Web Component renders inline, in any surface that can host a message thread. No copy-paste. No context switch. No <span class="display-serif">"let me open the app for you."</span>
+            GenicUI is the protocol that turns a chat into your product. An agent calls one MCP tool — <code class="font-mono text-base sm:text-lg text-violet-300/90">render_component</code> — and your real React, Vue, or Web Component renders inline, in any surface that can host a message thread.
           </p>
 
           <!-- Sleak install header — primary action sits above secondary CTAs.
                Single command, copy-to-clipboard, pairs a code-style chip with
                a docs link. No fake telemetry, no multi-runner comparison. -->
-          <div class="stagger mt-12 w-full max-w-xl mx-auto" style="--i:3">
+          <div class="stagger mt-8 w-full max-w-xl mx-auto" style="--i:3">
             <div class="install-pill">
               <span class="install-prompt" aria-hidden="true">$</span>
               <code class="install-command">bun add @genicui/core @genicui/server</code>
@@ -103,7 +104,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="stagger mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style="--i:4">
+          <div class="stagger mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style="--i:4">
             <NuxtLink to="/getting-started/quickstart" class="hero-link">
               <UIcon name="i-lucide-book-open" class="size-3.5" />
               Quickstart guide
@@ -124,7 +125,7 @@ onBeforeUnmount(() => {
             </a>
           </div>
 
-          <div class="stagger mt-16 flex items-center gap-6 text-xs font-mono text-[var(--color-text-muted)]" style="--i:4">
+          <div class="stagger mt-10 flex items-center gap-6 text-xs font-mono text-[var(--color-text-muted)]" style="--i:4">
             <span class="flex items-center gap-1.5">
               <UIcon name="i-lucide-circle-check" class="size-3.5 text-emerald-400" />
               MIT-licensed
@@ -153,13 +154,13 @@ onBeforeUnmount(() => {
                of the composite — no overlap. Mobile collapses to a
                single centred IDE card. The `render_component` chip
                floats between IDE (source) and Chat (target). -->
-          <div class="stagger mt-20 sm:mt-24 w-full max-w-5xl mx-auto" style="--i:5">
-            <div class="surface-stack relative h-[420px] sm:h-[460px] lg:h-[480px] mx-auto" style="max-width: 920px;">
+          <div class="stagger mt-12 sm:mt-14 w-full max-w-5xl mx-auto" style="--i:5">
+            <div class="surface-stack relative h-[420px] sm:h-[440px] lg:h-[440px] mx-auto" style="max-width: 920px;">
 
               <!-- Chat panel — top-left quadrant -->
               <div
                 class="surface-card hidden md:block"
-                style="left: 0; top: 0; width: 46%; z-index: 30; transform: rotate(-4deg) translateZ(20px);"
+                style="left: 0; top: 4%; width: 42%; z-index: 30; transform: rotate(-3deg) translateZ(0);"
               >
                 <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-violet-400/60">
                   <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
@@ -199,7 +200,7 @@ onBeforeUnmount(() => {
                    right so it doesn't sit dead-centre and overlap chat. -->
               <div
                 class="surface-card hidden md:block"
-                style="right: 8%; top: 12%; width: 52%; z-index: 50; transform: rotate(3deg) translateZ(60px);"
+                style="left: 22%; top: 0; width: 56%; z-index: 50; transform: rotate(2deg) translateZ(60px);"
               >
                 <div class="code-window">
                   <div class="code-window-header">
@@ -243,7 +244,7 @@ onBeforeUnmount(() => {
               <!-- Browser extension popup — middle-right, +2deg, z-20 -->
               <div
                 class="surface-card hidden lg:block"
-                style="right: 0; top: 48%; width: 30%; z-index: 20; transform: rotate(4deg) translateZ(0);"
+                style="right: 0; top: 8%; width: 26%; z-index: 20; transform: rotate(4deg) translateZ(0);"
               >
                 <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-blue-400/60">
                   <div class="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06] bg-black/30">
@@ -265,7 +266,7 @@ onBeforeUnmount(() => {
               <!-- In-app sidebar — bottom-left, -2deg, z-40 -->
               <div
                 class="surface-card hidden md:block"
-                style="left: 4%; bottom: 0; width: 42%; z-index: 40; transform: rotate(-2deg) translateZ(40px);"
+                style="left: 4%; bottom: 0; width: 42%; z-index: 40; transform: rotate(-1deg) translateZ(10px);"
               >
                 <div class="glass-card rounded-2xl overflow-hidden border-t-4 border-amber-400/60">
                   <div class="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-black/30">
@@ -303,16 +304,13 @@ onBeforeUnmount(() => {
                    between chat (top-left) and IDE (right). Visually
                    "travels" from IDE source to Chat target. -->
               <div
-                class="hero-chip absolute top-[28%] left-[42%] hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 border border-violet-400/40 backdrop-blur-md font-mono text-[10px] text-violet-200 z-[60]"
+                class="hero-chip absolute top-[30%] left-[36%] hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 border border-violet-400/40 backdrop-blur-md font-mono text-[10px] text-violet-200 z-[60]"
               >
                 <UIcon name="i-lucide-zap" class="size-3 text-amber-300" />
                 render_component
               </div>
 
             </div>
-            <p class="mt-6 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--color-text-muted,#71717A)]">
-              chat · IDE · browser · in-app — same protocol
-            </p>
           </div>
           </div>
         </div>
