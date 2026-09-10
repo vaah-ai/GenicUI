@@ -1,8 +1,7 @@
 <div align="right">
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvaah-ai%2FGenicUI&project-name=genicui-docs&root-directory=docs&build-command=bun+run+build&output-directory=.output%2Fpublic)
-[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.dev-7c3aed)](https://genicui.dev)
-[![llms.txt](https://img.shields.io/badge/llms.txt-7c3aed)](https://genicui.dev/llms-full.txt)
+[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.dev-7c3aed)](https://genicui.vaah.ai)
+[![llms.txt](https://img.shields.io/badge/llms.txt-7c3aed)](https://genicui.vaah.ai/llms-full.txt)
 
 </div>
 
@@ -11,7 +10,6 @@
 **The protocol that lets AI agents use your UI.**
 
 MCP-native · library-agnostic · agent-agnostic.
-**Render PrimeVue today**; Mantine / shadcn / MUI on the [registry roadmap](#pick-your-framework).
 
 > Build interactive components for AI agents — tables, forms, dashboards — that render live in your own app, with your own component library, against any MCP-capable agent.
 
@@ -40,9 +38,21 @@ JSON-RPC error namespace `-32001..-32010` is reserved for the GenicUI surface. F
 
 ---
 
+## See it — a chat with your UI
+
+A `claude · MCP` session rendering a real cart inline, a click streaming back as a `component_event`, the agent picking it up. One round-trip, one protocol, three primitives (`render_component` → UI → `component_event`).
+
+<p align="center">
+  <img alt="GenicUI Chat panel — claude · MCP session rendering a CartViewer inline and a component_action round-trip" src="https://raw.githubusercontent.com/vaah-ai/GenicUI/develop/docs/public/chat-panel.png" width="860">
+</p>
+
+The whole loop — agent message, rendered component, user click, agent follow-up — rides on AG-UI frames over the same MCP transport the agent already speaks.
+
+---
+
 ## See it running — frame a component in ~60s
 
-> A screenshot-by-screenshot walkthrough lives at **https://genicui.dev/getting-started/quick-start**. The block below is the same flow as code.
+> A screenshot-by-screenshot walkthrough lives at **https://genicui.vaah.ai/getting-started/quick-start**. The block below is the same flow as code.
 
 ```bash
 # 1. From a fresh checkout
@@ -71,21 +81,6 @@ const { componentId } = await client.call("render_component", {
 
 ---
 
-## Pick your framework
-
-| UI library | Status | Registry |
-| --- | --- | --- |
-| **PrimeVue** | ✅ Shipped | [`@genicul-primevue/registry`](packages/primevue/) — 5 components (`data-table`, `input-pair`, `result-card`, `city-picker`, `weather-card`) |
-| **Mantine** | 🟡 In design | — |
-| **shadcn/ui** | 🟡 In design | — |
-| **MUI** | 🟡 In design | — |
-| **Skeleton** | 🟡 In design | — |
-| **Flowbite** | 🟡 In design | — |
-
-UI library agnosticism is a property of the protocol, not a license. A registry declares the contract for any component in any library; the agent consumes the contract.
-
----
-
 ## Why GenicUI — and what's different
 
 The empty quadrant — every other AI/UI tool picks two of three and gives up the third. GenicUI takes all three:
@@ -100,7 +95,7 @@ The empty quadrant — every other AI/UI tool picks two of three and gives up th
 | Same protocol feeds chat + voice + dashboard | ✅ | ❌ one journey | ❌ | ❌ |
 | Schema-as-source-of-truth (TypeBox → MCP → agent prompt) | ✅ | partial | ❌ | ❌ |
 
-Full side-by-side with `json-render` / `LiveKit Agents UI` / `Vercel AI SDK` at **[genicui.dev/guides/migration](https://genicui.dev/guides/migration)**.
+Full side-by-side with `json-render` / `LiveKit Agents UI` / `Vercel AI SDK` at **[genicui.vaah.ai/guides/migration](https://genicui.vaah.ai/guides/migration)**.
 
 ---
 
@@ -114,97 +109,18 @@ Full side-by-side with `json-render` / `LiveKit Agents UI` / `Vercel AI SDK` at 
 
 ---
 
-## Trust boundary, briefly
-
-Three zones, enforced at every MCP tool call:
-
-- **Tool surface** — untrusted input from the agent. Stripped of `__proto__`, `constructor`, `prototype` at the boundary.
-- **Trust boundary** — every input validated against a TypeBox schema with `additionalProperties: false`. Property-based tested (`strip-proto-keys` runs 50K random inputs in CI).
-- **Internal bus** — trusted components, validated props, monotonic sequence numbers, channel multiplexing.
-
-Full spec at **[genicui.dev/concepts/trust-boundary](https://genicui.dev/concepts/trust-boundary)**.
-
----
-
-## Supported runtimes & transports
-
-| Runtime | Client | Server | Notes |
-| --- | :-: | :-: | --- |
-| Node ≥ 20 LTS | ✅ | ✅ | Recommended |
-| Bun ≥ 1.3 | ✅ | ✅ | Recommended |
-| Cloudflare Workers | ✅ (planned) | 🟡 | M6 milestone |
-| Bun self-host binary | — | 🟡 | M6 milestone |
-| Nitro / Nuxt binding | 🟡 | 🟡 | M6 milestone |
-| Browsers | ✅ | — | Client only; `@genicui/client` is the Web-Component runtime |
-
-| Transport | Status |
-| --- | --- |
-| stdio | ✅ (Claude Code, mcp-inspector) |
-| Streamable HTTP | ✅ |
-| SSE | ✅ |
-| WebSocket (frame multiplexing) | ✅ |
-
----
-
-## Repository tour
-
-```
-packages/
-├── core/             @genicui/core            v0.1.0   Schema builder, 14-event AG-UI types, JSON-Patch engine, SessionStore
-├── server/           @genicui/server          v0.1.0   MCP server, 4-tool surface, trust boundary, WebSocket frames
-├── client/           @genicui/client          v0.1.0   GenicElement Web Component (closed Shadow DOM), RuntimeBridge
-├── vite-plugin/      @genicui/vite-plugin     v0.1.0   AST scanner, genui-registry.json emission, HMR
-└── agent-bridge/     @genicui/agent-bridge    v0.1.0   Platform-agnostic LLM ↔ MCP bridge (OpenAI, Anthropic, OpenAI-compatible)
-
-registries/
-└── primevue/         @genicul-primevue/registry  v0.1.0   5 components: data-table, input-pair, result-card, city-picker, weather-card
-
-examples/
-├── playground/       Nuxt 4 + PrimeVue demo app, WebSocket client, three-zone layout
-└── docs/             Docus 5.13 documentation site → https://genicui.dev
-```
-
-Build: `bun install && bun --filter @genicui/server start`. Test: `bun test` (~200 unit/integration) · `bun test --coverage` (80/90/60 coverage gate).
-
----
-
-## Status — 5 of 7 milestones shipped
-
-- **M1–M5 ✅** — core, server, client, vite-plugin, agent-bridge, registry v1, agent bridge, suggestive prompts, component event interactivity.
-- **M5.1 🟡** — documentation site (Docus + Nuxt UI v4 + Vercel) **live at https://genicui.dev**.
-- **M6 🟡** — Cloudflare / Bun self-host / Nitro deployment adapters.
-
-Every core package is at `v0.1.0`. One community registry (`@genicul-primevue/registry`) is shipped. The protocol is stable at the four-tool surface and the AG-UI frame envelope; pre-`1.0` while M6 lands.
-
----
-
 ## For AI agents
 
 Full content available as plain markdown at:
 
-- **[https://genicui.dev/llms.txt](https://genicui.dev/llms.txt)** — index + per-section links (7.6 KB)
-- **[https://genicui.dev/llms-full.txt](https://genicui.dev/llms-full.txt)** — full corpus (283 KB)
-- **[https://genicui.dev/raw/&lt;page&gt;.md](https://genicui.dev/)** — per-page raw markdown
+- **[https://genicui.vaah.ai/llms.txt](https://genicui.vaah.ai/llms.txt)** — index + per-section links (7.6 KB)
+- **[https://genicui.vaah.ai/llms-full.txt](https://genicui.vaah.ai/llms-full.txt)** — full corpus (283 KB)
+- **[https://genicui.vaah.ai/raw/&lt;page&gt;.md](https://genicui.vaah.ai/)** — per-page raw markdown
 
-If you're an AI coding assistant reading this repo, the agent-bridge section of the docs is the highest-signal starting point: **[genicui.dev/api/agent-bridge](https://genicui.dev/api/agent-bridge)**.
-
----
-
-## Contributing
-
-The authoritative design contract lives in `.vaahagents/requirements/specs/manifest.json` (29 features, 93 ACs). Per-feature specs in `.vaahagents/requirements/specs/features/`. The milestone plan is at `.vaahagents/milestones-and-tasks/`. Issues and PRs are triaged against those specs — open one with a link to a feature ID for fastest review.
-
-For local dev:
-
-```bash
-bun install
-bun --filter @genicui/server start       # MCP server on :3040
-bun --filter genicui-playground dev      # playground on :3000
-bun test                                 # unit + integration
-```
+If you're an AI coding assistant reading this repo, the agent-bridge section of the docs is the highest-signal starting point: **[genicui.vaah.ai/api/agent-bridge](https://genicui.vaah.ai/api/agent-bridge)**.
 
 ---
 
 ## License
 
-**Apache-2.0 — see [`LICENSE`](LICENSE).** *(LICENSE file pending — to be added in the next release.)*
+**Apache-2.0 — see [`LICENSE`](LICENSE).** Patent grants, attribution requirements, and trademark reservations are documented in [`NOTICE`](NOTICE).
