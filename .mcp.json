@@ -5,7 +5,7 @@
       "command": "bun",
       "args": [
         "run",
-        "/Users/pk/Projects/GenicUI/packages/server/bin/mcp-stdio.ts"
+        "D:/xampp/htdocs/atul-s001/GenicUI/packages/server/bin/mcp-stdio.ts"
       ],
       "alwaysLoad": true
     }

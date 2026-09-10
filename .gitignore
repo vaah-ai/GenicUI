@@ -3,6 +3,8 @@ node_modules/
 
 # Claude Code local settings (per-developer)
 .claude/
+.mcp.json
+.env
 
 # Playwright cache
 .playwright-mcp/
