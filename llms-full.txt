@@ -1,6 +1,6 @@
 # GenicUI — `llms-full.txt` (full corpus for AI agent ingestion)
 #
-# Snapshot of the canonical https://genicui.dev/llms-full.txt. Commited for
+# Snapshot of the canonical https://genicui.vaah.ai/llms-full.txt. Commited for
 # cold-start AI-agent discoverability on a fresh fork.
 #
 # DO NOT EDIT BY HAND. To refresh after doc changes:
@@ -85,7 +85,7 @@ When the agent updates a component, GenicUI ships a [RFC 6902 JSON-Patch](https:
   ---
   icon: i-lucide-download
   title: Install GenicUI
-  to: https://genicui.dev/getting-started/installation
+  to: https://genicui.vaah.ai/getting-started/installation
   ---
   Add 
 
@@ -106,7 +106,7 @@ When the agent updates a component, GenicUI ships a [RFC 6902 JSON-Patch](https:
   ---
   icon: i-lucide-zap
   title: Quickstart
-  to: https://genicui.dev/getting-started/quick-start
+  to: https://genicui.vaah.ai/getting-started/quick-start
   ---
   Render your first component in five minutes — from 
 
@@ -119,7 +119,7 @@ When the agent updates a component, GenicUI ships a [RFC 6902 JSON-Patch](https:
   ---
   icon: i-lucide-book-open
   title: Protocol Concepts
-  to: https://genicui.dev/concepts/protocol
+  to: https://genicui.vaah.ai/concepts/protocol
   ---
   Understand the four MCP tools, the JSON-Patch wire format, and the trust boundary.
   :::
@@ -247,7 +247,7 @@ The server listens on `http://localhost:3040` by default. Override with `GENICUI
 
  unset disables auth — every request is accepted. See 
 
-[Trust Boundary](https://genicui.dev/concepts/trust-boundary)
+[Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary)
 
  for production setup.
 ::
@@ -268,7 +268,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 });
 ```
 
-For React, SvelteKit, or vanilla HTML, see the framework-specific recipes in [Guides → Development](https://genicui.dev/guides/development).
+For React, SvelteKit, or vanilla HTML, see the framework-specific recipes in [Guides → Development](https://genicui.vaah.ai/guides/development).
 
 ### 3. Render your first component
 
@@ -347,7 +347,7 @@ The playground bundles a chat surface wired to the GenicUI server. Type "render 
   ---
   icon: i-lucide-zap
   title: Quickstart
-  to: https://genicui.dev/getting-started/quick-start
+  to: https://genicui.vaah.ai/getting-started/quick-start
   ---
   Walk through a complete render-component flow in under five minutes.
   :::
@@ -356,7 +356,7 @@ The playground bundles a chat surface wired to the GenicUI server. Type "render 
   ---
   icon: i-lucide-wrench
   title: The Four MCP Tools
-  to: https://genicui.dev/concepts/protocol
+  to: https://genicui.vaah.ai/concepts/protocol
   ---
   Read the tool-by-tool reference for 
 
@@ -377,7 +377,12 @@ The playground bundles a chat surface wired to the GenicUI server. Type "render 
   .
   :::
 
-  :::card{icon="i-lucide-code" title="API Reference" to="https://genicui.dev/api"}
+  :::card
+  ---
+  icon: i-lucide-code
+  title: API Reference
+  to: https://genicui.vaah.ai/api
+  ---
   Browse the full public surface of every package.
   :::
 ::
@@ -443,7 +448,7 @@ claude mcp add genicui \
 
    from the client. See 
 
-  [Trust Boundary](https://genicui.dev/concepts/trust-boundary)
+  [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary)
 
    for production setup.
   :::
@@ -538,10 +543,10 @@ If the table did not render, walk down this checklist:
 
 You now have a working end-to-end GenicUI pipeline. To extend it:
 
-- **Wrap your own components** — see [Guides → Authoring a Custom Registry](https://genicui.dev/guides/custom-registry).
-- **Drive the server from your own backend** — see [`@genicui/agent-bridge`](https://genicui.dev/api/agent-bridge).
-- **Deploy to Cloudflare Workers** — see [Deployment → Cloudflare](https://genicui.dev/deployment/cloudflare).
-- **Ship a production-hardened server with API keys** — see [Concepts → Trust Boundary](https://genicui.dev/concepts/trust-boundary).
+- **Wrap your own components** — see [Guides → Authoring a Custom Registry](https://genicui.vaah.ai/guides/custom-registry).
+- **Drive the server from your own backend** — see [`@genicui/agent-bridge`](https://genicui.vaah.ai/api/agent-bridge).
+- **Deploy to Cloudflare Workers** — see [Deployment → Cloudflare](https://genicui.vaah.ai/deployment/cloudflare).
+- **Ship a production-hardened server with API keys** — see [Concepts → Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary).
 
 ## Next steps
 
@@ -550,7 +555,7 @@ You now have a working end-to-end GenicUI pipeline. To extend it:
   ---
   icon: i-lucide-book-open
   title: Protocol Concepts
-  to: https://genicui.dev/concepts/protocol
+  to: https://genicui.vaah.ai/concepts/protocol
   ---
   Deep-dive into the four MCP tools, JSON-Patch wire format, and trust boundary.
   :::
@@ -559,12 +564,17 @@ You now have a working end-to-end GenicUI pipeline. To extend it:
   ---
   icon: i-lucide-package
   title: Custom Registry
-  to: https://genicui.dev/guides/custom-registry
+  to: https://genicui.vaah.ai/guides/custom-registry
   ---
   Wrap your own PrimeVue / Mantine / shadcn components and publish them as a registry.
   :::
 
-  :::card{icon="i-lucide-code" title="API Reference" to="https://genicui.dev/api"}
+  :::card
+  ---
+  icon: i-lucide-code
+  title: API Reference
+  to: https://genicui.vaah.ai/api
+  ---
   Browse every public export of the five packages.
   :::
 ::
@@ -695,7 +705,7 @@ Tool calls use a thin JSON-RPC 2.0 envelope. The four MCP tools (`find_ui_compon
 ```
 ::
 
-Error codes occupy the namespace `-32001` through `-32010`. Standard MCP errors (`-32700` parse, `-32600` invalid request, `-32601` method not found, `-32603` internal) are honored but are not GenicUI-specific. The full table lives in [MCP Tools › Error codes](https://genicui.dev/concepts/mcp-tools#error-codes).
+Error codes occupy the namespace `-32001` through `-32010`. Standard MCP errors (`-32700` parse, `-32600` invalid request, `-32601` method not found, `-32603` internal) are honored but are not GenicUI-specific. The full table lives in [MCP Tools › Error codes](https://genicui.vaah.ai/concepts/mcp-tools#error-codes).
 
 ## End-to-end sequence: render a component
 
@@ -733,9 +743,9 @@ The `v` field is the protocol version. Today only `"1"` is defined. Future major
 
 ## What's next
 
-- **Channel multiplexing** — see [Frames](https://genicui.dev/concepts/frames) for the per-channel `seq` counter, reserved channel names, and out-of-order buffering.
-- **Tool contracts** — see [MCP Tools](https://genicui.dev/concepts/mcp-tools) for the full input/output schemas of all four public tools.
-- **Production wiring** — see [Guides › Production](https://genicui.dev/guides/production) for how `v`, `channel`, and `type` show up in a real Cloudflare Workers deployment.
+- **Channel multiplexing** — see [Frames](https://genicui.vaah.ai/concepts/frames) for the per-channel `seq` counter, reserved channel names, and out-of-order buffering.
+- **Tool contracts** — see [MCP Tools](https://genicui.vaah.ai/concepts/mcp-tools) for the full input/output schemas of all four public tools.
+- **Production wiring** — see [Guides › Production](https://genicui.vaah.ai/guides/production) for how `v`, `channel`, and `type` show up in a real Cloudflare Workers deployment.
 
 
 # Frames
@@ -910,9 +920,9 @@ A failure on any step closes with `1003`. There is no half-open state — client
 
 ## What's next
 
-- **Event semantics** — see [Events](https://genicui.dev/concepts/events) for how user actions cross the wire back to the agent.
-- **Hardening** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for how the frame validator stops prototype pollution and schema bypass.
-- **Production deployment** — see [Guides › Production](https://genicui.dev/guides/production) for how Cloudflare Workers and Bun self-host handle backpressure at the frame layer.
+- **Event semantics** — see [Events](https://genicui.vaah.ai/concepts/events) for how user actions cross the wire back to the agent.
+- **Hardening** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for how the frame validator stops prototype pollution and schema bypass.
+- **Production deployment** — see [Guides › Production](https://genicui.vaah.ai/guides/production) for how Cloudflare Workers and Bun self-host handle backpressure at the frame layer.
 
 
 # MCP Tools
@@ -1138,7 +1148,7 @@ Validates props against the component's TypeBox schema, allocates a fresh `compo
 
 ### Idempotency
 
-Pass `clientRequestId: "<uuid>"` and the server caches the response for 24 hours. Retries with the same id return the original `componentId` without re-mounting — see [Frames › Idempotency keys](https://genicui.dev/concepts/frames#idempotency-keys).
+Pass `clientRequestId: "<uuid>"` and the server caches the response for 24 hours. Retries with the same id return the original `componentId` without re-mounting — see [Frames › Idempotency keys](https://genicui.vaah.ai/concepts/frames#idempotency-keys).
 
 ---
 
@@ -1321,10 +1331,10 @@ Every tool call also emits the AG-UI run lifecycle frames (`RUN_STARTED` → `TO
 
 ## What's next
 
-- **Schema validation** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for how `Value.Check()`, prototype-pollution stripping, and `additionalProperties: false` harden every tool call.
-- **Component lifecycle** — see [Components](https://genicui.dev/concepts/components) for the Web Component base class that consumes `STATE_SNAPSHOT` and `STATE_DELTA`.
-- **Event semantics** — see [Events](https://genicui.dev/concepts/events) for what happens between `subscribe_to_events` and `COMPONENT_EVENT`.
-- **Implementation** — see [API Reference › Server](https://genicui.dev/api/server) for the handler code and `AgentBridge` schema.
+- **Schema validation** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for how `Value.Check()`, prototype-pollution stripping, and `additionalProperties: false` harden every tool call.
+- **Component lifecycle** — see [Components](https://genicui.vaah.ai/concepts/components) for the Web Component base class that consumes `STATE_SNAPSHOT` and `STATE_DELTA`.
+- **Event semantics** — see [Events](https://genicui.vaah.ai/concepts/events) for what happens between `subscribe_to_events` and `COMPONENT_EVENT`.
+- **Implementation** — see [API Reference › Server](https://genicui.vaah.ai/api/server) for the handler code and `AgentBridge` schema.
 
 
 # Components
@@ -1525,10 +1535,10 @@ The component's Web Component instance is garbage-collected once no JS reference
 
 ## What's next
 
-- **Frame-level multiplexing** — see [Frames](https://genicui.dev/concepts/frames) for the channel and seq mechanics that drive `STATE_SNAPSHOT` and `STATE_DELTA` ordering.
-- **User actions** — see [Events](https://genicui.dev/concepts/events) for the `composed: true` event flow that crosses back from the Shadow DOM to the agent.
-- **Catalog** — see [Registries](https://genicui.dev/concepts/registries) for the `defineRegistry` and `defineComponent` contracts that produce the `<genic-data-table>` element above.
-- **Implementation** — see [API Reference › Client](https://genicui.dev/api/client) for the full `@genicui/client` surface.
+- **Frame-level multiplexing** — see [Frames](https://genicui.vaah.ai/concepts/frames) for the channel and seq mechanics that drive `STATE_SNAPSHOT` and `STATE_DELTA` ordering.
+- **User actions** — see [Events](https://genicui.vaah.ai/concepts/events) for the `composed: true` event flow that crosses back from the Shadow DOM to the agent.
+- **Catalog** — see [Registries](https://genicui.vaah.ai/concepts/registries) for the `defineRegistry` and `defineComponent` contracts that produce the `<genic-data-table>` element above.
+- **Implementation** — see [API Reference › Client](https://genicui.vaah.ai/api/client) for the full `@genicui/client` surface.
 
 
 # Events
@@ -1694,7 +1704,7 @@ The server never returns
 
  patch failures. Event failures are silent by design: the agent should not retry a user click that the server has already dropped. See 
 
-[Trust Boundary › Drop vs Reject](https://genicui.dev/concepts/trust-boundary#drop-vs-reject)
+[Trust Boundary › Drop vs Reject](https://genicui.vaah.ai/concepts/trust-boundary#drop-vs-reject)
 
  for the rationale.
 ::
@@ -1707,10 +1717,10 @@ A per-component rate limit caps event delivery at **200 events/sec** (F19-AC3). 
 
 ## What's next
 
-- **Schema validation** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for the prototype-pollution strip and `additionalProperties: false` enforcement that protects event payloads too.
-- **Mount lifecycle** — see [Components](https://genicui.dev/concepts/components) for the Web Component lifecycle that dispatches these events.
-- **Tool contracts** — see [MCP Tools › `subscribe_to_events`](https://genicui.dev/concepts/mcp-tools#subscribe_to_events) for the request/response shapes and error codes.
-- **Production deployment** — see [Guides › Production](https://genicui.dev/guides/production) for how Cloudflare Durable Objects back the event bus in production.
+- **Schema validation** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for the prototype-pollution strip and `additionalProperties: false` enforcement that protects event payloads too.
+- **Mount lifecycle** — see [Components](https://genicui.vaah.ai/concepts/components) for the Web Component lifecycle that dispatches these events.
+- **Tool contracts** — see [MCP Tools › `subscribe_to_events`](https://genicui.vaah.ai/concepts/mcp-tools#subscribe_to_events) for the request/response shapes and error codes.
+- **Production deployment** — see [Guides › Production](https://genicui.vaah.ai/guides/production) for how Cloudflare Durable Objects back the event bus in production.
 
 
 # Trust Boundary
@@ -1748,7 +1758,7 @@ GenicUI has three independent trust boundaries. A breach in one does not auto-br
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Zone 1 is the standard network edge — Cloudflare Workers or a reverse proxy. Zone 2 is where the rest of this page focuses. Zone 3 is documented under [Events › Error handling](https://genicui.dev/concepts/events#error-handling).
+Zone 1 is the standard network edge — Cloudflare Workers or a reverse proxy. Zone 2 is where the rest of this page focuses. Zone 3 is documented under [Events › Error handling](https://genicui.vaah.ai/concepts/events#error-handling).
 
 ## Why three zones
 
@@ -1932,10 +1942,10 @@ The full matrix covers 15 threats. The ones deferred to Phase 2 are explicitly t
 
 ## What's next
 
-- **Schema contracts** — see [Registries](https://genicui.dev/concepts/registries) for the `defineRegistry` + `defineComponent` shape that the trust boundary validates.
-- **Tool contracts** — see [MCP Tools › Error codes](https://genicui.dev/concepts/mcp-tools#error-codes) for the full -32001..-32010 namespace.
-- **Wire-level hardening** — see [Protocol](https://genicui.dev/concepts/protocol) for the frame validator and WS code 1003 rejection.
-- **Production deployment** — see [Guides › Production](https://genicui.dev/guides/production) for how Cloudflare WAF rules enforce rate limits at the network edge.
+- **Schema contracts** — see [Registries](https://genicui.vaah.ai/concepts/registries) for the `defineRegistry` + `defineComponent` shape that the trust boundary validates.
+- **Tool contracts** — see [MCP Tools › Error codes](https://genicui.vaah.ai/concepts/mcp-tools#error-codes) for the full -32001..-32010 namespace.
+- **Wire-level hardening** — see [Protocol](https://genicui.vaah.ai/concepts/protocol) for the frame validator and WS code 1003 rejection.
+- **Production deployment** — see [Guides › Production](https://genicui.vaah.ai/guides/production) for how Cloudflare WAF rules enforce rate limits at the network edge.
 
 
 # Registries
@@ -2042,11 +2052,11 @@ Malformed URIs return MCP's standard `resource not found` error. There is no par
 
 `Source: .vaahagents/requirements/specs/features/feature-038-registry-trust-tiers.md` (F38). GenicUI loads registries from three tiers:
 
-| Tier        | Source               | Path                                          | Allow-list?                            |
-| ----------- | -------------------- | --------------------------------------------- | -------------------------------------- |
-| **Project** | Repo-local manifest  | `./registry.json` or `registries/` directory  | No — always trusted                    |
-| **User**    | User home directory  | `~/.config/genicui/registry.json`             | No                                     |
-| **Remote**  | HTTP registry server | `https://registry.genicui.dev/api/components` | **Yes** — `GENICUI_REGISTRY_ALLOWLIST` |
+| Tier        | Source               | Path                                         | Allow-list?                            |
+| ----------- | -------------------- | -------------------------------------------- | -------------------------------------- |
+| **Project** | Repo-local manifest  | `./registry.json` or `registries/` directory | No — always trusted                    |
+| **User**    | User home directory  | `~/.config/genicui/registry.json`            | No                                     |
+| **Remote**  | HTTP registry server | `https://<registry-host>/api/components`     | **Yes** — `GENICUI_REGISTRY_ALLOWLIST` |
 
 Resolution order: **Project > User > Remote**. When two tiers define the same component URI, the higher tier wins:
 
@@ -2188,10 +2198,10 @@ The check is recursive — every nested `object` in `props.properties.*` and `it
 
 ## What's next
 
-- **Build your own** — see [Guides › Custom Registry](https://genicui.dev/guides/custom-registry) for a step-by-step walkthrough of authoring a registry from scratch.
-- **API surface** — see [API Reference › PrimeVue Registry](https://genicui.dev/api/primevue-registry) for the full `@genicul-primevue/registry` exports and schema details.
-- **Schema enforcement** — see [Trust Boundary › `additionalProperties: false`](https://genicui.dev/concepts/trust-boundary#additionalproperties-false-enforcement) for the rejection rules.
-- **Production deployment** — see [Guides › Production](https://genicui.dev/guides/production) for how `GENICUI_REGISTRY_ALLOWLIST` is enforced at the network edge.
+- **Build your own** — see [Guides › Custom Registry](https://genicui.vaah.ai/guides/custom-registry) for a step-by-step walkthrough of authoring a registry from scratch.
+- **API surface** — see [API Reference › PrimeVue Registry](https://genicui.vaah.ai/api/primevue-registry) for the full `@genicul-primevue/registry` exports and schema details.
+- **Schema enforcement** — see [Trust Boundary › `additionalProperties: false`](https://genicui.vaah.ai/concepts/trust-boundary#additionalproperties-false-enforcement) for the rejection rules.
+- **Production deployment** — see [Guides › Production](https://genicui.vaah.ai/guides/production) for how `GENICUI_REGISTRY_ALLOWLIST` is enforced at the network edge.
 
 
 # Development Setup
@@ -2201,7 +2211,7 @@ This guide walks through the local GenicUI inner loop — clone, install, start 
 ::note
 If you just want to consume GenicUI from your own app, 
 
-[Getting Started → Quick Start](https://genicui.dev/getting-started/quick-start)
+[Getting Started → Quick Start](https://genicui.vaah.ai/getting-started/quick-start)
 
  is faster — this guide is for 
 
@@ -2332,7 +2342,7 @@ The dev server prints the auto-generated API key on every boot (`GENICUI_API_KEY
 
 . See 
 
-[Production](https://genicui.dev/guides/production)
+[Production](https://genicui.vaah.ai/guides/production)
 
  for the rotation policy.
 ::
@@ -2358,7 +2368,7 @@ bun test                    # ~150 unit + 20 integration
 bun test --coverage         # adds the coverage gate (~90s)
 ```
 
-See [Testing](https://genicui.dev/guides/testing) for the full pyramid and per-layer commands.
+See [Testing](https://genicui.vaah.ai/guides/testing) for the full pyramid and per-layer commands.
 
 ## Verification
 
@@ -2373,15 +2383,15 @@ If any of these fail, the most common culprit is port contention (`lsof -i :3040
 
 ## What's next
 
-- **Production wiring** — see [Production](https://genicui.dev/guides/production) for the deploy-time checklist (key rotation, CORS allowlist, observability).
-- **Testing** — see [Testing](https://genicui.dev/guides/testing) for the 150/20/3-5 pyramid and coverage targets.
-- **Concepts primer** — see [Protocol](https://genicui.dev/concepts/protocol) for the wire frame envelope, [MCP Tools](https://genicui.dev/concepts/mcp-tools) for the four-tool surface.
-- **Build your own registry** — see [Building a Custom Registry](https://genicui.dev/guides/custom-registry) when you're ready to author components.
+- **Production wiring** — see [Production](https://genicui.vaah.ai/guides/production) for the deploy-time checklist (key rotation, CORS allowlist, observability).
+- **Testing** — see [Testing](https://genicui.vaah.ai/guides/testing) for the 150/20/3-5 pyramid and coverage targets.
+- **Concepts primer** — see [Protocol](https://genicui.vaah.ai/concepts/protocol) for the wire frame envelope, [MCP Tools](https://genicui.vaah.ai/concepts/mcp-tools) for the four-tool surface.
+- **Build your own registry** — see [Building a Custom Registry](https://genicui.vaah.ai/guides/custom-registry) when you're ready to author components.
 
 
 # Production Checklist
 
-This guide is the **deploy-time gate** for GenicUI. It maps the 10-item pre-deploy list from this [production checklist section](https://genicui.dev/#the-10-item-checklist) to the exact commands that satisfy each one, plus the env-var reference, secrets policy, and observability hooks you need before serving the first production request.
+This guide is the **deploy-time gate** for GenicUI. It maps the 10-item pre-deploy list from this [production checklist section](https://genicui.vaah.ai/#the-10-item-checklist) to the exact commands that satisfy each one, plus the env-var reference, secrets policy, and observability hooks you need before serving the first production request.
 
 ::callout{type="warning"}
 **The 10-item checklist is non-negotiable.**
@@ -2578,15 +2588,15 @@ If all four pass and the 10-item checklist is green, you're production-ready.
 
 ## What's next
 
-- **Deploy targets** — see [Deployment](https://genicui.dev/deployment/overview) for Cloudflare Workers, Bun self-host, and Nitro wiring.
-- **Trust boundary** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for the deeper mechanism behind checklist item 4.
-- **Registry allowlist** — see [Registries](https://genicui.dev/concepts/registries) for the trust-tier model and remote-loading rules.
-- **API key auth recipe** — see [Cookbook › API Key Authentication](https://genicui.dev/cookbook/auth) for rotation scripts and per-environment key generation.
+- **Deploy targets** — see [Deployment](https://genicui.vaah.ai/deployment/overview) for Cloudflare Workers, Bun self-host, and Nitro wiring.
+- **Trust boundary** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for the deeper mechanism behind checklist item 4.
+- **Registry allowlist** — see [Registries](https://genicui.vaah.ai/concepts/registries) for the trust-tier model and remote-loading rules.
+- **API key auth recipe** — see [Cookbook › API Key Authentication](https://genicui.vaah.ai/cookbook/auth) for rotation scripts and per-environment key generation.
 
 
 # Testing
 
-This guide is the **how we verify** companion to the [testing strategy spec](https://genicui.dev/guides/testing#the-pyramid). It maps the 150/20/3-5 pyramid onto concrete `bun test` commands, walks the four required `fast-check` property tests, and explains the `@genicui/conformance` runner that every registry must pass before publishing.
+This guide is the **how we verify** companion to the [testing strategy spec](https://genicui.vaah.ai/guides/testing#the-pyramid). It maps the 150/20/3-5 pyramid onto concrete `bun test` commands, walks the four required `fast-check` property tests, and explains the `@genicui/conformance` runner that every registry must pass before publishing.
 
 ## The pyramid
 
@@ -2624,7 +2634,7 @@ GenicUI follows the classic test pyramid — fast, isolated unit tests form the 
 
 ## Coverage targets
 
-The lock-in from the [maintainability requirements](https://genicui.dev/guides/testing#coverage-targets):
+The lock-in from the [maintainability requirements](https://genicui.vaah.ai/guides/testing#coverage-targets):
 
 | Component         | Line    | Branch |
 | ----------------- | ------- | ------ |
@@ -2833,9 +2843,9 @@ If any one fails, the PR is blocked. Coverage regressions are the most common cu
 
 ## What's next
 
-- **Concepts primer** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for the `__proto__` stripper that F14's property test exercises.
-- **CI cookbook** — see [Cookbook › Testing Components](https://genicui.dev/cookbook/testing) for adapter-specific testing patterns and conformance-rule walkthroughs.
-- **Build your own registry** — see [Building a Custom Registry](https://genicui.dev/guides/custom-registry) for the conformance runner's role in the publishing pipeline.
+- **Concepts primer** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for the `__proto__` stripper that F14's property test exercises.
+- **CI cookbook** — see [Cookbook › Testing Components](https://genicui.vaah.ai/cookbook/testing) for adapter-specific testing patterns and conformance-rule walkthroughs.
+- **Build your own registry** — see [Building a Custom Registry](https://genicui.vaah.ai/guides/custom-registry) for the conformance runner's role in the publishing pipeline.
 
 
 # Building a Custom Registry
@@ -2945,7 +2955,7 @@ export const registry = {
 
    object must set it. The trust boundary rejects registries that omit it — see 
 
-  [Trust Boundary](https://genicui.dev/concepts/trust-boundary)
+  [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary)
 
   .
   :::
@@ -2967,7 +2977,7 @@ The trust tier is a runtime config that the server reads at boot. `project` is t
 
 #### Add per-event `detailSchema` and lifecycle hooks
 
-For every event declared in `events[]`, the component must declare a `payloadSchema` matching the `detail` it dispatches. Components are responsible for emitting events with `composed: true` so they cross the closed Shadow DOM boundary — see [Events](https://genicui.dev/concepts/events).
+For every event declared in `events[]`, the component must declare a `payloadSchema` matching the `detail` it dispatches. Components are responsible for emitting events with `composed: true` so they cross the closed Shadow DOM boundary — see [Events](https://genicui.vaah.ai/concepts/events).
 
 ```ts
 // In your Web Component subclass
@@ -3117,10 +3127,10 @@ If the round-trip works, the registry is correctly wired end-to-end.
 
 ## What's next
 
-- **Registry contract reference** — see [Registries](https://genicui.dev/concepts/registries) for the full `defineRegistry` shape and trust-tier semantics.
-- **Schema contracts** — see [API Reference › PrimeVue Registry](https://genicui.dev/api/primevue-registry) for the canonical schema layout your registry will mirror.
-- **Trust boundary** — see [Trust Boundary](https://genicui.dev/concepts/trust-boundary) for why `additionalProperties: false` is mandatory and how the validator strips `__proto__` payloads.
-- **Versioning patterns** — see [Cookbook › Registry Versioning](https://genicui.dev/cookbook/registry-versioning) for migration strategies when a `propsSchema` needs a breaking change.
+- **Registry contract reference** — see [Registries](https://genicui.vaah.ai/concepts/registries) for the full `defineRegistry` shape and trust-tier semantics.
+- **Schema contracts** — see [API Reference › PrimeVue Registry](https://genicui.vaah.ai/api/primevue-registry) for the canonical schema layout your registry will mirror.
+- **Trust boundary** — see [Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) for why `additionalProperties: false` is mandatory and how the validator strips `__proto__` payloads.
+- **Versioning patterns** — see [Cookbook › Registry Versioning](https://genicui.vaah.ai/cookbook/registry-versioning) for migration strategies when a `propsSchema` needs a breaking change.
 
 
 # Migrating to GenicUI
@@ -3201,7 +3211,7 @@ Keep the same `ui://` namespace your clients already expect; just add the `@vers
 GenicUI speaks Streamable HTTP at `/mcp`. Bearer auth stays the same.
 ::
 
-**Effort:** Small — typically a 1–2 day spike to swap the resource layer. Reference app: `examples/migration-from-mcp-apps/` (planned — see [Verification](https://genicui.dev/#verification)).
+**Effort:** Small — typically a 1–2 day spike to swap the resource layer. Reference app: `examples/migration-from-mcp-apps/` (planned — see [Verification](https://genicui.vaah.ai/#verification)).
 
 ## From OpenAI Apps SDK
 
@@ -3397,17 +3407,17 @@ The wire is **identical**. CopilotKit emits AG-UI events; GenicUI consumes them.
 
     ; the reference apps themselves are scoped for a follow-up milestone (see the 
 
-    [roadmap](https://genicui.dev/community/roadmap)
+    [roadmap](https://genicui.vaah.ai/community/roadmap)
 
     ). Until then, the migration steps above are the source of truth and the conformance suite is the only formal verification gate.
     ::::
 
   ## What's next
 
-  - **Wire reference** — see [Protocol](https://genicui.dev/concepts/protocol) for the frame envelope that all three inbound paths eventually resolve to.
-  - **Web Component model** — see [Components](https://genicui.dev/concepts/components) for the closed Shadow DOM lifecycle the CopilotKit migration ports to.
-  - **Event flow** — see [Events](https://genicui.dev/concepts/events) for how `composed: true` events cross from Shadow DOM back to the agent.
-  - **First Cookbook recipe** — see [Cookbook › API Key Authentication](https://genicui.dev/cookbook/auth) for the auth wiring every migration needs end-to-end.
+  - **Wire reference** — see [Protocol](https://genicui.vaah.ai/concepts/protocol) for the frame envelope that all three inbound paths eventually resolve to.
+  - **Web Component model** — see [Components](https://genicui.vaah.ai/concepts/components) for the closed Shadow DOM lifecycle the CopilotKit migration ports to.
+  - **Event flow** — see [Events](https://genicui.vaah.ai/concepts/events) for how `composed: true` events cross from Shadow DOM back to the agent.
+  - **First Cookbook recipe** — see [Cookbook › API Key Authentication](https://genicui.vaah.ai/cookbook/auth) for the auth wiring every migration needs end-to-end.
   :::
 ::
 
@@ -3416,7 +3426,7 @@ The wire is **identical**. CopilotKit emits AG-UI events; GenicUI consumes them.
 
 The `@genicui/core` package contains the framework-agnostic primitives that every other package depends on. It has no DOM, no Node-specific globals, and no transport — the runtime-agnostic source of truth for schemas, JSON-Patch, sequence generation, and the AG-UI wire envelope.
 
-For the conceptual model behind each export, see [Concepts → Components](https://genicui.dev/concepts/components) and [Concepts → Frames](https://genicui.dev/concepts/frames). This page is the reference — terse, table-heavy, verbatim from `packages/core/src/`.
+For the conceptual model behind each export, see [Concepts → Components](https://genicui.vaah.ai/concepts/components) and [Concepts → Frames](https://genicui.vaah.ai/concepts/frames). This page is the reference — terse, table-heavy, verbatim from `packages/core/src/`.
 
 ## Constants
 
@@ -3430,7 +3440,7 @@ Package version. Updated automatically by release tooling. The only top-level ex
 
 ## Schema builder
 
-A small wrapper around JSON Schema 2020-12 that adds fluent composition, defaults, and a single-call validator. See [Concepts → Components](https://genicui.dev/concepts/components#schemas) for the rationale.
+A small wrapper around JSON Schema 2020-12 that adds fluent composition, defaults, and a single-call validator. See [Concepts → Components](https://genicui.vaah.ai/concepts/components#schemas) for the rationale.
 
 ### `genicSchema(definition)`
 
@@ -3515,7 +3525,7 @@ export type {
 
 ## Protocol — AG-UI frame envelope
 
-Single-line JSON envelope used by every WebSocket frame. See [Concepts → Frames](https://genicui.dev/concepts/frames) for the wire model.
+Single-line JSON envelope used by every WebSocket frame. See [Concepts → Frames](https://genicui.vaah.ai/concepts/frames) for the wire model.
 
 ### `SequenceGenerator`
 
@@ -3626,13 +3636,13 @@ export {
 } from './protocol/index.js';
 ```
 
-| Constant                      | Type                       | Description                                                                                                          |
-| ----------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `PROTOCOL_VERSION`            | `1`                        | Current wire-protocol version. Bump on breaking envelope changes.                                                    |
-| `RESERVED_CHANNELS`           | `readonly string[]`        | Channel names that user code may not bind.                                                                           |
-| `ERROR_CODE_RESERVED_CHANNEL` | `number`                   | JSON-RPC-style error code returned when a reserved channel is requested.                                             |
-| `MAX_CHANNELS_PER_SOCKET`     | `256`                      | Hard cap on channels per socket.                                                                                     |
-| `AG_UI_EVENT_TYPES`           | `readonly AGUIEventType[]` | The 14 supported AG-UI event types. See [Concepts → Frames](https://genicui.dev/concepts/frames#the-14-event-types). |
+| Constant                      | Type                       | Description                                                                                                              |
+| ----------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `PROTOCOL_VERSION`            | `1`                        | Current wire-protocol version. Bump on breaking envelope changes.                                                        |
+| `RESERVED_CHANNELS`           | `readonly string[]`        | Channel names that user code may not bind.                                                                               |
+| `ERROR_CODE_RESERVED_CHANNEL` | `number`                   | JSON-RPC-style error code returned when a reserved channel is requested.                                                 |
+| `MAX_CHANNELS_PER_SOCKET`     | `256`                      | Hard cap on channels per socket.                                                                                         |
+| `AG_UI_EVENT_TYPES`           | `readonly AGUIEventType[]` | The 14 supported AG-UI event types. See [Concepts → Frames](https://genicui.vaah.ai/concepts/frames#the-14-event-types). |
 
 ### Types — `FrameEnvelope`, `FrameBufferResult`, `AGUIEventType`, `GenicUIError`
 
@@ -3653,7 +3663,7 @@ export type {
 
 ## JSON-Patch engine
 
-Thin, immutable wrapper around [fast-json-patch](https://github.com/Starcounter-JS/JSON-Patch){rel="&#x22;nofollow&#x22;"}. See [Concepts → Frames](https://genicui.dev/concepts/frames#state-delta) for the wire use.
+Thin, immutable wrapper around [fast-json-patch](https://github.com/Starcounter-JS/JSON-Patch){rel="&#x22;nofollow&#x22;"}. See [Concepts → Frames](https://genicui.vaah.ai/concepts/frames#state-delta) for the wire use.
 
 ### `JsonPatchEngine`
 
@@ -3716,7 +3726,7 @@ Interface for session-scoped state, with a default in-memory implementation.
 export { InMemoryStore } from './session/index.js';
 ```
 
-`Map`-backed implementation of [`SessionStore`](https://genicui.dev/#sessionstore-interface). Suitable for single-process development; production deployments should swap in a Durable Object–backed implementation.
+`Map`-backed implementation of [`SessionStore`](https://genicui.vaah.ai/#sessionstore-interface). Suitable for single-process development; production deployments should swap in a Durable Object–backed implementation.
 
 ```ts
 import { InMemoryStore } from '@genicui/core';
@@ -3783,7 +3793,7 @@ The
 
 `@genicui/server` exposes a **single TypeScript export** — `createServer()` — and an **MCP tool JSON-RPC surface** that is the *real* API. Documenting only the TS export would mislead you: every consumer of the server talks to the four MCP tools over HTTP, not to `createServer()` directly.
 
-This page covers both surfaces. For the conceptual model behind each tool, see [Concepts → MCP Tools](https://genicui.dev/concepts/mcp-tools). For the wire envelope, see [Concepts → Frames](https://genicui.dev/concepts/frames).
+This page covers both surfaces. For the conceptual model behind each tool, see [Concepts → MCP Tools](https://genicui.vaah.ai/concepts/mcp-tools). For the wire envelope, see [Concepts → Frames](https://genicui.vaah.ai/concepts/frames).
 
 ## createServer()
 
@@ -3828,7 +3838,7 @@ The runtime entry point is
 
  is what both call — see the 
 
-[Server boot sequence](https://genicui.dev/concepts/mcp-tools#the-server-boot-sequence)
+[Server boot sequence](https://genicui.vaah.ai/concepts/mcp-tools#the-server-boot-sequence)
 
  concept page.
 ::
@@ -3849,7 +3859,7 @@ The four MCP tools share a common request envelope. Every `tools/call` is a JSON
 }
 ```
 
-A successful response carries the tool result under `result.content[0].text`; an error response uses the standard JSON-RPC error envelope with a GenicUI-specific code (see [Error codes](https://genicui.dev/#error-codes)).
+A successful response carries the tool result under `result.content[0].text`; an error response uses the standard JSON-RPC error envelope with a GenicUI-specific code (see [Error codes](https://genicui.vaah.ai/#error-codes)).
 
 ---
 
@@ -4262,16 +4272,16 @@ For tool-level errors, the error is returned under `result.content[0].text` with
 
 ## Related
 
-- [Concepts → MCP Tools](https://genicui.dev/concepts/mcp-tools) — protocol rationale, lifecycle, tool selection flow.
-- [Concepts → Frames](https://genicui.dev/concepts/frames) — the wire envelope that carries every tool call's effect.
-- [Concepts → Trust Boundary](https://genicui.dev/concepts/trust-boundary) — why every tool call is validated through `wrapWithValidation()` before reaching a handler.
+- [Concepts → MCP Tools](https://genicui.vaah.ai/concepts/mcp-tools) — protocol rationale, lifecycle, tool selection flow.
+- [Concepts → Frames](https://genicui.vaah.ai/concepts/frames) — the wire envelope that carries every tool call's effect.
+- [Concepts → Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) — why every tool call is validated through `wrapWithValidation()` before reaching a handler.
 
 
 # Client API
 
 The `@genicui/client` package provides the browser-side primitives: a Web Component base class with closed Shadow DOM + JSON-Patch re-rendering, and a runtime engine that wires it to the WebSocket transport. Everything in this package is framework-agnostic — it does not depend on Vue, React, or any UI library.
 
-For the conceptual model, see [Concepts → Components](https://genicui.dev/concepts/components). For the wire protocol that the runtime engine sends and receives, see [Concepts → Frames](https://genicui.dev/concepts/frames).
+For the conceptual model, see [Concepts → Components](https://genicui.vaah.ai/concepts/components). For the wire protocol that the runtime engine sends and receives, see [Concepts → Frames](https://genicui.vaah.ai/concepts/frames).
 
 ## `GenicElement`
 
@@ -4522,7 +4532,7 @@ export interface GenicElementProps {
 }
 ```
 
-The props shape passed to `render()`. Indexable by string; concrete components should narrow with a schema (see [Core API → genicSchema](https://genicui.dev/api/core#genicschemadefinition)).
+The props shape passed to `render()`. Indexable by string; concrete components should narrow with a schema (see [Core API → genicSchema](https://genicui.vaah.ai/api/core#genicschemadefinition)).
 
 ::note
 **No Vue subpath exists.**
@@ -4553,7 +4563,7 @@ The props shape passed to `render()`. Indexable by string; concrete components s
 
  — the 
 
-[Guides → Development](https://genicui.dev/guides/development)
+[Guides → Development](https://genicui.vaah.ai/guides/development)
 
  page walks through the Vue integration using 
 
@@ -4567,7 +4577,7 @@ The props shape passed to `render()`. Indexable by string; concrete components s
 
 `@genicui/vite-plugin` adds zero-config auto-registration for GenicUI components in any Vite-powered project. Drop the plugin into `vite.config.ts`, place `GenicElement` subclasses under your chosen components directory, and the plugin discovers them, registers the custom elements, and emits a `genui-registry.json` on every build.
 
-For the rationale behind the plugin shape, see [Concepts → Components](https://genicui.dev/concepts/components#auto-registration).
+For the rationale behind the plugin shape, see [Concepts → Components](https://genicui.vaah.ai/concepts/components#auto-registration).
 
 ## `viteGenicUI(options?)`
 
@@ -4736,7 +4746,7 @@ export type {
 
 `@genicui/agent-bridge` is the platform-agnostic glue between any LLM provider (OpenAI, Anthropic, OpenAI-compatible) and the GenicUI MCP tool surface. Connect to an MCP endpoint, hand the bridge an LLM config, and it routes the model's tool calls through the server's `find_ui_component` / `render_component` / `update_component` / `subscribe_to_events` surface.
 
-For the lifecycle model and a full walkthrough, see [Concepts → MCP Tools](https://genicui.dev/concepts/mcp-tools#the-agent-bridge-loop).
+For the lifecycle model and a full walkthrough, see [Concepts → MCP Tools](https://genicui.vaah.ai/concepts/mcp-tools#the-agent-bridge-loop).
 
 ## `AgentBridge`
 
@@ -5012,7 +5022,7 @@ The bridge performs tool calls
 
 `@genicul-primevue/registry` is the canonical PrimeVue-backed component registry. Each component ships with a JSON Schema describing its props (with `additionalProperties: false` enforced) and the event payloads it emits. The server-side catalog mirrors these schemas; the client-side PrimeVue components render the validated props.
 
-For the trust-boundary rationale behind `additionalProperties: false`, see [Concepts → Trust Boundary](https://genicui.dev/concepts/trust-boundary). For how registries are loaded, see [Concepts → Components](https://genicui.dev/concepts/components#registry-loader).
+For the trust-boundary rationale behind `additionalProperties: false`, see [Concepts → Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary). For how registries are loaded, see [Concepts → Components](https://genicui.vaah.ai/concepts/components#registry-loader).
 
 The registry currently ships **5 components**. Each entry below is a verbatim copy of its `propsSchema` from [`registries/primevue/registry.json`](https://github.com/vaah-ai/GenicUI/blob/develop/registries/primevue/registry.json){rel="&#x22;nofollow&#x22;"}.
 
@@ -5192,7 +5202,7 @@ Interactive dropdown of cities with a Submit button. The first step in any weath
 
  See 
 
-[Concepts → Components](https://genicui.dev/concepts/components#when-to-use-city-picker)
+[Concepts → Components](https://genicui.vaah.ai/concepts/components#when-to-use-city-picker)
 
  for the rationale.
 ::
@@ -5247,7 +5257,7 @@ PassThrough customization is framework-level (PrimeVue), not a GenicUI surface. 
 
 ## Trust boundary
 
-Every prop schema above is `additionalProperties: false`. The server-side catalog rejects any prop that is not enumerated; the client-side component never receives unexpected keys. This is the trust boundary in action — see [Concepts → Trust Boundary](https://genicui.dev/concepts/trust-boundary).
+Every prop schema above is `additionalProperties: false`. The server-side catalog rejects any prop that is not enumerated; the client-side component never receives unexpected keys. This is the trust boundary in action — see [Concepts → Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary).
 
 If you add a prop to a component, you must:
 
@@ -5276,7 +5286,7 @@ The auth check runs in step
 
  of the pipeline — see 
 
-[Trust Boundary › The input validation pipeline](https://genicui.dev/concepts/trust-boundary#the-input-validation-pipeline)
+[Trust Boundary › The input validation pipeline](https://genicui.vaah.ai/concepts/trust-boundary#the-input-validation-pipeline)
 
 . A failure here never reaches step 1, so you can't accidentally pollute the idempotency cache with an invalid payload.
 ::
@@ -5358,9 +5368,9 @@ A 401 on step 3 confirms the trust boundary never ran. If you see `-32003 props_
 
 ## Related
 
-- [Concepts → Trust Boundary](https://genicui.dev/concepts/trust-boundary) — pipeline order, drop-vs-reject semantics, prototype-pollution strip.
-- [API Reference → Server](https://genicui.dev/api/server#error-codes) — the full `-32001..-32010` namespace including `-32007 auth_invalid`.
-- [API Reference → Agent Bridge → `LLMProviderConfig.headers`](https://genicui.dev/api/agent-bridge#llmproviderconfig) — pass the JWT to upstream LLM calls when your IdP requires it.
+- [Concepts → Trust Boundary](https://genicui.vaah.ai/concepts/trust-boundary) — pipeline order, drop-vs-reject semantics, prototype-pollution strip.
+- [API Reference → Server](https://genicui.vaah.ai/api/server#error-codes) — the full `-32001..-32010` namespace including `-32007 auth_invalid`.
+- [API Reference → Agent Bridge → `LLMProviderConfig.headers`](https://genicui.vaah.ai/api/agent-bridge#llmproviderconfig) — pass the JWT to upstream LLM calls when your IdP requires it.
 
 
 # Retry, Backoff, and Idempotency
@@ -5381,7 +5391,7 @@ Two layers of defense:
 ::callout{type="info"}
 The 24h TTL is enforced by an LRU cache. See 
 
-[Frames › Idempotency keys](https://genicui.dev/concepts/frames#idempotency-keys)
+[Frames › Idempotency keys](https://genicui.vaah.ai/concepts/frames#idempotency-keys)
 
  for the cache key shape and the silent-eviction policy.
 ::
@@ -5464,16 +5474,16 @@ The server log will show exactly one `STATE_SNAPSHOT` and one `COMPONENT_MOUNTED
 
 - **Don't reuse keys across `render` vs `update`.** A `render_component` key and a later `update_component` call sharing the same key collide — the server sees a `params` mismatch and returns `-32007 idempotency_conflict`. Use the same key *only* across retries of the same logical operation.
 - **Keys expire after 24h.** A user who retries a render that succeeded yesterday gets a fresh mount and a second `componentId`. Persist `(componentId, idempotencyKey)` pairs in your session store if you need to survive TTL eviction.
-- **Backoff cap of 30s matches the server.** The runtime's reconnect loop also uses 30s as its cap ([Events › Backpressure](https://genicui.dev/concepts/events#backpressure-and-rate-limits)). Capping client-side backoff higher just makes you look hung to the user.
+- **Backoff cap of 30s matches the server.** The runtime's reconnect loop also uses 30s as its cap ([Events › Backpressure](https://genicui.vaah.ai/concepts/events#backpressure-and-rate-limits)). Capping client-side backoff higher just makes you look hung to the user.
 - **Dead-letter, don't silently drop.** After `maxAttempts`, persist the failed call to a queue (Redis Streams, SQS, a local SQLite). Surface it in your agent's UI as "1 retryable failure, click to retry" — silent drops are how users lose trust.
 - **Don't retry `-32003 props_invalid`.** Validation errors are deterministic — retrying won't fix them. Add `400` to the non-retryable list (it's not in `TRANSIENT` above) and surface the error to the user.
 - **Skip the retry for `401`/`403`.** Token expiry needs a refresh, not a backoff. Catch `err.status === 401` separately, refresh the token, then retry *once* with the new bearer.
 
 ## Related
 
-- [Concepts → Frames › Idempotency keys](https://genicui.dev/concepts/frames#idempotency-keys) — cache key shape, 24h LRU, silent eviction.
-- [API Reference → Server › `update_component`](https://genicui.dev/api/server#update_component) — JSON-Patch + merge modes, `-32004 patch_invalid`.
-- [API Reference → Server › Error codes](https://genicui.dev/api/server#error-codes) — full error namespace including `-32007 idempotency_conflict`.
+- [Concepts → Frames › Idempotency keys](https://genicui.vaah.ai/concepts/frames#idempotency-keys) — cache key shape, 24h LRU, silent eviction.
+- [API Reference → Server › `update_component`](https://genicui.vaah.ai/api/server#update_component) — JSON-Patch + merge modes, `-32004 patch_invalid`.
+- [API Reference → Server › Error codes](https://genicui.vaah.ai/api/server#error-codes) — full error namespace including `-32007 idempotency_conflict`.
 
 
 # Custom Event Types
@@ -5495,7 +5505,7 @@ Events without
 
  are silently dropped at the Shadow boundary — see 
 
-[Events › The composed: true decision](https://genicui.dev/concepts/events#the-composed-true-decision)
+[Events › The composed: true decision](https://genicui.vaah.ai/concepts/events#the-composed-true-decision)
 
 . F19-AC1 enforces this.
 ::
@@ -5624,7 +5634,7 @@ The verification proves three things: the events cross the Shadow boundary (`com
 
 ## Pitfalls
 
-- **Debounce at the source.** Server-side throttling caps at 200 events/sec per component ([Events › Backpressure](https://genicui.dev/concepts/events#backpressure-and-rate-limits)) — drag fires faster than that. If you don't debounce, the server drops the tail of the stream and `drop_count` ticks up silently.
+- **Debounce at the source.** Server-side throttling caps at 200 events/sec per component ([Events › Backpressure](https://genicui.vaah.ai/concepts/events#backpressure-and-rate-limits)) — drag fires faster than that. If you don't debounce, the server drops the tail of the stream and `drop_count` ticks up silently.
 - **Bound the payload.** A `drag_started` event with the full row tree (`detail: { row }`) couples your schema to your UI tree. Send only the `rowId` — let the agent `update_component` to fetch the row's current state if it needs more.
 - **Don't dispatch `focus_changed` on every focus movement.** Browser focus events fire on tab, on click, on programmatic `element.focus()` — your agent will see noise. Emit on `blur` of the *previous* element + `focus` of the new one, or skip `focus_changed` entirely and let the agent rely on `selection`.
 - **`composed: true` is non-negotiable.** See the callout above — events without it never leave the Shadow DOM. The runtime's event bridge listens at `document` with `{ capture: true }`; without the flag, the event stops at the Shadow Root.
@@ -5633,9 +5643,9 @@ The verification proves three things: the events cross the Shadow boundary (`com
 
 ## Related
 
-- [Concepts → Events](https://genicui.dev/concepts/events) — `composed: true`, `subscribe_to_events` filtering, end-to-end event flow.
-- [API Reference → Client › `GenicElement`](https://genicui.dev/api/client#genicelement) — base class, observed attributes, lifecycle hooks.
-- [API Reference → Server › `subscribe_to_events`](https://genicui.dev/api/server#subscribe_to_events) — input schema, `actions[]` filter, auto-cleanup.
+- [Concepts → Events](https://genicui.vaah.ai/concepts/events) — `composed: true`, `subscribe_to_events` filtering, end-to-end event flow.
+- [API Reference → Client › `GenicElement`](https://genicui.vaah.ai/api/client#genicelement) — base class, observed attributes, lifecycle hooks.
+- [API Reference → Server › `subscribe_to_events`](https://genicui.vaah.ai/api/server#subscribe_to_events) — input schema, `actions[]` filter, auto-cleanup.
 
 
 # Multi-Channel Coordination
@@ -5665,7 +5675,7 @@ The three reserved channels —
 
  — are checked at mount time (
 
-[Frames › Channel model](https://genicui.dev/concepts/frames#channel-model)
+[Frames › Channel model](https://genicui.vaah.ai/concepts/frames#channel-model)
 
 ). Reusing them as component channels returns 
 
@@ -5802,17 +5812,17 @@ for (let i = 0; i < 300; i++) {
 
 - **256 channels per socket.** Hard cap — opening the 257th returns `-32001 component_not_found`. With 3 reserved system channels + `__broadcast__` you get 252 component channels in practice. If you need more, open a second socket.
 - **Don't put state on `__broadcast__`.** Coordination events are *intents* — the actual state lives on each component's own channel. Putting props on `__broadcast__` creates a write race: two siblings updating `__broadcast__` simultaneously produce torn reads.
-- **Backpressure on `__broadcast__` is global.** The 500-frame outbound cap ([Events › Backpressure](https://genicui.dev/concepts/events#backpressure-and-rate-limits)) is per-socket, not per-channel. A coordination storm on `__broadcast__` consumes the same budget as a chatty component. Throttle coordination events the same way you'd throttle any high-frequency frame.
-- **`envelope()` validates the channel name.** Passing `__broadcast__` as the third arg to `envelope()` is allowed because it's reserved — the validator checks against `RESERVED_CHANNELS`. If you mistype (`__boradcast__`), you get a `GenicUIError` before the frame hits the wire. See [Core API › `validateChannel`](https://genicui.dev/api/core#validatechannelchannel).
+- **Backpressure on `__broadcast__` is global.** The 500-frame outbound cap ([Events › Backpressure](https://genicui.vaah.ai/concepts/events#backpressure-and-rate-limits)) is per-socket, not per-channel. A coordination storm on `__broadcast__` consumes the same budget as a chatty component. Throttle coordination events the same way you'd throttle any high-frequency frame.
+- **`envelope()` validates the channel name.** Passing `__broadcast__` as the third arg to `envelope()` is allowed because it's reserved — the validator checks against `RESERVED_CHANNELS`. If you mistype (`__boradcast__`), you get a `GenicUIError` before the frame hits the wire. See [Core API › `validateChannel`](https://genicui.vaah.ai/api/core#validatechannelchannel).
 - **Don't subscribe on every render.** Attach the `onEvent` listener in `connectedCallback` and remove it in `disconnectedCallback`. The runtime guarantees the bridge is the same instance per socket, so adding listeners per-render leaks.
-- **Causality over `causes[]`.** When the master dispatches a coordination frame, set `causes: [lastSeq]` on the `STATE_DELTA` so the agent's run-tracer can rebuild the causal chain. See [Protocol › Frame envelope schema](https://genicui.dev/concepts/protocol#frame-envelope-schema).
+- **Causality over `causes[]`.** When the master dispatches a coordination frame, set `causes: [lastSeq]` on the `STATE_DELTA` so the agent's run-tracer can rebuild the causal chain. See [Protocol › Frame envelope schema](https://genicui.vaah.ai/concepts/protocol#frame-envelope-schema).
 
 ## Related
 
-- [Concepts → Frames › Channel model](https://genicui.dev/concepts/frames#channel-model) — reserved channels, 256-channel cap, seq per channel.
-- [Concepts → Protocol](https://genicui.dev/concepts/protocol) — `envelope()`, `causes[]`, the 14 AG-UI event types.
-- [API Reference → Core › `validateChannel`](https://genicui.dev/api/core#validatechannelchannel) — reserved-channel check, error code.
-- [API Reference → Core › `FrameBuffer`](https://genicui.dev/api/core#framebuffer) — replay buffer used by the session-recovery layer on reconnect.
+- [Concepts → Frames › Channel model](https://genicui.vaah.ai/concepts/frames#channel-model) — reserved channels, 256-channel cap, seq per channel.
+- [Concepts → Protocol](https://genicui.vaah.ai/concepts/protocol) — `envelope()`, `causes[]`, the 14 AG-UI event types.
+- [API Reference → Core › `validateChannel`](https://genicui.vaah.ai/api/core#validatechannelchannel) — reserved-channel check, error code.
+- [API Reference → Core › `FrameBuffer`](https://genicui.vaah.ai/api/core#framebuffer) — replay buffer used by the session-recovery layer on reconnect.
 
 
 # Registry Versioning and Coexistence
@@ -5834,7 +5844,7 @@ The default remote allow-list is
 
  only. Other remote entries are dropped with a log warning. See 
 
-[Registries › Trust tiers and resolution order](https://genicui.dev/concepts/registries#trust-tiers-and-resolution-order)
+[Registries › Trust tiers and resolution order](https://genicui.vaah.ai/concepts/registries#trust-tiers-and-resolution-order)
 
 .
 ::
@@ -5926,16 +5936,16 @@ A schema-rejection on step 4 means the pin didn't take effect — your `registry
 
 - **Trust tier is silent.** No toast, no banner — the loader just resolves and moves on. If you shadow a third-party component by accident, the agent picks the wrong one with zero diagnostic. Always `GENICUI_REGISTRY_DRY_RUN=1` before promoting to production.
 - **Pins are absolute.** A pinned component can't be temporarily overridden for one user or session. If you need per-tenant customization, build a *different* registry (e.g., `@acme/data-table-tenant-a`) and let the agent pick via `find_ui_component`'s `tags` filter — don't rely on tier resolution for per-user variations.
-- **Bump the major on breaking schema changes.** The trust boundary rejects registries that change a `propsSchema`'s required keys without a major bump. See [Building a Custom Registry](https://genicui.dev/guides/custom-registry#publishing) — semver matters here because the schema check is strict.
+- **Bump the major on breaking schema changes.** The trust boundary rejects registries that change a `propsSchema`'s required keys without a major bump. See [Building a Custom Registry](https://genicui.vaah.ai/guides/custom-registry#publishing) — semver matters here because the schema check is strict.
 - **Don't pin to `latest`.** A floating pin becomes a silent source of nondeterminism — your dev environment picks up the latest release, your staging picks up a different one. Always pin to an exact version (`2.0.0`, not `^2.0.0`).
 - **Hot reload on `SIGHUP` only updates unpinned components.** A pinned entry is read once at boot; sending `SIGHUP` won't re-resolve the pin. Restart the server to pick up a new pinned version.
 - **Two registries, one URI, different schemas** — never allow this in production. The loader throws at boot if the same `ui://` URI is claimed by two registries in the same tier. Move one to a different URI namespace (`ui://acme/...` vs `ui://genicul/...`).
 
 ## Related
 
-- [Concepts → Registries](https://genicui.dev/concepts/registries) — `defineRegistry` contract, `ui://` URI grammar, three-tier resolution.
-- [Guides → Building a Custom Registry](https://genicui.dev/guides/custom-registry) — the five-step process for authoring `@genicul-<yourlib>/registry` from scratch.
-- [API Reference → PrimeVue Registry](https://genicui.dev/api/primevue-registry) — the canonical registry layout that your custom registry will mirror.
+- [Concepts → Registries](https://genicui.vaah.ai/concepts/registries) — `defineRegistry` contract, `ui://` URI grammar, three-tier resolution.
+- [Guides → Building a Custom Registry](https://genicui.vaah.ai/guides/custom-registry) — the five-step process for authoring `@genicul-<yourlib>/registry` from scratch.
+- [API Reference → PrimeVue Registry](https://genicui.vaah.ai/api/primevue-registry) — the canonical registry layout that your custom registry will mirror.
 
 
 # Testing Components End-to-End
@@ -5960,7 +5970,7 @@ The pattern below mirrors
 
  — see 
 
-[Testing › The pyramid](https://genicui.dev/guides/testing#the-pyramid)
+[Testing › The pyramid](https://genicui.vaah.ai/guides/testing#the-pyramid)
 
  for the 150/20/3-5 split and where e2e sits.
 ::
@@ -6088,18 +6098,18 @@ If `bun test` fails on `createServer()`, check that you're not running it in par
 ## Pitfalls
 
 - **Don't mock the trust boundary.** The whole point of running the real server is that `stripProtoKeys` + `Value.Check` run on every call. A mocked boundary lets `-32003 props_invalid` through and your tests pass while prod breaks.
-- **Use the real `InMemoryStore`, not Jest mocks.** `InMemoryStore` is the source-of-truth for session state during tests — Jest's `jest.fn()` mocks of `Map` miss edge cases (TTL eviction, `on('evicted')` callbacks). See [Core API › `InMemoryStore`](https://genicui.dev/api/core#inmemorystore).
+- **Use the real `InMemoryStore`, not Jest mocks.** `InMemoryStore` is the source-of-truth for session state during tests — Jest's `jest.fn()` mocks of `Map` miss edge cases (TTL eviction, `on('evicted')` callbacks). See [Core API › `InMemoryStore`](https://genicui.vaah.ai/api/core#inmemorystore).
 - **Playwright `exposeFunction` is the right way to capture events.** Don't `console.log` from the page and parse stdout — that breaks when the page is sandboxed or the listener fires before Playwright attaches. Expose a function once and have the page call it.
-- **Deterministic test data, not `Date.now()`.** The test pyramid's rule #4 ([Testing › Authoring rules](https://genicui.dev/guides/testing#authoring-rules)) — pass timestamps as fixtures. A test that asserts `subscription.expiresAt > Date.now()` fails intermittently.
+- **Deterministic test data, not `Date.now()`.** The test pyramid's rule #4 ([Testing › Authoring rules](https://genicui.vaah.ai/guides/testing#authoring-rules)) — pass timestamps as fixtures. A test that asserts `subscription.expiresAt > Date.now()` fails intermittently.
 - **Don't share ports across test files.** Bun's parallel runner will race. Pick a unique port per file (3041, 3042, 3043…) or set `GENICUI_PORT=0` and read the bound port from `server.address().port`.
 - **Wire-format assertions > frame-content assertions.** Test that `STATE_DELTA` arrived, not that it arrived with exactly the patch ops you expected. The diff engine is allowed to coalesce `replace` ops into `add`/`remove` pairs without breaking the contract.
 
 ## Related
 
-- [Concepts → Components](https://genicui.dev/concepts/components) — Web Component lifecycle, observed attributes, the runtime engine.
-- [Guides → Testing](https://genicui.dev/guides/testing) — the 150/20/3-5 pyramid, property tests, conformance runner.
-- [API Reference → Core › `InMemoryStore`](https://genicui.dev/api/core#inmemorystore) — `Map`-backed session store with eviction events.
-- [API Reference → Client › `createRuntime`](https://genicui.dev/api/client#createruntimeoptions-and-runtimeengine) — the runtime engine the Playwright spec drives.
+- [Concepts → Components](https://genicui.vaah.ai/concepts/components) — Web Component lifecycle, observed attributes, the runtime engine.
+- [Guides → Testing](https://genicui.vaah.ai/guides/testing) — the 150/20/3-5 pyramid, property tests, conformance runner.
+- [API Reference → Core › `InMemoryStore`](https://genicui.vaah.ai/api/core#inmemorystore) — `Map`-backed session store with eviction events.
+- [API Reference → Client › `createRuntime`](https://genicui.vaah.ai/api/client#createruntimeoptions-and-runtimeengine) — the runtime engine the Playwright spec drives.
 
 
 # Overview
@@ -6114,12 +6124,12 @@ Pick the host that matches your traffic profile, ops preference, and existing in
 
 ## Decision matrix
 
-| Target                                                                               | Best for                        | Cold start           | State store                      | Setup effort                             | Trade-off                                            |
-| ------------------------------------------------------------------------------------ | ------------------------------- | -------------------- | -------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
-| **Cloudflare Workers + DO** ([deep dive](https://genicui.dev/deployment/cloudflare)) | Production, multi-region edge   | \~50ms (Workers p95) | Durable Objects SQLite (>1MB)    | Medium — `wrangler.toml` + DO migrations | 30s request limit, DO pricing, hibernation semantics |
-| **Bun self-host** ([deep dive](https://genicui.dev/deployment/bun-self-host))        | Dev, CI, single-tenant, on-prem | 0ms (always warm)    | In-memory `Map` (MVP); pluggable | Trivial — `bun run start`                | You own ops, no auto-scaling, single-region          |
-| **Nitro/Nuxt binding** ([deep dive](https://genicui.dev/deployment/nitro))           | Existing Nuxt apps              | Inherits host        | In-memory, host-store pluggable  | Easy — `pnpm add nuxt-genicui`           | Tied to Nuxt release cycle; can't run on Workers     |
-| **Vercel (docs site only)**                                                          | This documentation site         | (static)             | (static, Git)                    | Trivial — Git push                       | Not for runtime; static SSG only                     |
+| Target                                                                                   | Best for                        | Cold start           | State store                      | Setup effort                             | Trade-off                                            |
+| ---------------------------------------------------------------------------------------- | ------------------------------- | -------------------- | -------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
+| **Cloudflare Workers + DO** ([deep dive](https://genicui.vaah.ai/deployment/cloudflare)) | Production, multi-region edge   | \~50ms (Workers p95) | Durable Objects SQLite (>1MB)    | Medium — `wrangler.toml` + DO migrations | 30s request limit, DO pricing, hibernation semantics |
+| **Bun self-host** ([deep dive](https://genicui.vaah.ai/deployment/bun-self-host))        | Dev, CI, single-tenant, on-prem | 0ms (always warm)    | In-memory `Map` (MVP); pluggable | Trivial — `bun run start`                | You own ops, no auto-scaling, single-region          |
+| **Nitro/Nuxt binding** ([deep dive](https://genicui.vaah.ai/deployment/nitro))           | Existing Nuxt apps              | Inherits host        | In-memory, host-store pluggable  | Easy — `pnpm add nuxt-genicui`           | Tied to Nuxt release cycle; can't run on Workers     |
+| **Vercel (docs site only)**                                                              | This documentation site         | (static)             | (static, Git)                    | Trivial — Git push                       | Not for runtime; static SSG only                     |
 
 ::callout{type="warning"}
 **Trade-offs matter more than features.**
@@ -6146,29 +6156,29 @@ If two of these apply (e.g. global + Nuxt), **pick the binding that wins on infr
 
 Three signals point at a host not in the matrix:
 
-- **Need Kubernetes** — wait for the Phase-3 work tracked in the [roadmap](https://genicui.dev/community/roadmap). Today there is no first-party `Deployment` manifest; community-maintained options live in the [community › contributing](https://genicui.dev/community/contributing) list.
+- **Need Kubernetes** — wait for the Phase-3 work tracked in the [roadmap](https://genicui.vaah.ai/community/roadmap). Today there is no first-party `Deployment` manifest; community-maintained options live in the [community › contributing](https://genicui.vaah.ai/community/contributing) list.
 - **Need a fully managed control plane** — same answer as above. Cloudflare's managed Durable Objects are the closest available; nothing else ships in the MVP.
-- **Need to deploy the doc site somewhere other than Vercel** — see the [Vercel deploy guide](https://genicui.dev) — the project includes `vercel.json` and an opinionated `nitro` preset, but a Cloudflare Pages or Netlify drop-in is in scope for a follow-up.
+- **Need to deploy the doc site somewhere other than Vercel** — see the [Vercel deploy guide](https://genicui.vaah.ai) — the project includes `vercel.json` and an opinionated `nitro` preset, but a Cloudflare Pages or Netlify drop-in is in scope for a follow-up.
 
 ## Next steps
 
-- Cloudflare — [Workers + Durable Objects](https://genicui.dev/deployment/cloudflare), M6-T1 deep dive
-- Bun — [self-host binary](https://genicui.dev/deployment/bun-self-host), M6-T2 deep dive
-- Nitro — [Nuxt binding](https://genicui.dev/deployment/nitro), M6-T4 deep dive
-- Read the [production checklist](https://genicui.dev/guides/production) before flipping DNS — the 10-item gate covers CORS, auth, observability, and rate-limit hooks that no deployment target handles for you.
+- Cloudflare — [Workers + Durable Objects](https://genicui.vaah.ai/deployment/cloudflare), M6-T1 deep dive
+- Bun — [self-host binary](https://genicui.vaah.ai/deployment/bun-self-host), M6-T2 deep dive
+- Nitro — [Nuxt binding](https://genicui.vaah.ai/deployment/nitro), M6-T4 deep dive
+- Read the [production checklist](https://genicui.vaah.ai/guides/production) before flipping DNS — the 10-item gate covers CORS, auth, observability, and rate-limit hooks that no deployment target handles for you.
 
 ## See also
 
-- [Production guide](https://genicui.dev/guides/production) — the 10-item checklist (CORS, auth rotation, observability, persistent storage, TLS, rate limits).
-- [Trust boundary](https://genicui.dev/concepts/trust-boundary) — why input validation matters regardless of host.
-- [Registries](https://genicui.dev/concepts/registries) — how the registry trust tiers interact with `GENICUI_REGISTRY_ALLOWLIST` per host.
+- [Production guide](https://genicui.vaah.ai/guides/production) — the 10-item checklist (CORS, auth rotation, observability, persistent storage, TLS, rate limits).
+- [Trust boundary](https://genicui.vaah.ai/concepts/trust-boundary) — why input validation matters regardless of host.
+- [Registries](https://genicui.vaah.ai/concepts/registries) — how the registry trust tiers interact with `GENICUI_REGISTRY_ALLOWLIST` per host.
 
 
 # Cloudflare Workers
 
 Run GenicUI on Cloudflare's edge network. Cold start p95 ≤ 50ms across the 300+ POPs, state persisted in Durable Object SQLite, WebSocket hibernation keeps sessions alive across restarts. This is the production-grade target chosen for the MVP.
 
-This page is a **landing** — it links to the M6-T1 deep dive that owns the wiring, tests, and operational tools. If you've already decided on Cloudflare, jump straight to the M6-T1 task file; otherwise read the [overview](https://genicui.dev/deployment/overview) first.
+This page is a **landing** — it links to the M6-T1 deep dive that owns the wiring, tests, and operational tools. If you've already decided on Cloudflare, jump straight to the M6-T1 task file; otherwise read the [overview](https://genicui.vaah.ai/deployment/overview) first.
 
 ## Architecture
 
@@ -6225,7 +6235,7 @@ interface Env {
 - **Hibernation semantics.** State is durable; in-process state (`let x = ...`) is not. Per-message handlers must rehydrate from `state.storage.sql` on every entry.
 - **No filesystem.** Bundling must happen at build time. Dynamic `import()` of unsupported modules fails. The `nodejs_compat` flag covers most Node APIs.
 
-If any of these is a hard blocker, the [Bun self-host](https://genicui.dev/deployment/bun-self-host) or [Nitro binding](https://genicui.dev/deployment/nitro) may be a better fit.
+If any of these is a hard blocker, the [Bun self-host](https://genicui.vaah.ai/deployment/bun-self-host) or [Nitro binding](https://genicui.vaah.ai/deployment/nitro) may be a better fit.
 ::
 
 ## Operational tooling
@@ -6235,21 +6245,21 @@ If any of these is a hard blocker, the [Bun self-host](https://genicui.dev/deplo
 - `wrangler deploy --env production` — promote a built Worker
 - DO inspector — list DO instances by ID from the Cloudflare dashboard
 
-The [production checklist](https://genicui.dev/guides/production) covers the 10-item gate that applies *after* Cloudflare is wired (CORS, observability, log scrubbing, rate-limit hooks).
+The [production checklist](https://genicui.vaah.ai/guides/production) covers the 10-item gate that applies *after* Cloudflare is wired (CORS, observability, log scrubbing, rate-limit hooks).
 
 ## See also
 
-- [Deployment overview](https://genicui.dev/deployment/overview) — the decision matrix
-- [Bun self-host](https://genicui.dev/deployment/bun-self-host) — escape hatch for hosts that can't run Workers
-- [Nitro binding](https://genicui.dev/deployment/nitro) — when GenicUI is one feature of a larger Nuxt app
-- [Production guide](https://genicui.dev/guides/production) — the post-deploy 10-item gate
+- [Deployment overview](https://genicui.vaah.ai/deployment/overview) — the decision matrix
+- [Bun self-host](https://genicui.vaah.ai/deployment/bun-self-host) — escape hatch for hosts that can't run Workers
+- [Nitro binding](https://genicui.vaah.ai/deployment/nitro) — when GenicUI is one feature of a larger Nuxt app
+- [Production guide](https://genicui.vaah.ai/guides/production) — the post-deploy 10-item gate
 
 
 # Bun Self-Host
 
 Run GenicUI as a single OS binary with no external runtime install. Two paths share the same `@genicui/server/bun` adapter: `bun run start` for fast iteration, and `bun build --compile` for a static binary you can ship to bare hosts and containers.
 
-This page is a **landing** — it links to the M6-T2 deep dive that owns the binary, sizing, and cold-start tests. If you've already decided on Bun, jump to the M6-T2 task file; otherwise skim the [overview](https://genicui.dev/deployment/overview) decision matrix first.
+This page is a **landing** — it links to the M6-T2 deep dive that owns the binary, sizing, and cold-start tests. If you've already decided on Bun, jump to the M6-T2 task file; otherwise skim the [overview](https://genicui.vaah.ai/deployment/overview) decision matrix first.
 
 ## When to pick Bun
 
@@ -6324,7 +6334,7 @@ CMD ["genicui"]
 - **Deep dive** — `.vaahagents/milestones-and-tasks/milestone-06-deployment/task-M6-T2-bun-self-host.md` (F62)
 - **Spec** — `.vaahagents/requirements/specs/deployment.md` §"Target 2: Bun Self-host"
 - **Code** — `packages/server/src/adapters/bun/` (the `mountGenicUIForBun` adapter)
-- **Adapter docs** — [Server › API Reference](https://genicui.dev/api/server) for the full options shape
+- **Adapter docs** — [Server › API Reference](https://genicui.vaah.ai/api/server) for the full options shape
 
 ## Trade-offs
 
@@ -6337,7 +6347,7 @@ CMD ["genicui"]
   - **In-memory state by default.** The MVP store loses sessions on restart. Wire [Postgres or SQLite](https://bun.sh/docs/api/sqlite){rel=""nofollow""} yourself, or accept the loss.
   - **Cold start = 0ms only because you're always warm.** If you autoscale to zero, the first request pays the boot cost. Cloudflare's hibernation model avoids this by design.
 
-  If any of these is a hard blocker, the [Cloudflare Workers](https://genicui.dev/deployment/cloudflare) target or the [Nitro binding](https://genicui.dev/deployment/nitro) may be a better fit.
+  If any of these is a hard blocker, the [Cloudflare Workers](https://genicui.vaah.ai/deployment/cloudflare) target or the [Nitro binding](https://genicui.vaah.ai/deployment/nitro) may be a better fit.
   :::
 
 ## Operational tooling
@@ -6348,14 +6358,14 @@ CMD ["genicui"]
 - `systemctl status genicul` — process supervision
 - `curl http://localhost:8080/health` — readiness probe
 
-The [production checklist](https://genicui.dev/guides/production) covers the post-deploy gate (CORS, observability, log scrubbing, rate-limit hooks) that applies once your binary is behind a reverse proxy.
+The [production checklist](https://genicui.vaah.ai/guides/production) covers the post-deploy gate (CORS, observability, log scrubbing, rate-limit hooks) that applies once your binary is behind a reverse proxy.
 
 ## See also
 
-- [Deployment overview](https://genicui.dev/deployment/overview) — the decision matrix
-- [Cloudflare Workers](https://genicui.dev/deployment/cloudflare) — when global + auto-scaling matter
-- [Nitro binding](https://genicui.dev/deployment/nitro) — when GenicUI is one feature of a larger Nuxt app
-- [Production guide](https://genicui.dev/guides/production) — the post-deploy 10-item gate
+- [Deployment overview](https://genicui.vaah.ai/deployment/overview) — the decision matrix
+- [Cloudflare Workers](https://genicui.vaah.ai/deployment/cloudflare) — when global + auto-scaling matter
+- [Nitro binding](https://genicui.vaah.ai/deployment/nitro) — when GenicUI is one feature of a larger Nuxt app
+- [Production guide](https://genicui.vaah.ai/guides/production) — the post-deploy 10-item gate
 ::
 
 
@@ -6363,7 +6373,7 @@ The [production checklist](https://genicui.dev/guides/production) covers the pos
 
 Drop GenicUI into a Nuxt app as a first-class module. The `nuxt-genicui` module wires the same `@genicui/server` runtime into the host app at `/api/ws`, so GenicUI shares the host's origin, the host's auth middleware, and the host's infrastructure.
 
-This page is a **landing** — it links to the M6-T4 deep dive that owns the module, the devtools panel, and the auth-from-env wiring. If you've already decided on a Nitro binding, jump to the M6-T4 task file; otherwise compare against the [overview](https://genicui.dev/deployment/overview) options.
+This page is a **landing** — it links to the M6-T4 deep dive that owns the module, the devtools panel, and the auth-from-env wiring. If you've already decided on a Nitro binding, jump to the M6-T4 task file; otherwise compare against the [overview](https://genicui.vaah.ai/deployment/overview) options.
 
 ## When to pick Nitro
 
@@ -6440,7 +6450,7 @@ export default defineWebSocketHandler({
 - **In-memory state by default.** Sessions live in the host process. For multi-instance Nuxt hosts you'll need a shared store (Postgres, Redis) — wire it yourself.
 - **Devtools panel is part of the host UI.** F64-AC3 ships a sessions panel in `nuxt-devtools`. If you prefer a separate admin tool, the Cloudflare or Bun standalones expose a JSON admin API instead.
 
-If any of these is a hard blocker, the [Cloudflare Workers](https://genicui.dev/deployment/cloudflare) target or the [Bun self-host](https://genicui.dev/deployment/bun-self-host) may be a better fit.
+If any of these is a hard blocker, the [Cloudflare Workers](https://genicui.vaah.ai/deployment/cloudflare) target or the [Bun self-host](https://genicui.vaah.ai/deployment/bun-self-host) may be a better fit.
 ::
 
 ## Operational tooling
@@ -6450,14 +6460,14 @@ If any of these is a hard blocker, the [Cloudflare Workers](https://genicui.dev/
 - `pnpm preview` — smoke-test the production bundle
 - `nuxt-devtools` — GenicUI sessions panel lives under the Devtools tab
 
-The [production checklist](https://genicui.dev/guides/production) covers the 10-item gate that applies *after* the Nuxt bundle ships (CORS, observability, log scrubbing, rate-limit hooks).
+The [production checklist](https://genicui.vaah.ai/guides/production) covers the 10-item gate that applies *after* the Nuxt bundle ships (CORS, observability, log scrubbing, rate-limit hooks).
 
 ## See also
 
-- [Deployment overview](https://genicui.dev/deployment/overview) — the decision matrix
-- [Cloudflare Workers](https://genicui.dev/deployment/cloudflare) — for multi-region production
-- [Bun self-host](https://genicui.dev/deployment/bun-self-host) — for hosts that can't run Nuxt
-- [Production guide](https://genicui.dev/guides/production) — the post-deploy 10-item gate
+- [Deployment overview](https://genicui.vaah.ai/deployment/overview) — the decision matrix
+- [Cloudflare Workers](https://genicui.vaah.ai/deployment/cloudflare) — for multi-region production
+- [Bun self-host](https://genicui.vaah.ai/deployment/bun-self-host) — for hosts that can't run Nuxt
+- [Production guide](https://genicui.vaah.ai/guides/production) — the post-deploy 10-item gate
 
 
 # FAQ

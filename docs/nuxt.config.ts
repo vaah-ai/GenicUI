@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   // production domain; M5.1-T12 (Vercel deploy) wires the real one.
   //
   // M5.1-T12 — In the Vercel dashboard (Settings → Environment Variables),
-  // set `NUXT_SITE_URL=https://genicui.dev` for Production. Nuxt Site
+  // set `NUXT_SITE_URL=https://genicui.vaah.ai` for Production. Nuxt Site
   // Config reads `NUXT_SITE_URL` at build time and overrides this
   // placeholder, so the placeholder is only used for local dev. This is
   // the canonical Docus way to set the production URL — it covers
@@ -51,7 +51,7 @@ export default defineNuxtConfig({
   // site.url because @nuxtjs/robots reads from nuxt.config.ts site.url,
   // not app.config.ts. M5.1-T12 (Vercel deploy) wires the real one.
   site: {
-    url: 'https://genicui.dev',
+    url: 'https://genicui.vaah.ai',
     name: 'GenicUI'
   },
 
@@ -66,7 +66,7 @@ export default defineNuxtConfig({
   // docus/modules/vercel-markdown-rewrite.ts), so this single block
   // satisfies AC4, AC5, AC6, and AC9 of M5.1-T11.
   llms: {
-    domain: 'https://genicui.dev',
+    domain: 'https://genicui.vaah.ai',
     title: 'GenicUI — Generative Agentic UI Framework',
     description: 'The protocol that lets AI agents use your UI. MCP-native, library-agnostic, framework-agnostic.',
     full: {

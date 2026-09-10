@@ -88,7 +88,7 @@ export default defineAppConfig({
 
   site: {
     name: 'GenicUI',
-    url: 'https://genicui.dev',
+    url: 'https://genicui.vaah.ai',
     description: 'The protocol that lets AI agents use your UI. MCP-native, library-agnostic, framework-agnostic.',
     defaultLocale: 'en'
   },

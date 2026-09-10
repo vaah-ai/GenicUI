@@ -11,7 +11,7 @@
  * The link target reads from `appConfig.site.url` so the same footer
  * renders correctly in preview deploys (where Vercel assigns a
  * `*.vercel.app` URL) and in production (where the custom domain
- * `genicui.dev` is configured).
+ * `genicui.vaah.ai` is configured).
  *
  * Hidden when `appConfig.site.url` is unset (defensive — should never
  * happen on the live site, but useful for the very first local build).
