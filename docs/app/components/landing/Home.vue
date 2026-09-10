@@ -516,7 +516,7 @@ onBeforeUnmount(() => {
           >
             <span class="orbit-ring orbit-ring-a rounded-full" aria-hidden="true" />
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 landing-pulse" />
-            <span>v0.5 · MCP-native · MIT</span>
+            <span>v0.5 · MCP-native · Apache-2.0</span>
           </div>
 
           <!-- Headline — one sentence + a single italic accent. The
@@ -588,7 +588,7 @@ onBeforeUnmount(() => {
           <div class="stagger mt-10 flex items-center gap-6 text-xs font-mono text-[var(--color-text-muted)]" style="--i:4">
             <span class="flex items-center gap-1.5">
               <UIcon name="i-lucide-circle-check" class="size-3.5 text-emerald-400" />
-              MIT-licensed
+              Apache-2.0-licensed
             </span>
             <span class="w-px h-3 bg-white/10" />
             <span class="flex items-center gap-1.5">
@@ -1161,9 +1161,9 @@ onBeforeUnmount(() => {
           </a>
         </div>
 
-        <!-- Open-source line — kept concise. MIT, no telemetry, no lock-in. -->
+        <!-- Open-source line — kept concise. Apache-2.0, no telemetry, no lock-in. -->
         <p class="mt-10 sm:mt-12 text-center text-xs font-mono text-[var(--color-text-muted)]">
-          <span class="text-emerald-400">MIT</span> · no telemetry · no lock-in · <a href="https://github.com/vaah-ai/GenicUI" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-white">view the source</a>
+          <span class="text-emerald-400">Apache-2.0</span> · no telemetry · no lock-in · <a href="https://github.com/vaah-ai/GenicUI" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-white">view the source</a>
         </p>
       </div>
     </section>

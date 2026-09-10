@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "GenicUI HTTP server — Elysia transport layer",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts"
   },

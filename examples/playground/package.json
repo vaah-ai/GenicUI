@@ -4,6 +4,7 @@
   "type": "module",
   "version": "0.1.0",
   "description": "GenicUI Playground — demo app for the full GenicUI pipeline",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",

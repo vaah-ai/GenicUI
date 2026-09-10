@@ -1,0 +1,83 @@
+GenicUI
+Copyright 2026 Vaah AI
+
+This product includes software developed at
+Vaah AI (https://github.com/vaah-ai/GenicUI).
+
+================================================================================
+Third-party attributions
+================================================================================
+
+This distribution includes or depends on the following third-party projects.
+Their licenses and copyright notices are preserved here as required by the
+Apache License, Version 2.0, Section 4(d).
+
+--------------------------------------------------------------------------------
+@genicul-primevue/registry
+--------------------------------------------------------------------------------
+The first official GenicUI registry wraps PrimeVue components. PrimeVue is
+licensed under the MIT License:
+
+    MIT License
+
+    Copyright (c) 2018-2026 PrimeVue Team (https://www.primefaces.org/primevue/)
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+A full copy of the MIT License is available at
+https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+docs/ workspace (Docus + Nuxt UI v4)
+--------------------------------------------------------------------------------
+The documentation site under docs/ is built on Docus (a Nuxt 4 layer) and
+Nuxt UI v4. Both are MIT-licensed; their copyright notices and license texts
+ship with their respective npm packages and are reproduced automatically
+through the standard Nuxt build output. No source-level incorporation occurs
+at this layer; the dependencies are consumed at build time only.
+
+--------------------------------------------------------------------------------
+Runtime dependencies (transitive, build-time only)
+--------------------------------------------------------------------------------
+This project depends on numerous MIT, Apache-2.0, and BSD-licensed runtime
+dependencies (TypeBox, @sinclair/typebox, fast-json-patch, Zod, ws, h3, Nitro,
+Vite, Vue, PrimeVue, and others). Their respective license texts are shipped
+in the `node_modules/` tree at install time and are exposed via each package's
+`LICENSE` file. They are not bundled into the redistributed source archive
+of GenicUI itself.
+
+================================================================================
+Trademarks
+================================================================================
+
+"GenicUI", the GenicUI wordmark, and any associated logos are trademarks of
+Vaah AI. Apache License 2.0 §6 reserves trademark rights to the Licensor and
+does NOT grant permission to use these marks except as required for describing
+the origin of the Work (e.g., in attribution notices and unmodified
+redistribution of source).
+
+================================================================================
+Patent notice
+================================================================================
+
+Pursuant to Apache License 2.0 §3, each Contributor grants a patent license
+for their Contributions. If you institute patent litigation alleging that the
+Work or a Contribution constitutes direct or contributory patent infringement,
+any patent licenses granted to you under this License for that Work shall
+terminate as of the date such litigation is filed.

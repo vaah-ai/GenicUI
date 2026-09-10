@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "PrimeVue DataTable registry adapter for GenicUI",
+  "license": "Apache-2.0",
   "exports": {
     "./registry": "./dist/registry.js",
     ".": "./dist/index.js"

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "GenicUI — AI agent-driven component library (PoC)",
+  "license": "Apache-2.0",
   "scripts": {
     "poc": "node poc/server/index.mjs",
     "poc:smoke": "node poc/server/smoke-test.mjs",
