@@ -6,17 +6,20 @@ This is a [Docus 5.13.0](https://docus.dev/en) layer installed inside the GenicU
 
 ## Status
 
-**M5.1-T1 — Docus scaffold + workspace wiring.**
+**M5.1-T12 — Vercel deploy wiring.** Repo-resident artifacts shipped; Vercel-side actions (link/deploy/DNS) require user.
 
 | AC | Description | Status |
 | -- | ----------- | ------ |
-| 1 | `docs/` exists with `nuxt.config.ts`, `app/`, `content/`, `package.json` | ✅ |
-| 2 | `nuxt.config.ts` has `extends: ['docus']` | ✅ |
-| 3 | Root `package.json` workspaces include `examples/*` | ✅ |
-| 4 | `bun install` exits 0 | ⏳ |
-| 5 | `bun --filter docs dev` boots with title "GenicUI" | ⏳ |
-| 6 | `bun --filter docs build` produces `index.html` | ⏳ |
-| 7 | No Nuxt UI Pro license (Nuxt UI v4 MIT) | ✅ |
+| 1 | `docs/vercel.json` committed with build + output config | ✅ |
+| 2 | Vercel "Deployed on Vercel" badge in landing footer | ✅ |
+| 3 | Root README `Deploy with Vercel` button | ✅ |
+| 4 | `vercel-deploy.md` runbook (link, deploy, domain, rollback, smoke test) | ✅ |
+| 5 | `vercel link` + GitHub integration | 🔵 manual — requires Vercel account |
+| 6 | `vercel deploy --prod` exits 0 | 🔵 manual — requires Vercel auth |
+| 7 | Custom domain `genicui.dev` DNS | 🔵 manual — requires DNS access |
+| 8 | 10-point integration smoke test | 🟠 6/10 verified locally, 4/10 manual-verified |
+
+The full T1 status table (Docus scaffold) is superseded by the milestone log below.
 
 ## Quick start
 
@@ -54,6 +57,7 @@ docs/
 - M5.1-T1 ✅ Scaffold + workspace wiring — landing renders, build works, MIT deps only.
 - M5.1-T3 ✅ Information architecture — 9 section directories, 38 page skeletons (frontmatter + `::note` placeholder), 10 `.navigation.yml` files. Build passes, all 38 routes return 200. See `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md`.
 - M5.1-T11 ✅ Search + SEO + llms.txt — Docus auto-registers `nuxt-llms`, `@nuxtjs/robots`, `nuxt-og-image`. The single config block in `nuxt.config.ts` (`llms: { domain: 'https://genicui.dev', ... }` + `robots: { blockAiBots: true }` + `nitro.prerender.routes: ['/robots.txt', '/llms.txt', '/llms-full.txt']`) emits `/llms.txt` (7.6 KB), `/llms-full.txt` (283 KB), `/robots.txt` (1.2 KB, blocks 39 AI crawlers), `/sitemap.xml` (39 entries), and `/raw/<route>.md` (37 files). AC1–AC8 verified by curl against the local preview; AC9 (`Accept: text/markdown`) and AC10 (Lighthouse ≥ 90) deferred to T12 (Vercel deploy). **Key gotcha:** `nuxt-llms` silently no-ops without `llms.domain` set — without it, none of the four artifacts are emitted.
+- M5.1-T12 🟠 Vercel deploy wiring — `docs/vercel.json` (build/output/headers, no rewrites), `docs/app/components/app/AppFooterLeft.vue` (Docus override with "Deployed on Vercel" badge), root `README.md` (Deploy button + Live Site shield), `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/vercel-deploy.md` (300+ line runbook covering link/deploy/domain/rollback/smoke test/troubleshooting). **Critical:** Docus's `vercel-markdown-rewrite` module (186 lines, hooks `nitro:init` on the Vercel preset only) auto-injects edge rewrites for `Accept: text/markdown` for every page — **do NOT add rewrites to `vercel.json`** (they would conflict). Build regression green (36 MB / 13 MB gzip). 6/10 smoke-test points verified locally; 4/10 manual-verified (live URL, Vercel GitHub integration, Lighthouse, custom-domain DNS).
 
 ## UAT findings (Playwright, 2026-09-08)
 
