@@ -1,6 +1,6 @@
 <div align="right">
 
-[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.dev-7c3aed)](https://genicui.vaah.ai)
+[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.vaah.ai-7c3aed)](https://genicui.vaah.ai)
 [![llms.txt](https://img.shields.io/badge/llms.txt-7c3aed)](https://genicui.vaah.ai/llms-full.txt)
 
 </div>
@@ -35,18 +35,6 @@ Same component renders in the chat, on a voice call, on a dashboard, or through 
 | `subscribe_to_events` | Filter-scoped subscription to component events; unsubscribe stops the stream; unmount cleans up. |
 
 JSON-RPC error namespace `-32001..-32010` is reserved for the GenicUI surface. Fourteen AG-UI event types ride on the wire (nine base AG-UI events + five GenicUI extensions: `COMPONENT_MOUNTED`, `COMPONENT_UPDATED`, `COMPONENT_UNMOUNTED`, `COMPONENT_EVENT`, `SURFACE_READY`).
-
----
-
-## See it — a chat with your UI
-
-A `claude · MCP` session rendering a real cart inline, a click streaming back as a `component_event`, the agent picking it up. One round-trip, one protocol, three primitives (`render_component` → UI → `component_event`).
-
-<p align="center">
-  <img alt="GenicUI Chat panel — claude · MCP session rendering a CartViewer inline and a component_action round-trip" src="https://raw.githubusercontent.com/vaah-ai/GenicUI/develop/docs/public/chat-panel.png" width="860">
-</p>
-
-The whole loop — agent message, rendered component, user click, agent follow-up — rides on AG-UI frames over the same MCP transport the agent already speaks.
 
 ---
 
