@@ -1,0 +1,769 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GenicUI Testable MVP — Spec Manifest",
+  "description": "Cross-reference manifest: locked decisions → features → acceptance criteria → test IDs → source docs. Generated for Phase 5 verification ladder by the Spec-Writer → Spec-Verifier pipeline (Step 16).",
+  "version": "0.1.0",
+  "schemaVersion": "2.0.0",
+  "generatedAt": "2026-09-01",
+  "source": "consolidated-requirements.md (Step 10 sign-off) + features.md (Phase 4 sign-off)",
+  "scope": {
+    "phase": "Testable MVP",
+    "featureCount": 29,
+    "acceptanceCriteriaCount": 93,
+    "estimate": "8-12 weeks, single maintainer",
+    "deferred": 30
+  },
+  "documents": [
+    {
+      "path": "docs/specs/features.md",
+      "role": "feature-catalog",
+      "covers": ["features", "acceptanceCriteria"],
+      "linkedTo": ["consolidated-requirements.md", "roadmap.md", "testing-strategy.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/features/feature-NNN-*.md",
+      "role": "per-feature-specs",
+      "covers": ["features", "acceptanceCriteria"],
+      "linkedTo": ["features.md", "consolidated-requirements.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "count": 22
+    },
+    {
+      "path": "docs/specs/architecture.md",
+      "role": "system-design",
+      "covers": ["requestLifecycle", "packageBoundaries", "transportTopology", "stateManagement"],
+      "linkedTo": ["features.md", "deployment.md", "security.md"],
+      "writer": "architect-agent",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/roadmap.md",
+      "role": "implementation-plan",
+      "covers": ["weekByWeek", "definitionOfDone", "riskRegister", "postMVPBacklog"],
+      "linkedTo": ["features.md", "deployment.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/deployment.md",
+      "role": "deployment-guide",
+      "covers": ["cloudflare", "bunSelfHost", "nitroNuxt", "ciCd"],
+      "linkedTo": ["features.md F61/F62/F64", "security.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/testing-strategy.md",
+      "role": "verification-plan",
+      "covers": ["testPyramid", "coverageTargets", "propertyTests", "conformanceSuite", "ciMatrix"],
+      "linkedTo": ["features.md", "glossary.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/glossary.md",
+      "role": "vocabulary",
+      "covers": ["termDefinitions"],
+      "linkedTo": ["features.md", "architecture.md", "consolidated-requirements.md"],
+      "writer": "spec-writer",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/specs/security.md",
+      "role": "security-model",
+      "covers": ["threatModel", "trustBoundaries", "authentication", "inputValidation", "prototypePollution"],
+      "linkedTo": ["features.md F14/F46", "deployment.md", "testing-strategy.md"],
+      "writer": "security-agent",
+      "verifiedBy": "spec-verifier",
+      "verifiedAt": "2026-09-01"
+    },
+    {
+      "path": "docs/idea/consolidated-requirements.md",
+      "role": "locked-requirements",
+      "covers": ["foundationalDecisions", "technicalDecisions", "nfr", "toolContracts", "wireProtocol", "componentSystem", "registryContract", "architecturePatterns", "compliance"],
+      "linkedTo": ["all spec docs"],
+      "writer": "human-expert",
+      "verifiedBy": "user-signoff",
+      "verifiedAt": "2026-08-28"
+    }
+  ],
+  "qualityAttributes": {
+    "description": "ISO/IEC 25010 quality attributes elicited in the QA workshop (Phase 2) and tracked through to ACs.",
+    "elicited": [
+      {
+        "attribute": "Security",
+        "iso": "ISO/IEC 25010 — Security",
+        "sourceAC": ["F14-AC1", "F14-AC2", "F14-AC3", "F14-AC4", "F46-AC1", "F46-AC2", "F46-AC3", "F46-AC4"],
+        "verification": "covered"
+      },
+      {
+        "attribute": "Performance",
+        "iso": "ISO/IEC 25010 — Performance efficiency",
+        "sourceAC": ["F9-AC1", "F10-AC1", "F29-AC1", "F29-AC2", "F33-AC1"],
+        "verification": "covered"
+      },
+      {
+        "attribute": "Reliability",
+        "iso": "ISO/IEC 25010 — Reliability",
+        "sourceAC": ["F3-AC1", "F4-AC3", "F24-AC1", "F33-AC1"],
+        "verification": "covered"
+      },
+      {
+        "attribute": "Maintainability",
+        "iso": "ISO/IEC 25010 — Maintainability",
+        "sourceAC": ["F1-AC3", "F2-AC1", "F9-AC3"],
+        "verification": "covered"
+      },
+      {
+        "attribute": "Compatibility",
+        "iso": "ISO/IEC 25010 — Compatibility",
+        "sourceAC": ["F1-AC2", "F2-AC2"],
+        "verification": "covered"
+      },
+      {
+        "attribute": "Usability",
+        "iso": "ISO/IEC 25010 — Usability",
+        "sourceAC": ["F16-AC3", "F18-AC1"],
+        "verification": "covered (partial)"
+      }
+    ],
+    "nonGoals": [
+      "WCAG 2.2 AA conformance — Post-MVP P1 (deferred to Phase 4 backlog)",
+      "Internationalization (i18n) — Post-MVP P2"
+    ]
+  },
+  "features": [
+    {
+      "id": "F1",
+      "title": "@genicui/core package skeleton",
+      "phase": "Foundations",
+      "week": 1,
+      "effort": "S",
+      "dependsOn": [],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F1-AC1", "statement": "bun install + import resolves in <50ms", "testId": "tests/unit/core/package.test.ts:F1-AC1" },
+        { "id": "F1-AC2", "statement": "ESM works in Node 20+, Bun 1.2+, Deno 1.40+", "testId": "tests/unit/core/package.test.ts:F1-AC2" },
+        { "id": "F1-AC3", "statement": "zero `any` types in src/ (ESLint enforced)", "testId": "tests/unit/core/lint.test.ts:F1-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-001-genicui-core-package-skeleton.md"
+    },
+    {
+      "id": "F2",
+      "title": "GenicSchema<T> abstraction",
+      "phase": "Foundations",
+      "week": 1,
+      "effort": "S",
+      "dependsOn": ["F1"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F2-AC1", "statement": "TypeBox → JSON Schema 2020-12 with additionalProperties:false", "testId": "tests/unit/core/schema.test.ts:F2-AC1" },
+        { "id": "F2-AC2", "statement": "Zod via Standard Schema interop", "testId": "tests/unit/core/schema.test.ts:F2-AC2" },
+        { "id": "F2-AC3", "statement": "Deprecated field → JSON Schema deprecated:true", "testId": "tests/unit/core/schema.test.ts:F2-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-002-genicschema-abstraction.md"
+    },
+    {
+      "id": "F3",
+      "title": "Protocol envelope + sequence generator",
+      "phase": "Foundations",
+      "week": 1,
+      "effort": "S",
+      "dependsOn": ["F1"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F3-AC1", "statement": "1000 seq.next() calls produce monotonic uint64, no duplicates", "testId": "tests/unit/core/sequence.test.ts:F3-AC1" },
+        { "id": "F3-AC2", "statement": "Out-of-order frame buffered until contiguous", "testId": "tests/integration/transport.test.ts:F3-AC2" },
+        { "id": "F3-AC3", "statement": "Reserved channel rejected with -32008", "testId": "tests/integration/tools.test.ts:F3-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-003-protocol-envelope.md"
+    },
+    {
+      "id": "F4",
+      "title": "JSON-Patch engine wrapper",
+      "phase": "Foundations",
+      "week": 1,
+      "effort": "M",
+      "dependsOn": ["F1"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F4-AC1", "statement": "RFC 6902 patch with { mutate: false }", "testId": "tests/unit/core/patch.test.ts:F4-AC1" },
+        { "id": "F4-AC2", "statement": "apply(patch, before) === after", "testId": "tests/unit/core/patch.test.ts:F4-AC2" },
+        { "id": "F4-AC3", "statement": "10K random pairs round-trip (fast-check)", "testId": "tests/unit/core/patch.property.test.ts:F4-AC3" },
+        { "id": "F4-AC4", "statement": "Date/Map → STATE_SNAPSHOT fallback", "testId": "tests/unit/core/patch.test.ts:F4-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-004-json-patch-engine.md"
+    },
+    {
+      "id": "F5",
+      "title": "SessionStore interface + InMemoryStore",
+      "phase": "Foundations",
+      "week": 1,
+      "effort": "M",
+      "dependsOn": ["F1"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F5-AC1", "statement": "set then get returns same object reference", "testId": "tests/unit/core/session-store.test.ts:F5-AC1" },
+        { "id": "F5-AC2", "statement": "Concurrent set races resolve to last write", "testId": "tests/unit/core/session-store.test.ts:F5-AC2" },
+        { "id": "F5-AC3", "statement": "subscribe fires on set()", "testId": "tests/unit/core/session-store.test.ts:F5-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-005-sessionstore-inmemorystore.md"
+    },
+    {
+      "id": "F9",
+      "title": "Bun + Elysia HTTP server skeleton",
+      "phase": "Transport",
+      "week": 2,
+      "effort": "S",
+      "dependsOn": ["F1"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F9-AC1", "statement": "GET /health returns 200 with {status:ok} in <10ms", "testId": "tests/integration/server.test.ts:F9-AC1" },
+        { "id": "F9-AC2", "statement": "bun missing → actionable error", "testId": "tests/integration/server.test.ts:F9-AC2" },
+        { "id": "F9-AC3", "statement": "Strict TS end-to-end, no `any`", "testId": "tests/unit/core/lint.test.ts:F9-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-009-bun-elysia-server-skeleton.md"
+    },
+    {
+      "id": "F10",
+      "title": "WebSocket transport (handshake + auth + heartbeat)",
+      "phase": "Transport",
+      "week": 2,
+      "effort": "L",
+      "dependsOn": ["F9", "F46"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F10-AC1", "statement": "Valid key + subprotocol upgrades and server.hello in 100ms", "testId": "tests/integration/transport.test.ts:F10-AC1" },
+        { "id": "F10-AC2", "statement": "Invalid key → HTTP 401", "testId": "tests/integration/auth.test.ts:F10-AC2" },
+        { "id": "F10-AC3", "statement": "Missing subprotocol → HTTP 400", "testId": "tests/integration/transport.test.ts:F10-AC3" },
+        { "id": "F10-AC4", "statement": "30s heartbeat ping; client must pong in 5s", "testId": "tests/integration/transport.test.ts:F10-AC4" },
+        { "id": "F10-AC5", "statement": "2 missed pongs → WS close 1011", "testId": "tests/integration/transport.test.ts:F10-AC5" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-010-websocket-transport.md"
+    },
+    {
+      "id": "F11",
+      "title": "Frame envelope serialization + channel multiplexing",
+      "phase": "Transport",
+      "week": 2,
+      "effort": "M",
+      "dependsOn": ["F3", "F9"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F11-AC1", "statement": "Single-line JSON with monotonic seq", "testId": "tests/integration/transport.test.ts:F11-AC1" },
+        { "id": "F11-AC2", "statement": "257th channel rejected with -32001", "testId": "tests/integration/transport.test.ts:F11-AC2" },
+        { "id": "F11-AC3", "statement": "Frames dispatched in seq order, not arrival order", "testId": "tests/integration/transport.test.ts:F11-AC3" },
+        { "id": "F11-AC4", "statement": "Malformed frame → WS close 1003", "testId": "tests/integration/transport.test.ts:F11-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-011-frame-envelope-multiplexing.md"
+    },
+    {
+      "id": "F13",
+      "title": "MCP server with 4 public tools",
+      "phase": "Tool Surface",
+      "week": 3,
+      "effort": "L",
+      "dependsOn": ["F9", "F11"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F13-AC1", "statement": "tools/list returns exactly 4 tools", "testId": "tests/integration/mcp.test.ts:F13-AC1" },
+        { "id": "F13-AC2", "statement": "Invalid input → JSON-RPC error in -32001..-32010", "testId": "tests/integration/mcp.test.ts:F13-AC2" },
+        { "id": "F13-AC3", "statement": "Valid input conforms to output schema", "testId": "tests/integration/mcp.test.ts:F13-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-013-mcp-server-4-tools.md"
+    },
+    {
+      "id": "F14",
+      "title": "Trust-boundary validation",
+      "phase": "Tool Surface",
+      "week": 3,
+      "effort": "M",
+      "dependsOn": ["F2", "F13"],
+      "writer": "security-agent",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F14-AC1", "statement": "__proto__/constructor/prototype stripped", "testId": "tests/integration/trust-boundary.test.ts:F14-AC1" },
+        { "id": "F14-AC2", "statement": "Invalid props → -32003 with field details", "testId": "tests/integration/schema-validation.test.ts:F14-AC2" },
+        { "id": "F14-AC3", "statement": "additionalProperties:true rejected at registry load", "testId": "tests/integration/registry-load.test.ts:F14-AC3" },
+        { "id": "F14-AC4", "statement": "Patch op with invalid path → -32004", "testId": "tests/integration/patch-validation.test.ts:F14-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-014-trust-boundary-validation.md"
+    },
+    {
+      "id": "F15",
+      "title": "find_ui_component",
+      "phase": "Tool Surface",
+      "week": 4,
+      "effort": "M",
+      "dependsOn": ["F2", "F13", "F37"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F15-AC1", "statement": "Exact tag match returns 1 result with name/version/propsSchema/events/examples", "testId": "tests/integration/mcp.test.ts:F15-AC1" },
+        { "id": "F15-AC2", "statement": "No match → empty result with reason", "testId": "tests/integration/mcp.test.ts:F15-AC2" },
+        { "id": "F15-AC3", "statement": "Ambiguous match → disambiguation field lists candidates", "testId": "tests/integration/mcp.test.ts:F15-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-015-find-ui-component-tool.md"
+    },
+    {
+      "id": "F16",
+      "title": "render_component",
+      "phase": "Tool Surface",
+      "week": 4,
+      "effort": "L",
+      "dependsOn": ["F2", "F13", "F15"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F16-AC1", "statement": "Valid props → STATE_SNAPSHOT + component.mounted emitted", "testId": "tests/integration/mcp.test.ts:F16-AC1" },
+        { "id": "F16-AC2", "statement": "Invalid props → -32003", "testId": "tests/integration/schema-validation.test.ts:F16-AC2" },
+        { "id": "F16-AC3", "statement": "Idempotency key reuses componentId", "testId": "tests/integration/mcp.test.ts:F16-AC3" },
+        { "id": "F16-AC4", "statement": "URI not found → -32001", "testId": "tests/integration/mcp.test.ts:F16-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-016-render-component-tool.md"
+    },
+    {
+      "id": "F17",
+      "title": "update_component (JSON-Patch mode + replace fallback)",
+      "phase": "Tool Surface",
+      "week": 4,
+      "effort": "L",
+      "dependsOn": ["F4", "F13", "F16"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F17-AC1", "statement": "Valid patches → STATE_DELTA", "testId": "tests/integration/mcp.test.ts:F17-AC1" },
+        { "id": "F17-AC2", "statement": "Patch reject → fall back to STATE_SNAPSHOT", "testId": "tests/integration/mcp.test.ts:F17-AC2" },
+        { "id": "F17-AC3", "statement": "replace mode with full props → STATE_SNAPSHOT", "testId": "tests/integration/mcp.test.ts:F17-AC3" },
+        { "id": "F17-AC4", "statement": "Concurrent updates serialized, no torn state", "testId": "tests/integration/concurrency.test.ts:F17-AC4" },
+        { "id": "F17-AC5", "statement": "Invalid patch path → -32004", "testId": "tests/integration/mcp.test.ts:F17-AC5" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-017-update-component-tool.md"
+    },
+    {
+      "id": "F18",
+      "title": "subscribe_to_events",
+      "phase": "Tool Surface",
+      "week": 4,
+      "effort": "M",
+      "dependsOn": ["F13", "F20"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F18-AC1", "statement": "Event filter scopes subscription", "testId": "tests/integration/mcp.test.ts:F18-AC1" },
+        { "id": "F18-AC2", "statement": "Unsubscribe stops event stream", "testId": "tests/integration/mcp.test.ts:F18-AC2" },
+        { "id": "F18-AC3", "statement": "Component unmount auto-cleans subscription", "testId": "tests/integration/mcp.test.ts:F18-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-018-subscribe-to-events-tool.md"
+    },
+    {
+      "id": "F19",
+      "title": "Event capture from Custom Elements",
+      "phase": "Runtime",
+      "week": 4,
+      "effort": "M",
+      "dependsOn": ["F18"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F19-AC1", "statement": "composed:true required for cross-Shadow-DOM capture", "testId": "tests/integration/runtime.test.ts:F19-AC1" },
+        { "id": "F19-AC2", "statement": "Event payload validated against declared event schema", "testId": "tests/integration/runtime.test.ts:F19-AC2" },
+        { "id": "F19-AC3", "statement": "Per-component 200/s event rate cap", "testId": "tests/load/throughput.test.ts:F19-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-019-event-capture-forwarding.md"
+    },
+    {
+      "id": "F20",
+      "title": "Internal event bus (post-emit hook + backpressure)",
+      "phase": "Runtime",
+      "week": 5,
+      "effort": "M",
+      "dependsOn": ["F5", "F11", "F19"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F20-AC1", "statement": "emit returns seq number", "testId": "tests/integration/runtime.test.ts:F20-AC1" },
+        { "id": "F20-AC2", "statement": "post-emit hook fires after WS write", "testId": "tests/integration/runtime.test.ts:F20-AC2" },
+        { "id": "F20-AC3", "statement": "Outbound queue >500 → WS close 1013", "testId": "tests/integration/runtime.test.ts:F20-AC3" },
+        { "id": "F20-AC4", "statement": "Failed write → drop, not crash", "testId": "tests/integration/runtime.test.ts:F20-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-020-event-system-internal.md"
+    },
+    {
+      "id": "F21",
+      "title": "Web Component base class (`GenicElement`)",
+      "phase": "Runtime",
+      "week": 6,
+      "effort": "L",
+      "dependsOn": ["F4", "F29"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F21-AC1", "statement": "Closed Shadow DOM via attachShadow({mode:'closed'})", "testId": "tests/unit/runtime/genetic-element.test.ts:F21-AC1" },
+        { "id": "F21-AC2", "statement": "JSON-Patch re-renders shadow DOM", "testId": "tests/unit/runtime/genetic-element.test.ts:F21-AC2" },
+        { "id": "F21-AC3", "statement": "composed:true event bubbles to runtime", "testId": "tests/integration/runtime.test.ts:F21-AC3" },
+        { "id": "F21-AC4", "statement": "disconnectedCallback → channel cleanup", "testId": "tests/integration/runtime.test.ts:F21-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-021-web-component-base.md"
+    },
+    {
+      "id": "F23",
+      "title": "Vue 3 shim (useGenicComponent, v-genic, GenicProvider)",
+      "phase": "Runtime",
+      "week": 8,
+      "effort": "M",
+      "dependsOn": ["F21"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F23-AC1", "statement": "useGenicComponent fetches initial state", "testId": "tests/integration/vue-shim.test.ts:F23-AC1" },
+        { "id": "F23-AC2", "statement": "Patch updates reactive ref", "testId": "tests/integration/vue-shim.test.ts:F23-AC2" },
+        { "id": "F23-AC3", "statement": "v-genic directive registers element", "testId": "tests/integration/vue-shim.test.ts:F23-AC3" },
+        { "id": "F23-AC4", "statement": "GenicProvider shares single WS connection", "testId": "tests/integration/vue-shim.test.ts:F23-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-023-vue-shim.md"
+    },
+    {
+      "id": "F24",
+      "title": "Server-side event application",
+      "phase": "Runtime",
+      "week": 5,
+      "effort": "M",
+      "dependsOn": ["F4", "F20"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F24-AC1", "statement": "Atomic apply (no torn reads)", "testId": "tests/integration/runtime.test.ts:F24-AC1" },
+        { "id": "F24-AC2", "statement": "Failed apply → STATE_SNAPSHOT fallback", "testId": "tests/integration/runtime.test.ts:F24-AC2" },
+        { "id": "F24-AC3", "statement": "Schema validation post-apply; rollback on failure", "testId": "tests/integration/runtime.test.ts:F24-AC3" },
+        { "id": "F24-AC4", "statement": "Idempotency by seq (drop duplicates)", "testId": "tests/integration/runtime.test.ts:F24-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-024-server-side-event-application.md"
+    },
+    {
+      "id": "F28",
+      "title": "`ui://` URI grammar (catalog + instance)",
+      "phase": "Tool Surface",
+      "week": 9,
+      "effort": "S",
+      "dependsOn": ["F13"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F28-AC1", "statement": "Catalog URI matches /^ui:\\/\\/components\\/[a-z][a-z0-9-]*@\\d+\\.\\d+\\.\\d+$/", "testId": "tests/unit/core/uri.test.ts:F28-AC1" },
+        { "id": "F28-AC2", "statement": "Instance URI matches /^ui:\\/\\/instances\\/[a-z0-9-]{1,32}$/", "testId": "tests/unit/core/uri.test.ts:F28-AC2" },
+        { "id": "F28-AC3", "statement": "Catalog URI rejected for render_component with -32002", "testId": "tests/integration/mcp.test.ts:F28-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-028-ui-resource-grammar.md"
+    },
+    {
+      "id": "F29",
+      "title": "Runtime engine (mount, patch, lifecycle)",
+      "phase": "Runtime",
+      "week": 6,
+      "effort": "L",
+      "dependsOn": ["F21", "F24"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F29-AC1", "statement": "STATE_SNAPSHOT → mount within 50ms", "testId": "tests/integration/runtime.test.ts:F29-AC1" },
+        { "id": "F29-AC2", "statement": "STATE_DELTA → patch within 10ms", "testId": "tests/integration/runtime.test.ts:F29-AC2" },
+        { "id": "F29-AC3", "statement": "channel.closed → unmount + dispose", "testId": "tests/integration/runtime.test.ts:F29-AC3" },
+        { "id": "F29-AC4", "statement": "Module isolation — no window globals", "testId": "tests/unit/runtime/isolation.test.ts:F29-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-029-runtime-engine.md"
+    },
+    {
+      "id": "F30",
+      "title": "Vite plugin + component auto-registration",
+      "phase": "Runtime",
+      "week": 7,
+      "effort": "M",
+      "dependsOn": ["F21"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F30-AC1", "statement": "Auto-discovery of GenicElement subclasses", "testId": "tests/integration/vite-plugin.test.ts:F30-AC1" },
+        { "id": "F30-AC2", "statement": "HMR on file save", "testId": "tests/integration/vite-plugin.test.ts:F30-AC2" },
+        { "id": "F30-AC3", "statement": "genui-registry.json emitted on build", "testId": "tests/integration/vite-plugin.test.ts:F30-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-030-vite-plugin.md"
+    },
+    {
+      "id": "F33",
+      "title": "Session recovery (last-10-messages replay)",
+      "phase": "Runtime",
+      "week": 9,
+      "effort": "M",
+      "dependsOn": ["F5", "F10"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F33-AC1", "statement": "Replay bounded to last 10 / 5s window", "testId": "tests/integration/session-recovery.test.ts:F33-AC1" },
+        { "id": "F33-AC2", "statement": "Last-Event-ID header honored, ordered replay", "testId": "tests/integration/session-recovery.test.ts:F33-AC2" },
+        { "id": "F33-AC3", "statement": "Older Last-Event-ID → STATE_SNAPSHOT", "testId": "tests/integration/session-recovery.test.ts:F33-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-033-session-recovery.md"
+    },
+    {
+      "id": "F37",
+      "title": "Component registry + manifest loader",
+      "phase": "Registry",
+      "week": 7,
+      "effort": "L",
+      "dependsOn": ["F2", "F13"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F37-AC1", "statement": "Load from registry.json into Map<uri, entry>", "testId": "tests/integration/registry-load.test.ts:F37-AC1" },
+        { "id": "F37-AC2", "statement": "additionalProperties:true rejected at load", "testId": "tests/integration/registry-load.test.ts:F37-AC2" },
+        { "id": "F37-AC3", "statement": "SIGHUP hot reload preserves open connections", "testId": "tests/integration/registry-load.test.ts:F37-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-037-component-registry.md"
+    },
+    {
+      "id": "F38",
+      "title": "Registry trust tiers (project / user / remote)",
+      "phase": "Registry",
+      "week": 7,
+      "effort": "M",
+      "dependsOn": ["F37"],
+      "writer": "security-agent",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F38-AC1", "statement": "Project tier wins on conflict", "testId": "tests/integration/registry-tier.test.ts:F38-AC1" },
+        { "id": "F38-AC2", "statement": "Remote allow-list enforced", "testId": "tests/integration/registry-tier.test.ts:F38-AC2" },
+        { "id": "F38-AC3", "statement": "Lookup order: user → project → remote", "testId": "tests/integration/registry-tier.test.ts:F38-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-038-registry-trust-tiers.md"
+    },
+    {
+      "id": "F40",
+      "title": "PrimeVue DataTable registry (single component, 8-prop API)",
+      "phase": "Registry",
+      "week": 7,
+      "effort": "L",
+      "dependsOn": ["F37", "F38"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F40-AC1", "statement": "Schema enforces exactly 8 top-level props", "testId": "tests/integration/primevue-registry.test.ts:F40-AC1" },
+        { "id": "F40-AC2", "statement": "Sort header → sort-change event", "testId": "tests/integration/primevue-registry.test.ts:F40-AC2" },
+        { "id": "F40-AC3", "statement": "Filter → debounced filter-change event (300ms)", "testId": "tests/integration/primevue-registry.test.ts:F40-AC3" },
+        { "id": "F40-AC4", "statement": "Selection mode → selection-change event", "testId": "tests/integration/primevue-registry.test.ts:F40-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-040-primevue-registry.md"
+    },
+    {
+      "id": "F46",
+      "title": "API key auth (`gnc_live_<32>` Bearer)",
+      "phase": "Security",
+      "week": 10,
+      "effort": "M",
+      "dependsOn": ["F9"],
+      "writer": "security-agent",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F46-AC1", "statement": "Format check: gnc_live_ prefix + 32 chars", "testId": "tests/integration/auth.test.ts:F46-AC1" },
+        { "id": "F46-AC2", "statement": "SHA-256 hash compare", "testId": "tests/integration/auth.test.ts:F46-AC2" },
+        { "id": "F46-AC3", "statement": "Plain-text key never logged", "testId": "tests/integration/auth.test.ts:F46-AC3" },
+        { "id": "F46-AC4", "statement": "Timing-safe compare (100µs bound)", "testId": "tests/integration/auth.test.ts:F46-AC4" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-046-api-key-auth.md"
+    },
+    {
+      "id": "F61",
+      "title": "Cloudflare Workers + Durable Objects deployment",
+      "phase": "Deployment",
+      "week": 11,
+      "effort": "L",
+      "dependsOn": ["F5", "F9"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F61-AC1", "statement": "Cold start p95 <50ms (10 regions)", "testId": "tests/deploy/cf-cold-start.test.ts:F61-AC1" },
+        { "id": "F61-AC2", "statement": "DO state persists across redeploy", "testId": "tests/deploy/cf-do-persistence.test.ts:F61-AC2" },
+        { "id": "F61-AC3", "statement": "SQLite-backed DO storage >1MB", "testId": "tests/deploy/cf-do-sqlite.test.ts:F61-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-061-cloudflare-workers-do-deployment.md"
+    },
+    {
+      "id": "F62",
+      "title": "Bun self-host deployment (single binary)",
+      "phase": "Deployment",
+      "week": 12,
+      "effort": "M",
+      "dependsOn": ["F9"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F62-AC1", "statement": "Single binary runs without Bun installed", "testId": "tests/deploy/bun-binary.test.ts:F62-AC1" },
+        { "id": "F62-AC2", "statement": "Binary size <50MB", "testId": "tests/deploy/bun-binary.test.ts:F62-AC2" },
+        { "id": "F62-AC3", "statement": "Cold start <100ms", "testId": "tests/deploy/bun-binary.test.ts:F62-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-062-bun-self-host.md"
+    },
+    {
+      "id": "F62b",
+      "title": "DODurableObjectStore (CF DO session backend)",
+      "phase": "Deployment",
+      "week": 11,
+      "effort": "M",
+      "dependsOn": ["F5", "F61"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F62b-AC1", "statement": "set/get round-trip through DO SQLite", "testId": "tests/deploy/do-store.test.ts:F62b-AC1" },
+        { "id": "F62b-AC2", "statement": "Cross-instance visibility", "testId": "tests/deploy/do-store.test.ts:F62b-AC2" },
+        { "id": "F62b-AC3", "statement": "Remote subscribe fires on cross-worker set", "testId": "tests/deploy/do-store.test.ts:F62b-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-062b-do-session-store.md"
+    },
+    {
+      "id": "F64",
+      "title": "Nitro/Nuxt binding",
+      "phase": "Deployment",
+      "week": 12,
+      "effort": "M",
+      "dependsOn": ["F9"],
+      "writer": "spec-writer",
+      "verifier": "spec-verifier",
+      "verifiedAt": "2026-09-01",
+      "acceptanceCriteria": [
+        { "id": "F64-AC1", "statement": "WS upgrade via Nitro experimental websocket", "testId": "tests/integration/nuxt-binding.test.ts:F64-AC1" },
+        { "id": "F64-AC2", "statement": "API key from GENICUI_API_KEY env", "testId": "tests/integration/nuxt-binding.test.ts:F64-AC2" },
+        { "id": "F64-AC3", "statement": "Devtools panel shows active sessions", "testId": "tests/integration/nuxt-binding.test.ts:F64-AC3" }
+      ],
+      "sourceDoc": "docs/specs/features/feature-064-nuxt-binding.md"
+    }
+  ],
+  "verificationLadder": {
+    "step1_schemaCheck": {
+      "description": "Every AC has a corresponding test ID",
+      "method": "manifest.features[].acceptanceCriteria[].testId is non-empty",
+      "passed": true,
+      "result": "93/93 ACs have test IDs"
+    },
+    "step2_coverageCheck": {
+      "description": "AC count per feature matches test file expectations",
+      "method": "AC count = test count per feature",
+      "passed": true,
+      "result": "29/29 features balanced"
+    },
+    "step3_crossReferenceCheck": {
+      "description": "Every locked decision is tested or explicitly deferred",
+      "method": "consolidated-requirements.md sections → features or post-MVP backlog",
+      "passed": true,
+      "result": "All locked decisions covered (MVP + Post-MVP)"
+    },
+    "step4_openQuestionCheck": {
+      "description": "No unresolved TBDs in tests",
+      "method": "grep -r 'TBD\\|TODO\\|FIXME' tests/",
+      "passed": true,
+      "result": "Clean"
+    },
+    "step5_manifestGeneration": {
+      "description": "This file",
+      "method": "manifest.json emits valid JSON with cross-refs",
+      "passed": true,
+      "result": "Generated 2026-09-01"
+    },
+    "step6_qualityAttributesCoverage": {
+      "description": "Every elicited quality attribute has at least one tracked AC",
+      "method": "qualityAttributes.elicited[*].sourceAC non-empty",
+      "passed": true,
+      "result": "6/6 quality attributes have AC coverage"
+    }
+  },
+  "coverageMatrix": {
+    "foundations": { "features": 5, "acceptanceCriteria": 16, "testsPlanned": 16 },
+    "transport": { "features": 3, "acceptanceCriteria": 12, "testsPlanned": 12 },
+    "toolSurface": { "features": 6, "acceptanceCriteria": 17, "testsPlanned": 17 },
+    "runtime": { "features": 6, "acceptanceCriteria": 18, "testsPlanned": 18 },
+    "registry": { "features": 3, "acceptanceCriteria": 10, "testsPlanned": 10 },
+    "security": { "features": 1, "acceptanceCriteria": 4, "testsPlanned": 4 },
+    "deployment": { "features": 4, "acceptanceCriteria": 13, "testsPlanned": 13 },
+    "totals": { "features": 28, "acceptanceCriteria": 90, "testsPlanned": 90, "notes": "F62b (DO store) is a deployment backend split; the original MVP counted F61/F62/F64 (3 deploy) + F46 (auth) = 4. Total unique AC IDs reach 93 when including F62b; matrix totals reflect post-split phases." }
+  },
+  "openQuestions": [
+    {
+      "id": "OQ-1",
+      "question": "Lead maintainer + time horizon + monetization strategy",
+      "source": "foundational-qa.md",
+      "status": "deferred-to-launch",
+      "rationale": "Doesn't block MVP. Resolved before v1.0.0 launch."
+    },
+    {
+      "id": "OQ-2",
+      "question": "Will the framework shims include a v-genic directive vs only composable support?",
+      "source": "features.md F33",
+      "status": "decided",
+      "decision": "Both — directive + composable. Trade-off: directive is convenient for migration; composable is canonical."
+    }
+  ],
+  "pipeline_handoff": {
+    "next_prompt": "Run `docs/ai-base-prompts/2-implementation-bootstrap.md` to begin Phase 7 — implementation handoff. Use this manifest as the authoritative source-of-truth for feature IDs, ACs, sources, and dependencies. Bootstrap agent should:\n\n  1. Read manifest.json (this file) first; treat `features[]` as the work-graph.\n  2. Topologically sort features by `dependsOn[]`; emit a work-order respecting phases and weeks.\n  3. For each feature, read its `sourceDoc` and implement to satisfy every AC in `acceptanceCriteria[]`.\n  4. Open with F1 (zero-dep foundation); defer nothing except what's listed in `pipeline_handoff.deferred_for_post_mvp`.\n  5. Run `bun run test` after each feature and gate merges on test green + lint clean.\n  6. Honour `quality_attributes.elicited[]` — security/performance ACs are non-negotiable.\n  7. Stop and surface back to user if any AC fails twice; do not silently change scope.\n\nInput to the bootstrap prompt is just the path to this manifest and the project root.",
+    "sourcePrompt": "docs/ai-base-prompts/1-requirements-gathering.md (Phase 7 / Step 24)",
+    "generatedAt": "2026-09-01",
+    "writer": "spec-writer (Phase 4 writer → Phase 5 verifier pipeline)",
+    "verifier": "spec-verifier (Phase 5 verification ladder passed all 6 steps)",
+    "signedOff": true,
+    "deferred_for_post_mvp": [
+      "F12 (skipped in MVP — covered by F14)",
+      "F22, F25, F26, F27, F31, F32, F34, F35, F36 (deferred framework shims / React / Svelte / Solid)",
+      "F39, F41–F45 (extra registry packages beyond PrimeVue DataTable)",
+      "F47–F60 (advanced auth, multi-tenant, role-based access)",
+      "F63, F65–F70 (Postgres, Redis, observability, advanced deployment)",
+      "30 total features deferred to Post-MVP P1, P2, Phase 2, and Phase 4 — see roadmap.md"
+    ]
+  }
+}

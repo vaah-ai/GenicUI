@@ -1,0 +1,283 @@
+{
+  "task_id": "M5.1-T2",
+  "generated_at": "2026-09-09",
+  "spec_claim": "125 references / 39 files",
+  "actual": {
+    "files": 41,
+    "rewrites": 141
+  },
+  "pattern": "docs/requirements \u2192 .vaahagents/requirements (literal, per-file)",
+  "note": "docs/requirements was the OLD snapshot tree; references now point to the canonical .vaahagents/requirements/{specs,idea}/ tree (moved from docs/{specs,idea}/). The OLD snapshot itself lives in .vaahagents/requirements/_archive/.",
+  "out_of_tree_links": {
+    "description": "References that cross OUT of the corpus to non-corpus paths; cannot be auto-rewritten.",
+    "patterns": [
+      {
+        "pattern": "docs/ai-base-prompts/*",
+        "note": "TODO(review) \u2014 prompts live at docs/ai-base-prompts/ at repo root; corpus files reference these for provenance. Defer decision to T6 (Concepts) or T7 (Guides).",
+        "referenced_by": [
+          ".vaahagents/requirements/specs/README.md",
+          ".vaahagents/requirements/specs/completion-summary.md",
+          ".vaahagents/requirements/_archive/specs/README.md",
+          ".vaahagents/requirements/_archive/specs/completion-summary.md"
+        ]
+      },
+      {
+        "pattern": "poc/README.md",
+        "note": "TODO(review) \u2014 poc/ is proof-of-concept only per CLAUDE.md. Defer decision: keep (link to historical PoC), rewrite to docs, or remove.",
+        "referenced_by": [
+          ".vaahagents/requirements/specs/features/feature-e2e-testing-infrastructure.md",
+          ".vaahagents/requirements/_archive/idea/lessons-learned.md"
+        ]
+      }
+    ],
+    "spec_claim": "3 out-of-tree links; actual: 2 distinct patterns (1 was already a duplicate in the spec text)."
+  },
+  "files": [
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/milestone-01.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/task-M1-T1-genicui-core-package-skeleton.md",
+      "rewrites": 6,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/task-M1-T2-genicschema-abstraction.md",
+      "rewrites": 4,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/task-M1-T3-protocol-envelope.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/task-M1-T4-json-patch-engine.md",
+      "rewrites": 4,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-01-foundations-core/task-M1-T5-sessionstore-inmemorystore.md",
+      "rewrites": 4,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-02-transport/milestone-02.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-02-transport/task-M2-T1-elysia-server-skeleton.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-02-transport/task-M2-T2-api-key-auth.md",
+      "rewrites": 5,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-02-transport/task-M2-T3-websocket-transport.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-02-transport/task-M2-T4-frame-multiplexing.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/milestone-03.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T1-mcp-server-4-tools.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T2-trust-boundary-validation.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T3-find-ui-component.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T4-render-component.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T5-update-component.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T6-subscribe-to-events.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-03-tool-surface/task-M3-T7-ui-resource-grammar.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/milestone-04.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T1-event-capture-forwarding.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T2-internal-event-bus.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T3-server-side-event-application.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T4-web-component-base.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T5-runtime-engine.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T6-vite-plugin.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-04-runtime/task-M4-T7-session-recovery.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05-registry/milestone-05.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05-registry/task-M5-T1-component-registry.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05-registry/task-M5-T2-registry-trust-tiers.md",
+      "rewrites": 2,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05-registry/task-M5-T3-primevue-datatable-registry.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05-registry/task-M5-T7-component-event-interactivity.md",
+      "rewrites": 4,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-M5.1-T2-corpus-reconciliation.md",
+      "rewrites": 15,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-06-deployment/milestone-06.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-06-deployment/task-M6-T1-cloudflare-workers-deploy.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-06-deployment/task-M6-T2-bun-self-host.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-06-deployment/task-M6-T3-do-session-store.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/milestones-and-tasks/milestone-06-deployment/task-M6-T4-nuxt-binding.md",
+      "rewrites": 3,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/prompts/prompt-ai-milestones-tasks-planner.md",
+      "rewrites": 25,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": ".vaahagents/prompts/prompt-task-execution.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    },
+    {
+      "file": "ai-base-prompts/5-task-execution-generator.md",
+      "rewrites": 1,
+      "before": "docs/requirements/*",
+      "after": ".vaahagents/requirements/*"
+    }
+  ]
+}

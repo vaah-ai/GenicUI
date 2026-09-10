@@ -1,0 +1,350 @@
+/**
+ * Tool registry — registers MCP tool definitions with stub handlers on the McpServer.
+ *
+ * Uses Zod schemas for the MCP surface (required by @modelcontextprotocol/sdk).
+ * TypeBox schemas in tool-schemas.ts are used for the server-level trust-boundary
+ * validation (see F14 — trust-boundary validation).
+ *
+ * @module @genicui/server/mcp/tool-registry
+ * @see {F13} — MCP server with 4 public tools
+ */
+
+import { z } from 'zod';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+
+import { stripProtoKeys } from '../validation/strip-proto-keys.js';
+import { findComponents } from './catalog.js';
+import { renderComponent } from './render-handler.js';
+import { updateComponent } from './update-handler.js';
+import { eventSubscriptionManager } from './subscribe-handler.js';
+import { isCatalogUri } from './uri-validator.js';
+
+/**
+ * GenicUI-specific JSON-RPC error codes.
+ * -32001..-32010
+ *
+ * @see {consolidated-requirements.md #D} — Error Code Namespace
+ */
+export const GENICUI_ERROR_CODES = {
+  /** -32001: The requested component was not found. */
+  component_not_found: -32001,
+  /** -32002: The component is already mounted / invalid resource URI. */
+  component_already_mounted: -32002,
+  /** -32002: Catalog URI used where instance URI expected. */
+  invalid_resource_uri: -32002,
+  /** -32003: The provided props or input are invalid. */
+  props_invalid: -32003,
+  /** -32004: The JSON-Patch operations are invalid. */
+  patch_invalid: -32004,
+  /** -32005: Rate limit exceeded. */
+  rate_limited: -32005,
+  /** -32006: Quota exceeded for this API key. */
+  quota_exceeded: -32006,
+  /** -32007: Authentication failed or token invalid. */
+  auth_invalid: -32007,
+  /** -32008: The requested surface is unavailable. */
+  surface_unavailable: -32008,
+  /** -32009: Region mismatch — request routed to wrong region. */
+  region_mismatch: -32009,
+  /** -32010: Internal server error. */
+  internal: -32010,
+} as const;
+
+/**
+ * A GenicUI error code value (-32001 to -32010).
+ */
+export type GenicUIErrorCode =
+  (typeof GENICUI_ERROR_CODES)[keyof typeof GENICUI_ERROR_CODES];
+
+/**
+ * Create a tool error result with the given error code and message.
+ *
+ * The result conforms to the MCP CallToolResult shape:
+ * `{ content: [{ type: 'text', text: '[code] message' }], isError: true }`
+ */
+function createErrorResult(code: number, message: string): CallToolResult {
+  return {
+    isError: true,
+    content: [{ type: 'text' as const, text: `[${code}] ${message}` }],
+  };
+}
+
+/**
+ * Create a success tool result.
+ */
+function createSuccessResult(text: string): CallToolResult {
+  return {
+    content: [{ type: 'text' as const, text }],
+  };
+}
+
+/**
+ * Wrap a tool handler with trust-boundary validation (F14).
+ *
+ * Applies `stripProtoKeys` to sanitize the input before the handler
+ * processes it, preventing prototype pollution attacks.
+ *
+ * @param handler — the original tool handler
+ * @returns wrapped handler with validation middleware
+ */
+function wrapWithValidation<T extends object>(
+  handler: (input: T) => Promise<CallToolResult>,
+): (input: T) => Promise<CallToolResult> {
+  return async (input: T) => {
+    // F14-AC1: Strip prototype pollution keys from inbound input
+    const sanitized = stripProtoKeys(input);
+    return handler(sanitized);
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Zod input schemas for the MCP surface
+// (TypeBox schemas in tool-schemas.ts are used for server-level validation)
+// ---------------------------------------------------------------------------
+
+const FindUiComponentInputSchema = z.object({
+  query: z.string().min(1).max(512).describe('Search query string'),
+  topK: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(5)
+    .describe('Maximum number of results to return'),
+});
+
+const RenderComponentInputSchema = z.object({
+  name: z.string().min(1).max(128).describe('Component name (e.g., DataTable)'),
+  props: z.record(z.string(), z.unknown()).describe('Component props'),
+  surface: z.string().optional().describe('Rendering surface'),
+  idempotencyKey: z.string().optional().describe('Idempotency key for re-render safety'),
+  parentComponentId: z.string().optional().describe('Parent component ID for nested rendering'),
+  replaceComponentId: z.string().optional().describe('Replace an existing component'),
+  transition: z.record(z.string(), z.unknown()).optional().describe('Transition animation config'),
+  render_mode: z.enum(['inline', 'iframe']).optional().describe('Render mode: inline or iframe'),
+});
+
+const JsonPatchOperationSchema = z.union([
+  // 'add', 'replace', 'test' — require value
+  z.object({
+    op: z.enum(['add', 'replace', 'test']).describe('Operation type'),
+    path: z.string().describe('JSON Pointer path'),
+    value: z.unknown().describe('Value to add/replace/test'),
+  }),
+  // 'remove' — no value
+  z.object({
+    op: z.literal('remove'),
+    path: z.string().describe('JSON Pointer path'),
+  }),
+  // 'move', 'copy' — require from
+  z.object({
+    op: z.enum(['move', 'copy']).describe('Operation type'),
+    from: z.string().describe('Source JSON Pointer path'),
+    path: z.string().describe('Destination JSON Pointer path'),
+  }),
+]);
+
+const UpdateComponentPatchInputSchema = z.object({
+  componentId: z.string().min(1).max(128).describe('Component ID to update'),
+  patch: z.array(JsonPatchOperationSchema).min(1).describe('JSON-Patch operations (RFC 6902)'),
+});
+
+const UpdateComponentMergeInputSchema = z.object({
+  componentId: z.string().min(1).max(128).describe('Component ID to update'),
+  merge: z.record(z.string(), z.unknown()).describe('Shallow merge object'),
+});
+
+const UpdateComponentInputSchema = z.union([
+  UpdateComponentPatchInputSchema,
+  UpdateComponentMergeInputSchema,
+]).describe(
+  'Input for update_component: either patch (JSON-Patch) or merge (shallow), not both',
+);
+
+const SubscribeToEventsInputSchema = z.object({
+  componentId: z.string().min(1).max(128).optional().describe('Component ID to subscribe to'),
+  actions: z.array(z.string().min(1)).min(1).optional().describe('Action names to subscribe to'),
+  sessionId: z.string().min(1).max(128).optional().describe('Session ID for scoped subscriptions'),
+  expiresAt: z.string().datetime().optional().describe('Expiration timestamp (ISO 8601)'),
+});
+
+// ---------------------------------------------------------------------------
+// Tool registration
+// ---------------------------------------------------------------------------
+
+/**
+ * Register all 4 public MCP tool definitions on the given McpServer.
+ *
+ * Stub handlers return a placeholder response. Real implementations are
+ * added in M3-T3 (find_ui_component), M3-T4 (render_component),
+ * M3-T5 (update_component), and M3-T6 (subscribe_to_events).
+ */
+export function registerToolDefinitions(server: McpServer): void {
+  // find_ui_component — search catalog for UI components
+  server.registerTool(
+    'find_ui_component',
+    {
+      description:
+        'Search the component catalog and return top-K matches. Use this to discover available UI components before rendering them.',
+      inputSchema: FindUiComponentInputSchema,
+    },
+    wrapWithValidation(async (input: z.infer<typeof FindUiComponentInputSchema>): Promise<CallToolResult> => {
+      // F15: Real implementation — search the in-memory catalog
+      const result = findComponents(input.query, input.topK);
+
+      if (result.components.length === 0) {
+        // F15-AC2: No match — return with reason
+        return createSuccessResult(
+          JSON.stringify({
+            components: [],
+            reason: result.reason ?? 'no_component_matches',
+          }, null, 2),
+        );
+      }
+
+      // Build the response with component metadata
+      const response = {
+        components: result.components.map((c) => ({
+          name: c.entry.name,
+          version: c.entry.version,
+          registryId: c.entry.registryId,
+          description: c.entry.description,
+          whenToUse: c.entry.whenToUse,
+          propsSchema: c.entry.propsJsonSchema,
+          events: c.entry.events,
+          examples: c.entry.examples,
+          score: c.score,
+        })),
+      } as Record<string, unknown>;
+
+      // F15-AC3: Disambiguation — include if present
+      if (result.disambiguation) {
+        (response as Record<string, unknown>).disambiguation = result.disambiguation;
+      }
+
+      return createSuccessResult(JSON.stringify(response, null, 2));
+    }),
+  );
+
+  // render_component — mount a component on the connected client
+  server.registerTool(
+    'render_component',
+    {
+      description:
+        'Render a UI component on the connected client. Returns a componentId for subsequent updates and event subscriptions.',
+      inputSchema: RenderComponentInputSchema,
+    },
+    wrapWithValidation(async (input: z.infer<typeof RenderComponentInputSchema>): Promise<CallToolResult> => {
+      // F28-AC3: Reject catalog URIs for render_component
+      if (isCatalogUri(input.name)) {
+        return createErrorResult(
+          GENICUI_ERROR_CODES.invalid_resource_uri,
+          `invalid_resource_uri: catalog URI "${input.name}" cannot be used with render_component; use instance URI or component name`,
+        );
+      }
+
+      const renderInput: {
+        name: string;
+        props: Record<string, unknown>;
+        idempotencyKey?: string;
+      } = {
+        name: input.name,
+        props: input.props,
+      };
+      if (input.idempotencyKey !== undefined) {
+        renderInput.idempotencyKey = input.idempotencyKey;
+      }
+      const result = renderComponent(renderInput);
+
+      // Error path — return error result
+      if (result.error) {
+        const detail = result.error.details?.join('; ') ?? '';
+        const msg = detail ? `${result.error.message}: ${detail}` : result.error.message;
+        return createErrorResult(result.error.code, msg);
+      }
+
+      // Success path — return component metadata
+      return createSuccessResult(
+        JSON.stringify({
+          componentId: result.componentId,
+          channel: result.channel,
+          schema: result.schema,
+          events: result.events,
+          initialState: result.initialState,
+        }, null, 2),
+      );
+    }),
+  );
+
+  // update_component — mutate live component state
+  server.registerTool(
+    'update_component',
+    {
+      description:
+        'Update a mounted component. Provide either a JSON-Patch array (patch) or a shallow merge object (merge), not both.',
+      inputSchema: UpdateComponentInputSchema,
+    },
+    wrapWithValidation(async (input: z.infer<typeof UpdateComponentInputSchema>): Promise<CallToolResult> => {
+      const result = await updateComponent(input);
+
+      if ('error' in result) {
+        const detail = result.error.details?.join('; ') ?? '';
+        const msg = detail ? `${result.error.message}: ${detail}` : result.error.message;
+        return createErrorResult(result.error.code, msg);
+      }
+
+      // Build response based on update type
+      const response: Record<string, unknown> = {
+        componentId: result.componentId,
+        channel: result.channel,
+        type: result.type,
+      };
+
+      if (result.type === 'STATE_DELTA' && result.patch) {
+        response.patch = result.patch;
+      }
+
+      if (result.type === 'STATE_SNAPSHOT' && result.snapshot) {
+        response.snapshot = result.snapshot;
+      }
+
+      return createSuccessResult(JSON.stringify(response, null, 2));
+    }),
+  );
+
+  // subscribe_to_events — listen for component events (F18)
+  server.registerTool(
+    'subscribe_to_events',
+    {
+      description:
+        'Subscribe to events from a mounted component. Specify componentId and actions to filter, plus optional session/expiration. Returns a subscriptionId for later unsubscription.',
+      inputSchema: SubscribeToEventsInputSchema,
+    },
+    wrapWithValidation(async (
+      input: z.infer<typeof SubscribeToEventsInputSchema>,
+    ): Promise<CallToolResult> => {
+      const subscribeInput: {
+        componentId?: string;
+        actions?: readonly string[];
+        sessionId?: string;
+        expiresAt?: string;
+      } = {};
+      if (input.componentId) subscribeInput.componentId = input.componentId;
+      if (input.actions) subscribeInput.actions = input.actions;
+      if (input.sessionId) subscribeInput.sessionId = input.sessionId;
+      if (input.expiresAt) subscribeInput.expiresAt = input.expiresAt;
+
+      const result = eventSubscriptionManager.subscribe(subscribeInput);
+
+      return createSuccessResult(
+        JSON.stringify({
+          subscriptionId: result.subscriptionId,
+          componentId: result.componentId,
+          actions: result.actions,
+        }, null, 2),
+      );
+    }),
+  );
+}

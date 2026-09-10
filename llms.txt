@@ -1,0 +1,52 @@
+# GenicUI — `llms.txt` index (AI agent discovery spec)
+#
+# This file is a **snapshot** of the canonical llms.txt served at
+# https://genicui.vaah.ai/llms.txt. It's commited to the repo so cold-start
+# forkers get AI-agent discovery without building the docs site first.
+#
+# DO NOT EDIT BY HAND. To refresh after doc changes:
+#
+#   bun --filter genicui-docs build
+#   cp docs/.output/public/llms.txt     llms.txt
+#   cp docs/.output/public/llms-full.txt llms-full.txt
+#
+# Canonical (always-fresh) counterpart:
+#   https://genicui.vaah.ai/llms.txt       — 7.6 KB, this file
+#   https://genicui.vaah.ai/llms-full.txt  — 283 KB, the entire corpus concatenated
+#   https://genicui.vaah.ai/raw/<page>.md  — per-page raw markdown
+#
+# Generated from the docs site (Docus + nuxt-llms ^0.2.0) by the M5.1-T11 task
+# pipeline. See docs/nuxt.config.ts and .vaahagents/milestones-and-tasks/
+# milestone-05.1-documentation-site for the spec.
+# ----------------------------------------------------------------------
+- [Production Checklist](https://genicui.vaah.ai/raw/guides/production.md): Pre-deploy checklist for GenicUI — API key rotation, CORS, trust boundary, observability, and the env-var reference.
+- [Testing](https://genicui.vaah.ai/raw/guides/testing.md): The GenicUI test pyramid — 150 unit, 20 integration, 3-5 e2e — plus property tests, the conformance suite, and the 80/90/60 coverage gate.
+- [Building a Custom Registry](https://genicui.vaah.ai/raw/guides/custom-registry.md): Author a @genicul-<yourlib>/registry package from scratch — defineRegistry, schema validation, trust tier, and conformance publishing.
+- [Migrating to GenicUI](https://genicui.vaah.ai/raw/guides/migration.md): Inbound paths from MCP Apps, OpenAI Apps SDK, and CopilotKit, with diff-style mappings and a decision matrix for when migration pays off.
+- [Core API](https://genicui.vaah.ai/raw/api/core.md): Public exports from @genicui/core — schema builder, JsonPatchEngine, SessionStore, AG-UI frame envelope.
+- [Server API](https://genicui.vaah.ai/raw/api/server.md): createServer() entry point plus the 4 MCP tool JSON-RPC schemas (find_ui_component, render_component, update_component, subscribe_to_events) and the -32001..-32010 error code namespace.
+- [Client API](https://genicui.vaah.ai/raw/api/client.md): Public exports from @genicui/client — GenicElement (Web Component base class), createRuntime, RuntimeEngine, and the RuntimeBridge injection pattern.
+- [Vite Plugin API](https://genicui.vaah.ai/raw/api/vite-plugin.md): Public exports from @genicui/vite-plugin — viteGenicUI factory, scanComponentFile AST scanner, and the genui-registry.json emission pipeline.
+- [Agent Bridge API](https://genicui.vaah.ai/raw/api/agent-bridge.md): Public exports from @genicui/agent-bridge — AgentBridge, AgentBridgeError, createLLMProvider, MCPClientImpl, buildSystemPrompt.
+- [PrimeVue Registry API](https://genicui.vaah.ai/raw/api/primevue-registry.md): Component schemas, props, and event payloads from @genicul-primevue/registry — data-table, input-pair, result-card, city-picker, weather-card.
+- [Custom Auth Wrapping](https://genicui.vaah.ai/raw/cookbook/auth.md): Replace API-key auth with JWT, OAuth, or mTLS by wrapping the Authorization header before the trust-boundary pipeline runs.
+- [Retry, Backoff, and Idempotency](https://genicui.vaah.ai/raw/cookbook/retry.md): Make render_component and update_component safe to retry with idempotency keys, exponential backoff, and dead-letter handling.
+- [Custom Event Types](https://genicui.vaah.ai/raw/cookbook/custom-event.md): Emit drag, hover, and focus events from a GenicElement subclass with composed:true, payloadSchema, and client-side debouncing.
+- [Multi-Channel Coordination](https://genicui.vaah.ai/raw/cookbook/multi-channel.md): Render three components concurrently, coordinate their state through the broadcast channel, and stay under the 256-channel cap.
+- [Registry Versioning and Coexistence](https://genicui.vaah.ai/raw/cookbook/registry-versioning.md): Pin, upgrade, and coexist with multiple registries declaring the same component name — trust-tier resolution, version constraints, and migration playbooks.
+- [Testing Components End-to-End](https://genicui.vaah.ai/raw/cookbook/testing.md): Test an agent → component → event flow without a real MCP client using InMemoryStore, a mock MCP client, and Playwright for the Web Component half.
+- [Overview](https://genicui.vaah.ai/raw/deployment/overview.md): Choose where to run GenicUI — Cloudflare Workers, Bun self-host, Nitro binding, or Vercel (docs site only).
+- [Cloudflare Workers](https://genicui.vaah.ai/raw/deployment/cloudflare.md): Deploy GenicUI to Cloudflare Workers + Durable Objects — edge-first, hibernation-aware, pay-per-request, multi-region.
+- [Bun Self-Host](https://genicui.vaah.ai/raw/deployment/bun-self-host.md): Run GenicUI as a single Bun binary — no runtime install required. Best for dev, CI, on-prem, and single-region deployments.
+- [Nitro / Nuxt Binding](https://genicui.vaah.ai/raw/deployment/nitro.md): Embed GenicUI inside a Nuxt app via the nuxt-genicui module — same-origin WebSocket at /api/ws, no separate server, no CORS.
+- [FAQ](https://genicui.vaah.ai/raw/resources/faq.md): Frequently asked questions about GenicUI.
+- [Troubleshooting](https://genicui.vaah.ai/raw/resources/troubleshooting.md): Common errors and how to resolve them.
+- [Community](https://genicui.vaah.ai/raw/resources/community.md): Discord, GitHub, and social links.
+- [Contributing](https://genicui.vaah.ai/raw/community/contributing.md): How to file issues and send pull requests.
+- [Code of Conduct](https://genicui.vaah.ai/raw/community/code-of-conduct.md): Community guidelines for contributors.
+- [Roadmap](https://genicui.vaah.ai/raw/community/roadmap.md): Public roadmap and upcoming milestones.
+- [Pre-1.0 Migration](https://genicui.vaah.ai/raw/migration/pre-1.0.md): Migration notes for early adopters of GenicUI.
+
+## Landing
+
+- [GenicUI — The protocol that lets AI agents use your UI](https://genicui.vaah.ai/raw/index.md): MCP-native, library-agnostic framework for rendering custom UI from any AI agent. Wrap PrimeVue, Mantine, shadcn — the agent stays agnostic.

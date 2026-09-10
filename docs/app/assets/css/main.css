@@ -1,0 +1,746 @@
+/* GenicUI landing — design tokens, premium typography, motion
+ *
+ * This file is the source of truth for the landing page's visual identity.
+ * It overrides Docus/Nuxt UI defaults where the framework's stock theme
+ * is too generic. Loaded via nuxt.config.ts (app entry css).
+ *
+ * Design archetype: Ethereal Glass (dark, OLED-black with radial mesh
+ * gradients). Pair with Asymmetrical Bento layout in content/index.md.
+ *
+ * Type scale follows a 1.250 minor third (1.250x step) anchored at 16px.
+ * Premium families: Geist (sans), Geist Mono (code), Instrument Serif
+ * (editorial accent). Explicitly NOT Inter, Roboto, Arial, Helvetica.
+ */
+
+/* Premium font stack — Geist (sans), Instrument Serif (editorial),
+ * Geist Mono (code). Loaded from Vercel's CDN.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+/* Geist via @fontsource-style CDN */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.5/files/geist-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.5/files/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+/* Design tokens — registered via :root so they survive Tailwind's
+ * @theme processing. Docus already brings its own Tailwind theme; we
+ * scope our additions to the landing surface and avoid clashing.
+ */
+:root {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Instrument Serif', 'Geist', ui-serif, Georgia, serif;
+
+  /* Landing-page-specific color tokens (OLED-black + radial accents) */
+  --color-canvas: #08090A;
+  --color-canvas-elevated: #0E1012;
+  --color-canvas-glass: rgba(14, 16, 18, 0.6);
+  --color-canvas-border: rgba(255, 255, 255, 0.08);
+  --color-canvas-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Accent palette — depth comes from layered radial gradients */
+  --color-accent-blue: #3B82F6;
+  --color-accent-violet: #8B5CF6;
+  --color-accent-emerald: #10B981;
+  --color-accent-amber: #F59E0B;
+  --color-text-muted: #C4C4C8;
+  --color-text-dim: #71717A;
+
+  /* Motion tokens — custom cubic-bezier for spring-like feel */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Keyframes must live outside @theme so the browser actually finds them
+ * when CSS resolves `animation-name` from a `var(--animate-*)` reference.
+ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, -2%) rotate(1deg); }
+  66% { transform: translate(-1%, 1%) rotate(-1deg); }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Hue rotation for the animated install pill border — slow, gentle.
+ * Conveys "alive" without distracting from the headline.
+ */
+@keyframes hue-rotate {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Slow orbiting glow — used on hero badge accent rings.
+ * Two concentric rings rotate in opposite directions so the eye
+ * catches the motion without being able to track a single point.
+ */
+@keyframes orbit-glow {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes orbit-glow-reverse {
+  0%   { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* noise-drift keyframe removed: the texture overlay is now static. The
+ * previous animated translate produced a visible shimmer at the footer's
+ * top edge that read as cheap, low-quality motion. */
+
+/* Override Tailwind defaults — push the landing away from the standard
+ * light-mode SaaS look. We force dark mode on the landing regardless of
+ * system preference.
+ */
+html, html.dark, html.light {
+  background-color: var(--color-canvas);
+  color: var(--color-text, #FAFAFA);
+}
+
+/* Landing-page scoped overrides (cascade to children via .landing-root) */
+.landing-root {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  background-color: var(--color-canvas);
+  color: #FAFAFA;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
+/* Belt-and-braces horizontal-scroll guard. `overflow-x: clip` is
+ * preferred over `hidden` because it doesn't create a scroll
+ * container (so it doesn't break sticky/fixed positioning in
+ * children, e.g. the Docus header).
+ */
+html, body {
+  overflow-x: clip;
+}
+
+.landing-root :where(code) {
+  font-family: var(--font-mono);
+}
+
+/* Massive display type — Instrument Serif for editorial weight.
+ * Tracking + leading tuned at hero sizes (4xl–7xl) — descenders no
+ * longer clip into the next line, lyric-tail letters don't hang off. */
+.landing-root .display-serif {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.0;
+  font-style: italic;
+}
+
+.landing-root .display-sans {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+/* Glass card primitive — Double-Bezel nested architecture.
+ * Background is a literal rgba so it works regardless of CSS variable
+ * resolution (the @theme custom property resolves to empty under Docus).
+ */
+.glass-card {
+  position: relative;
+  background: rgba(14, 16, 18, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 60px -20px rgba(0, 0, 0, 0.5);
+  transition: all 500ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.glass-card:hover {
+  border-color: var(--color-canvas-border-strong);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 40px 80px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Hover-tilt variant — for use-case visuals that should feel physical
+ * when the visitor's cursor passes over them. Capped at ~2deg on both
+ * axes so it never tips into "novelty parallax" territory. Pair with
+ * the standard .glass-card surface; this only adds the 3D shell.
+ *
+ * Falls back to plain glass on touch devices (no hover state).
+ */
+.glass-card-tilt {
+  transform-style: preserve-3d;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-card-tilt:hover {
+    transform: perspective(1200px) rotateX(1.5deg) rotateY(-1.5deg) translateY(-2px);
+  }
+}
+
+/* Hero floating chip — travels between IDE (source) and Chat (target)
+ * on a small arc. Using translate (GPU-safe) only. The chip has its
+ * own absolute positioning; the keyframe provides the motion path.
+ */
+@keyframes orbit-chip {
+  0%   { transform: translate(-30px, 40px); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(20px, -10px); opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translate(-30px, 40px); opacity: 0; }
+}
+
+.hero-chip {
+  animation: orbit-chip 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Surface stack — hero composite (4 surface chromes fanned at
+ * different depths). `perspective` lives on the parent so children
+ * with `transform-style: preserve-3d` can hover-lift into real depth.
+ *
+ * Used by the hero `.surface-stack` block. Children are `.surface-card`
+ * with inline `transform: rotate(...) translateZ(...)`.
+ */
+.surface-stack {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+
+.surface-card {
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .surface-card:hover {
+    transform: translateZ(60px) scale(1.04);
+  }
+}
+
+/* Reduced motion: snap to flat, no hover lift */
+@media (prefers-reduced-motion: reduce) {
+  .surface-card { transition: none; }
+  .surface-card:hover { transform: none; }
+}
+
+/* Orbiting glow rings — used on hero badges to suggest depth.
+ * Two rings, opposite directions. `prefers-reduced-motion` halts them.
+ */
+.orbit-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.orbit-ring-a {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(139, 92, 246, 0.5) 90deg,
+    transparent 180deg,
+    rgba(59, 130, 246, 0.4) 270deg,
+    transparent 360deg
+  );
+  animation: orbit-glow 14s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+  opacity: 0.7;
+}
+
+.orbit-ring-b {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(16, 185, 129, 0.35) 120deg,
+    transparent 240deg,
+    rgba(139, 92, 246, 0.4) 360deg
+  );
+  animation: orbit-glow-reverse 18s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1.5px;
+  opacity: 0.45;
+}
+
+/* "Button-in-Button" trailing icon container */
+.btn-icon-nest {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.group:hover .btn-icon-nest,
+.group:focus-visible .btn-icon-nest {
+  transform: translate(2px, -2px) scale(1.05);
+}
+
+/* Custom cubic-bezier transitions for Nuxt UI buttons on landing */
+.landing-root button,
+.landing-root a {
+  transition: all 400ms var(--ease-out-quart);
+}
+
+/* Single continuous mesh background — painted once on the page root.
+ *
+ * Architecture change: every <section> used to paint its own
+ * .landing-mesh::before (inset: -10% radial gradient). That created
+ * visible color seams between sections and inflated the page's
+ * scrollWidth (causing a horizontal scrollbar). Lifting the mesh to
+ * one fixed background on .landing-root gives us Nuxt.com's "one
+ * continuous dark canvas" feel and kills the horizontal scroll in
+ * the same change.
+ *
+ * The mesh is dominated by violet (the brand primary) and indigo
+ * on the left half (where the hero sits), fading to a near-flat
+ * deep-blue on the right. The conic gradient is a low-opacity
+ * ambient layer that keeps the surface from looking posterized.
+ * Animations are slow (40s) and respect prefers-reduced-motion.
+ */
+.landing-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 15% 0%, rgba(139, 92, 246, 0.45) 0%, transparent 55%),
+    radial-gradient(50% 60% at 35% 15%, rgba(99, 102, 241, 0.30) 0%, transparent 60%),
+    radial-gradient(70% 50% at 80% 30%, rgba(59, 130, 246, 0.18) 0%, transparent 60%),
+    radial-gradient(60% 60% at 90% 100%, rgba(16, 185, 129, 0.10) 0%, transparent 65%),
+    radial-gradient(45% 45% at 10% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 65%),
+    conic-gradient(from 220deg at 30% 20%, rgba(139, 92, 246, 0.10), rgba(59, 130, 246, 0.06), rgba(16, 185, 129, 0.04), rgba(139, 92, 246, 0.10));
+  animation: mesh-drift 40s ease-in-out infinite;
+}
+
+/* Hero glow — a stronger, shorter-lived violet halo painted once
+ * at the top of the page. This is the only "color spot" — the
+ * rest of the page is uniform dark canvas. Sits at z-index -1
+ * like the base mesh, but stacked above it via DOM order.
+ */
+.landing-hero-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-hero-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 50% at 30% 20%, rgba(139, 92, 246, 0.55) 0%, transparent 60%),
+    radial-gradient(45% 40% at 70% 10%, rgba(99, 102, 241, 0.40) 0%, transparent 60%),
+    radial-gradient(80% 60% at 50% 90%, rgba(59, 130, 246, 0.20) 0%, transparent 60%);
+  animation: mesh-drift 22s ease-in-out infinite;
+}
+
+/* Backwards-compat alias: the old per-section .landing-mesh class is
+ * now a no-op (kept in source so existing class lists don't break).
+ * New code should not use it — sections are <section class="relative">.
+ */
+.landing-mesh,
+.landing-hero-mesh {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Noise texture overlay — static film grain. Scoped to the landing-root
+ * (not `position: fixed` page-wide) so it never paints on top of the
+ * Docus header or sidebar. `pointer-events: none` keeps it click-through;
+ * `mix-blend-mode: overlay` blends over dark surfaces and disappears on
+ * light.
+ *
+ * Animation was removed: the `noise-drift` translate read as a visible
+ * shimmer at the footer's top edge because the texture extends to the
+ * full landing-root height. Static grain keeps the Ethereal Glass
+ * texture without the cheap-looking motion.
+ */
+.landing-root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Code window — terminal chrome */
+.code-window {
+  position: relative;
+  background: #050607;
+  border: 1px solid var(--color-canvas-border);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 50px 100px -30px rgba(0, 0, 0, 0.7);
+}
+
+.code-window-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--color-canvas-border);
+}
+
+.code-window-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.code-window-dot.red { background: #FF5F57; }
+.code-window-dot.amber { background: #FEBC2E; }
+.code-window-dot.green { background: #28C840; }
+
+.code-window-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: lowercase;
+}
+
+/* Bento grid for features */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid { gap: 1.25rem; }
+}
+
+/* Bento card sizes — single column on mobile, asymmetric on >=md.
+ * Each variant starts at full width; @media upgrades the spans above 768px.
+ */
+.bento-lg { grid-column: span 12; }
+.bento-md { grid-column: span 12; }
+.bento-sm { grid-column: span 12; }
+.bento-wide { grid-column: span 12; }
+.bento-narrow { grid-column: span 12; }
+.bento-hero-feature { grid-column: span 12; }
+.bento-side-feature { grid-column: span 12; }
+
+@media (min-width: 768px) {
+  .bento-md { grid-column: span 6; }
+  .bento-sm { grid-column: span 4; }
+  .bento-wide { grid-column: span 8; }
+  .bento-narrow { grid-column: span 4; }
+  .bento-hero-feature { grid-column: span 8; }
+  .bento-side-feature { grid-column: span 4; }
+}
+
+/* Stagger entrance — apply via inline style --i for delay.
+ * Animation is written as a literal (not via --animate-fade-up var) because
+ * the @theme custom property resolves to empty under Docus's CSS pipeline.
+ */
+.stagger {
+  opacity: 0;
+  animation: fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Sleak install pill — single command, copy-to-clipboard.
+ * Sits in the hero as the dominant CTA. No fake telemetry, no multi-runner
+ * comparison; npm/pnpm/yarn links live in the secondary row below.
+ *
+ * M5.1-T4 (final): animated gradient border (slow hue rotation via the
+ * ::before pseudo). Conveys "alive" without competing with the headline.
+ */
+.install-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.5rem 0.625rem 1rem;
+  background: rgba(14, 16, 18, 0.78);
+  border: 1px solid transparent;
+  border-radius: 0.875rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 60px -20px rgba(139, 92, 246, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
+}
+
+.install-pill::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    115deg,
+    rgba(139, 92, 246, 0.7),
+    rgba(59, 130, 246, 0.6),
+    rgba(16, 185, 129, 0.55),
+    rgba(139, 92, 246, 0.7)
+  );
+  background-size: 300% 300%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: gradient-pan 6s ease-in-out infinite;
+}
+
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.install-pill:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 70px -20px rgba(59, 130, 246, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.install-prompt {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #10B981;
+  user-select: none;
+}
+
+.install-command {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .install-prompt,
+  .install-command {
+    font-size: 1rem;
+  }
+}
+
+.install-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.install-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.install-copy:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+}
+
+.install-copy:active {
+  transform: scale(0.95);
+}
+
+/* Hero secondary links — quickstart / package managers / GitHub.
+ * Smaller, quieter than the install pill. Single line on mobile.
+ */
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-text-muted, #A1A1AA);
+  text-decoration: none;
+  transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-link:hover {
+  color: white;
+}
+
+.hero-link-arrow {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-link:hover .hero-link-arrow {
+  transform: translateX(2px);
+}
+
+/* Pulse ring dot — used for status indicators (e.g. "live" badges) */
+.landing-pulse {
+  animation: pulse-ring 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .stagger,
+  .landing-root::before,
+  .landing-hero-glow::before,
+  .landing-root::after,
+  .install-pill::before,
+  .orbit-ring-a,
+  .orbit-ring-b,
+  .surface-card,
+  .hero-chip {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+  .glass-card-tilt:hover {
+    transform: translateY(-2px);
+  }
+  .landing-root * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Smooth scroll for in-page anchors */
+html { scroll-behavior: smooth; }
+
+/* Selection — violet wash to match the primary */
+::selection {
+  background: rgba(139, 92, 246, 0.35);
+  color: #FAFAFA;
+}
+
+/* Focus ring — visible, non-default, violet to match primary */
+*:focus-visible {
+  outline: 2px solid var(--color-accent-violet);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Docus AppHeader — follow the active color mode. The header slot is
+ * styled in app.config.ts (ui.header.slots.root) using the bg-default /
+ * border-default semantic tokens, which flip via the --ui-bg /
+ * --ui-border CSS custom properties. We do NOT paint the header dark
+ * unconditionally here anymore — the landing page itself uses the
+ * dark "Ethereal Glass" archetype via .landing-root's background, but
+ * the navbar follows the user's selected color mode like every other
+ * page on the site. The previous `body:has(.landing-root) header {
+ * background-color: rgba(8, 9, 10, 0.72) }` rule was masking the
+ * semantic tokens and forced a dark navbar even in light mode.
+ */
+
+/* Docus UFooter on the landing — paint it dark to match the dark canvas.
+ *
+ * Without this, UFooter inherits the global light color mode (Docus
+ * defaults to light), which produces a bright cyan/teal band at the
+ * bottom of the landing page that breaks the dark visual identity.
+ * We override the slots UFooter renders with [data-slot=...] attrs.
+ */
+body:has(.landing-root) footer[data-slot="root"] {
+  background-color: rgba(8, 9, 10, 0.65) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #FAFAFA;
+}
+body:has(.landing-root) footer[data-slot="root"] [data-slot="left"],
+body:has(.landing-root) footer[data-slot="root"] [data-slot="center"],
+body:has(.landing-root) footer[data-slot="root"] [data-slot="right"] {
+  color: rgba(255, 255, 255, 0.55);
+}
+body:has(.landing-root) footer[data-slot="root"] button {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+body:has(.landing-root) footer[data-slot="root"] button:hover {
+  color: #FAFAFA !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}

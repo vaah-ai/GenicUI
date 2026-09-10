@@ -1,0 +1,68 @@
+# Task M2-T2 — API key auth (`gnc_live_<32>` Bearer)
+
+> **Milestone:** M2 (Transport: Server + WS + Frames)
+> **Manifest feature:** F46 (API key auth)
+> **Priority:** Critical
+> **Status:** ✅ Completed
+> **Estimated Effort:** 2-3 days
+
+## Description
+
+Implement API key authentication middleware: `gnc_live_` prefix + 32 random chars (256 bits), validated against SHA-256 hashes. Plain-text keys are never logged. Timing-safe comparison prevents side-channel attacks. This is a hard prerequisite for WebSocket transport (M2-T3, F10).
+
+**Delivered:** 5 files in `packages/server/src/auth/` — types, key-validator, log-scrubber, barrel index, and 30 comprehensive tests. All 4 ACs verified. Auth middleware integrated into server with `/health` open, `/api/*` requiring Bearer token.
+
+## Task Goals
+
+- Format check: `gnc_live_` prefix + 32 chars (F46-AC1)
+- SHA-256 hash compare (F46-AC2)
+- Plain-text key never logged (F46-AC3)
+- Timing-safe compare (100µs bound) (F46-AC4)
+
+## Implementation Plan
+
+### Pre-Implementation Analysis
+
+- Depends on M2-T1 (F9 — Elysia server, same milestone)
+- Auth model: API key only per [consolidated-requirements.md §L10](../../../.vaahagents/requirements/idea/consolidated-requirements.md#b-locked-technical-decisions)
+- Trust boundary: server re-validates every inbound call (§F)
+
+### Steps
+
+1. Implement API key format validation: `gnc_live_` + 32 chars regex
+2. Implement SHA-256 hash storage: store only `sha256(input)`, never plain text
+3. Implement timing-safe compare (constant-time, <100µs)
+4. Implement middleware: `Authorization: Bearer` header + `Sec-WebSocket-Protocol: api-key.<key>`
+5. Implement log redaction: show `keyId` only
+6. Write integration test: format validation (F46-AC1)
+7. Write integration test: hash compare (F46-AC2)
+8. Write integration test: log redaction (F46-AC3)
+9. Write integration test: timing-safe compare (F46-AC4)
+
+## Acceptance Criteria
+
+- Format check: `gnc_live_` prefix + 32 chars → 401 on wrong format
+- SHA-256 hash compare succeeds for valid keys
+- Plain-text key never logged
+- Timing-safe compare within 100µs bound
+
+## Completion Criteria
+
+- [x] All acceptance criteria above pass (30 tests, 0 failures)
+- [x] `bun run test` exits green (68 tests pass)
+- [x] `bun run lint` reports zero errors
+- [x] `bun run build` succeeds (tsc clean)
+- [x] Trust-boundary strip verified, `additionalProperties: false` enforced
+- [x] Security-touching: timing-safe compare, hash-only storage, log scrubbing verified
+
+## Dependencies
+
+- **Requires:** M2-T1 (F9 — Elysia server, same milestone)
+- **Blocks:** M2-T3 (F10 — WS transport, same milestone)
+
+## Documentation References
+
+- Manifest: `.vaahagents/requirements/specs/manifest.json` → `features[F46]`
+- Per-feature: `.vaahagents/requirements/specs/features/feature-046-api-key-auth.md`
+- Security: `.vaahagents/requirements/specs/security.md`
+- Locked decisions: `.vaahagents/requirements/idea/consolidated-requirements.md` §B (L10)

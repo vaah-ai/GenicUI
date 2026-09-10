@@ -1,0 +1,19 @@
+# Docus / Nuxt build artifacts
+.nuxt
+.output
+.data
+dist
+
+# Bun
+node_modules
+bun.lock
+
+# Editor
+.vscode
+.idea
+.DS_Store
+
+# Env
+.env
+.env.local
+.vercel

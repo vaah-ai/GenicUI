@@ -1,54 +1,114 @@
+<div align="right">
+
+[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.vaah.ai-7c3aed)](https://genicui.vaah.ai)
+[![llms.txt](https://img.shields.io/badge/llms.txt-7c3aed)](https://genicui.vaah.ai/llms-full.txt)
+
+</div>
+
 # GenicUI
 
-**Generative agentic UI framework** — install into any AI project to render custom UI components and bridge them to your agent.
+**The protocol that lets AI agents use your UI.**
 
-GenicUI lets an AI agent **render, update, and respond to** UI components inside a chat conversation. You wrap your existing component library (PrimeVue, Flowbite, ShadCN, anything) with a tiny adaptor, declare the component's contract in one place, and any MCP-capable agent — Claude Code, GPT, or your own — can discover and use it.
+MCP-native · library-agnostic · agent-agnostic.
 
-## What you get
+> Build interactive components for AI agents — tables, forms, dashboards — that render live in your own app, with your own component library, against any MCP-capable agent.
 
-- **Render custom UI from agent output** — components appear inline in the chat surface as the agent talks
-- **Library-agnostic** — wrap PrimeVue, Flowbite, ShadCN, or hand-rolled components; the agent never knows which
-- **Agent-agnostic** — works with any MCP-capable agent via standard MCP tools (`find_ui_component`, `render_component`, `update_component`, `subscribe_to_events`)
-- **Journey-agnostic** — ecommerce, support, ops, internal tools — the same framework
-- **Schema-as-source-of-truth** — one declaration generates TypeScript types, MCP tool definitions, and agent prompt fragments
+---
 
-## Install
+## What GenicUI is
+
+Plain markdown and structured JSON work for many agent surfaces. They stop working the moment your agent needs a *clickable table*, a *form the user can fill*, or a *chart that re-renders on a button press* — anywhere the conversation and the UI have to be the same thing.
+
+GenicUI is the protocol layer that turns those clicks back into something the agent can hear. You wrap your existing component library with one tiny adapter, declare the component's contract in one place, and any MCP-capable agent — Claude Code, GPT, Cursor, Goose, VS Code — discovers the components and uses them through four standard tools.
+
+Same component renders in the chat, on a voice call, on a dashboard, or through an MCP tool. The agent doesn't know which UI library you used. You can swap libraries without retraining the agent.
+
+---
+
+## How it works — the four tools
+
+| Tool | What it does |
+| --- | --- |
+| `find_ui_component` | Semantic search over your registry — `intent + data shape + layout` → component + props schema + alternatives. |
+| `render_component` | Mount a component with validated props; returns a `componentId`. Emits `STATE_SNAPSHOT` + `component.mounted`. Idempotency-key aware. |
+| `update_component` | Two modes — JSON-Patch deltas (RFC 6902) → `STATE_DELTA`, or full-props replace → `STATE_SNAPSHOT`. |
+| `subscribe_to_events` | Filter-scoped subscription to component events; unsubscribe stops the stream; unmount cleans up. |
+
+JSON-RPC error namespace `-32001..-32010` is reserved for the GenicUI surface. Fourteen AG-UI event types ride on the wire (nine base AG-UI events + five GenicUI extensions: `COMPONENT_MOUNTED`, `COMPONENT_UPDATED`, `COMPONENT_UNMOUNTED`, `COMPONENT_EVENT`, `SURFACE_READY`).
+
+---
+
+## See it running — frame a component in ~60s
+
+> A screenshot-by-screenshot walkthrough lives at **https://genicui.vaah.ai/getting-started/quick-start**. The block below is the same flow as code.
 
 ```bash
-# Option A: scaffold a new project
-npx create-genicui-app my-app && cd my-app && npm run dev
+# 1. From a fresh checkout
+bun install
+bun --filter @genicui/server start        # → http://localhost:3040
 
-# Option B: drop into an existing project
-npm install genicui
+# 2. Drop into your MCP client (Claude Code, mcp-inspector, anything that speaks MCP)
+#    Authorization: Bearer gnc_live_<32-char-key>  (printed by the server on boot)
 ```
 
-## Try the PoC
+```ts
+// 3. From any MCP client
+import { MCPClient } from "@genicui/agent-bridge";
 
-This repo includes a working PoC. To run it locally:
-
-```bash
-bash start.sh
-# Then open http://localhost:8080/poc/web/
+const client = new MCPClient({ url: "http://localhost:3040/mcp", apiKey: "gnc_live_..." });
+const { componentId } = await client.call("render_component", {
+  name: "data-table",
+  props: {
+    columns: [{ key: "name", label: "Name" }, { key: "status", label: "Status" }],
+    rows: [{ name: "Alice", status: "active" }, { name: "Bob", status: "inactive" }]
+  }
+});
+// → <genic-data-table> mounts in whatever chat surface you're using
+// → component.mounted + STATE_SNAPSHOT stream back as AG-UI frames
 ```
 
-The PoC has a chat surface, three sample components (Counter, TodoList, CartViewer), and a multi-turn Claude Code backend. See [poc/README.md](poc/README.md) for details.
+---
 
-## Documentation
+## Why GenicUI — and what's different
 
-The full design and contract surface lives in [docs/idea/](docs/idea/):
+The empty quadrant — every other AI/UI tool picks two of three and gives up the third. GenicUI takes all three:
 
-- **[Overview](docs/idea/README.md)** — what GenicUI is and how it's positioned
-- **[Architecture](docs/idea/architecture.md)** — system design, component interaction, data flow
-- **[Four-Agnostic Design](docs/idea/four-agnostic.md)** — the contract surface (journey/component/library/provider agnostic, sideEffects, subscriptions, Submit semantics)
-- **[Developer Experience](docs/idea/dx.md)** — install paths, authoring flow, debugging DX
-- **[CartViewer in 3 Frameworks](docs/idea/examples-cartviewer.md)** — same component in Nuxt+PrimeVue, Next.js+Flowbite, SvelteKit+Skeleton
-- **[Lessons Learned](docs/idea/lessons-learned.md)** — what the PoC build taught us
-- **[Adaptor Specification](docs/idea/adaptor-spec.md)**, **[Agent Protocol](docs/idea/agent-protocol.md)** — interface contracts
+| | GenicUI | Tambo / CopilotKit / assistant-ui | OpenAI Apps SDK | MCP Apps |
+| --- | :-: | :-: | :-: | :-: |
+| Library-agnostic | ✅ | ❌ React-only | — | ❌ iframe-locked |
+| MCP-native | ✅ | — | — | ✅ |
+| Agent-agnostic | ✅ | ✅ | ❌ OpenAI-only | ✅ |
+| No iframe between agent and your DOM | ✅ | ✅ | — | ❌ `postMessage` |
+| Works on Claude Desktop / Goose / VS Code today | ✅ | partial | ❌ | ✅ |
+| Same protocol feeds chat + voice + dashboard | ✅ | ❌ one journey | ❌ | ❌ |
+| Schema-as-source-of-truth (TypeBox → MCP → agent prompt) | ✅ | partial | ❌ | ❌ |
 
-## Project status
+Full side-by-side with `json-render` / `LiveKit Agents UI` / `Vercel AI SDK` at **[genicui.vaah.ai/guides/migration](https://genicui.vaah.ai/guides/migration)**.
 
-PoC — working end-to-end on macOS with Claude Code. The framework is not yet packaged for npm distribution; this repo captures the design, the working PoC, and the contract surface we're building toward.
+---
+
+## Five flows this unblocks
+
+1. **Ecommerce** — agent renders a `<CartViewer>` with `<TicketCard>` rows; user clicks "Apply SUMMER25"; the click becomes a `componentEvent` the agent can hear.
+2. **Customer support** — agent renders a `<KpiDashboard>` with weekly revenue; user clicks a row drilldown; agent updates with `<ClaimForm>` pre-filled.
+3. **Internal ops** — voice call dispatches a `<CityPicker>`; agent pre-fills based on intent; user confirms; `<WeatherCard>` updates via `update_component` JSON-Patch.
+4. **Migration** — drop a GenicUI registry into an existing MCP Apps / OpenAI Apps SDK / CopilotKit surface; the contract stays the same, only the renderer changes.
+5. **Multi-channel** — same MCP server, same registry, three render targets (chat / voice / dashboard) — same component renders in all three with no per-channel code.
+
+---
+
+## For AI agents
+
+Full content available as plain markdown at:
+
+- **[https://genicui.vaah.ai/llms.txt](https://genicui.vaah.ai/llms.txt)** — index + per-section links (7.6 KB)
+- **[https://genicui.vaah.ai/llms-full.txt](https://genicui.vaah.ai/llms-full.txt)** — full corpus (283 KB)
+- **[https://genicui.vaah.ai/raw/&lt;page&gt;.md](https://genicui.vaah.ai/)** — per-page raw markdown
+
+If you're an AI coding assistant reading this repo, the agent-bridge section of the docs is the highest-signal starting point: **[genicui.vaah.ai/api/agent-bridge](https://genicui.vaah.ai/api/agent-bridge)**.
+
+---
 
 ## License
 
-Private — internal PoC.
+**Apache-2.0 — see [`LICENSE`](LICENSE).** Patent grants, attribution requirements, and trademark reservations are documented in [`NOTICE`](NOTICE).

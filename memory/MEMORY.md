@@ -1,0 +1,4 @@
+- [GenicUI — Task Execution Prompt Generated](task-execution-prompt-generated.md) — 16 steps, 8 reference files, generated 2026-09-01
+- [GenicUI — M1-T1 Complete](m1-t1-complete.md) — @genicui/core package skeleton, 4/4 tests pass, merged into develop
+- [GenicUI — M1-T3 Complete](m1-t3-complete.md) — Protocol envelope + sequence generator, 42 tests pass, 7 files created/modified
+- [GenicUI — M4-T2 InternalEventBus Complete](m4-t2-eventbus-complete.md) — F20 InternalEventBus with backpressure, 18 tests, 5 files

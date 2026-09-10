@@ -9,3 +9,6 @@ node_modules/
 
 # Runtime artifacts
 /tmp/genicui-*.log
+
+# Compiled output (Bun resolves .ts source directly — dist/ is unused at runtime)
+packages/*/dist/

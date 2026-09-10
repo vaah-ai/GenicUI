@@ -1,0 +1,27 @@
+{
+  "name": "genicui-docs",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "GenicUI Documentation Site — Docus 5.13.0 layer (M5.1)",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "docus": "^5.13.0",
+    "nuxt": "^4.0.0",
+    "@nuxt/ui": "^4.0.0",
+    "nuxt-llms": "^0.2.0",
+    "tailwindcss": "^4.0.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^2.0.0",
+    "eslint": "^9.0.0"
+  }
+}

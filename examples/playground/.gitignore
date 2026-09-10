@@ -1,0 +1,21 @@
+# Nuxt
+/.nuxt
+/.output
+/.data
+/dist
+
+# Node
+/node_modules
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
