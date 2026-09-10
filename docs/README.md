@@ -53,6 +53,7 @@ docs/
 
 - M5.1-T1 ✅ Scaffold + workspace wiring — landing renders, build works, MIT deps only.
 - M5.1-T3 ✅ Information architecture — 9 section directories, 38 page skeletons (frontmatter + `::note` placeholder), 10 `.navigation.yml` files. Build passes, all 38 routes return 200. See `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md`.
+- M5.1-T11 ✅ Search + SEO + llms.txt — Docus auto-registers `nuxt-llms`, `@nuxtjs/robots`, `nuxt-og-image`. The single config block in `nuxt.config.ts` (`llms: { domain: 'https://genicui.dev', ... }` + `robots: { blockAiBots: true }` + `nitro.prerender.routes: ['/robots.txt', '/llms.txt', '/llms-full.txt']`) emits `/llms.txt` (7.6 KB), `/llms-full.txt` (283 KB), `/robots.txt` (1.2 KB, blocks 39 AI crawlers), `/sitemap.xml` (39 entries), and `/raw/<route>.md` (37 files). AC1–AC8 verified by curl against the local preview; AC9 (`Accept: text/markdown`) and AC10 (Lighthouse ≥ 90) deferred to T12 (Vercel deploy). **Key gotcha:** `nuxt-llms` silently no-ops without `llms.domain` set — without it, none of the four artifacts are emitted.
 
 ## UAT findings (Playwright, 2026-09-08)
 

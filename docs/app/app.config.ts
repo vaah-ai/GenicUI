@@ -97,13 +97,18 @@ export default defineAppConfig({
   },
 
   // SEO defaults — title template + OG card metadata. Per-page `seo:` blocks
-  // (in frontmatter) override these. T11 (Search + SEO + llms) may layer
-  // additional modules on top.
+  // (in frontmatter) override these. T11 (Search + SEO + llms) wires
+  // nuxt-llms + @nuxtjs/robots in nuxt.config.ts.
+  //
+  // Note: `seo.image` was previously set to '/og-image.png', a static
+  // fallback that never existed in `public/`. Docus's bundled
+  // `nuxt-og-image` emits a per-page OG image via `defineOgImage()` for
+  // every route (see `_og/` build output), so the static fallback is
+  // redundant — and a dead reference risks a 404 on the landing.
   seo: {
     siteName: 'GenicUI',
     titleTemplate: '%s · GenicUI',
     description: 'The protocol that lets AI agents use your UI. MCP-native, library-agnostic, framework-agnostic.',
-    twitter: '@genicui',
-    image: '/og-image.png'
+    twitter: '@genicui'
   }
 })
