@@ -1,44 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 28" width="132" height="28" role="img" aria-label="GenicUI">
-  <!--
-    GenicUI logo lockup — light variant (companion to /logo.svg).
-
-    Why a separate file:
-      Nuxt UI's <UColorModeImage> (and Docus's AppHeader).logo emit
-      <img src="..."> — and an <img>-embedded SVG renders in its
-      own document context, so @media (prefers-color-scheme: light)
-      inside the SVG has no effect. The dark-mode fill always wins.
-
-    Color choices (all verified against WCAG 2.1 on white #FFFFFF
-    and on the navbar backdrop bg-white/70 → effective ≈ #FAFAFA):
-      "Genic" (#5B21B6, violet-800) → 7.4:1 → AAA
-      "UI" gradient (#7C3AED → #4F46E5 → #1D4ED8)
-        #7C3AED on white → 5.5:1 → AA Normal
-        #4F46E5 on white → 6.5:1 → AAA
-        #1D4ED8 on white → 8.6:1 → AAA
-      All three pass the navbar's bg-white/70 with similar contrast.
-
-    Anatomy unchanged from logo.svg:
-      viewBox 132 × 28, font 22px Geist Mono, baseline y=21.
-      Wordmark only (no device mark) per user feedback on v7.
-  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 28" role="img" aria-label="GenicUI">
   <defs>
-    <linearGradient id="genicui-letter-light" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"   stop-color="#7C3AED"/>
-      <stop offset="55%"  stop-color="#4F46E5"/>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#4F46E5"/>
       <stop offset="100%" stop-color="#1D4ED8"/>
     </linearGradient>
   </defs>
-
-  <text
-    x="2"
-    y="21"
-    font-family="'Geist Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace"
-    font-size="22"
-    font-weight="700"
-    letter-spacing="-0.5"
-    fill="#5B21B6"
-  >Genic<tspan
-    font-weight="800"
-    fill="url(#genicui-letter-light)"
-  >UI</tspan></text>
+  <g fill="#5B21B6"><g transform="translate(2.0000,21) scale(0.010742,-0.010742)"><path d="M872 270V555H670V803H1130V119Q1045 46 942.5 8.5Q840 -29 723 -29Q433 -29 275.0 172.5Q117 374 117 745Q117 1122 276.5 1321.0Q436 1520 737 1520Q827 1520 914.0 1494.5Q1001 1469 1077 1421V1094Q1015 1174 934.5 1214.5Q854 1255 758 1255Q590 1255 507.0 1128.5Q424 1002 424 745Q424 496 504.0 366.0Q584 236 737 236Q783 236 817.0 244.5Q851 253 872 270Z"/></g><g transform="translate(14.7451,21) scale(0.010742,-0.010742)"><path d="M1102 55Q1000 13 894.0 -8.0Q788 -29 670 -29Q389 -29 240.5 121.5Q92 272 92 555Q92 829 235.0 988.0Q378 1147 625 1147Q874 1147 1011.5 999.5Q1149 852 1149 584V465H390Q391 333 468.0 268.0Q545 203 698 203Q799 203 897.0 232.0Q995 261 1102 324ZM854 685Q852 801 794.5 860.5Q737 920 625 920Q524 920 464.0 858.5Q404 797 393 684Z"/></g><g transform="translate(27.4902,21) scale(0.010742,-0.010742)"><path d="M1071 727V0H780V682Q780 804 745.5 856.5Q711 909 633 909Q554 909 508.5 838.0Q463 767 463 641V0H172V1120H463V952Q494 1045 569.0 1096.0Q644 1147 750 1147Q909 1147 990.0 1041.5Q1071 936 1071 727Z"/></g><g transform="translate(40.2354,21) scale(0.010742,-0.010742)"><path d="M221 1120H801V225H1165V0H143V225H508V895H221ZM508 1665H801V1323H508Z"/></g><g transform="translate(52.9805,21) scale(0.010742,-0.010742)"><path d="M1061 57Q987 14 902.0 -7.5Q817 -29 719 -29Q460 -29 314.0 127.0Q168 283 168 559Q168 836 315.0 992.5Q462 1149 721 1149Q811 1149 894.5 1128.0Q978 1107 1061 1063V795Q997 850 920.5 879.5Q844 909 762 909Q619 909 542.0 818.0Q465 727 465 559Q465 391 542.0 301.0Q619 211 762 211Q847 211 921.0 239.5Q995 268 1061 326Z"/></g></g>
+  <g fill="url(#g)"><g transform="translate(65.7256,21) scale(0.010742,-0.010742)"><path d="M106 551V1493H401V477Q401 365 458.0 301.5Q515 238 616 238Q717 238 774.0 301.5Q831 365 831 477V1493H1126V551Q1126 247 1005.0 109.0Q884 -29 616 -29Q349 -29 227.5 109.0Q106 247 106 551Z"/></g><g transform="translate(78.4707,21) scale(0.010742,-0.010742)"><path d="M172 1233V1493H1061V1233H764V260H1061V0H172V260H469V1233Z"/></g></g>
 </svg>
