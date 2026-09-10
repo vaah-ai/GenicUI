@@ -706,20 +706,17 @@ html { scroll-behavior: smooth; }
   border-radius: 0.25rem;
 }
 
-/* Docus AppHeader — make it transparent on the landing so the violet
- * hero mesh shows through. Keep the rest of the chrome (search, github,
- * theme toggle) as-is. Docus renders the header inside the UApp root
- * which is also the parent of our landing-root, so the selector must
- * be unscoped.
+/* Docus AppHeader — follow the active color mode. The header slot is
+ * styled in app.config.ts (ui.header.slots.root) using the bg-default /
+ * border-default semantic tokens, which flip via the --ui-bg /
+ * --ui-border CSS custom properties. We do NOT paint the header dark
+ * unconditionally here anymore — the landing page itself uses the
+ * dark "Ethereal Glass" archetype via .landing-root's background, but
+ * the navbar follows the user's selected color mode like every other
+ * page on the site. The previous `body:has(.landing-root) header {
+ * background-color: rgba(8, 9, 10, 0.72) }` rule was masking the
+ * semantic tokens and forced a dark navbar even in light mode.
  */
-body:has(.landing-root) header,
-body:has(.landing-root) #header {
-  background-color: rgba(8, 9, 10, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
-  color: #FAFAFA;
-}
 
 /* Docus UFooter on the landing — paint it dark to match the dark canvas.
  *

@@ -27,8 +27,13 @@
 //   logo.svg       — dark mode: violet-300 "Genic" + violet→blue "UI"
 //   logo-light.svg — light mode: violet-800 "Genic" + deep indigo→blue "UI"
 //
-// All colors verified against WCAG 2.1 on the navbar backdrops
-// (bg-white/70 light, #0A0A0B/85 dark).
+// All colors verified against WCAG 2.1 on the navbar backdrops.
+// The light/dark tokens use Nuxt UI's `default` semantic color
+// (bg-default = #fff light, --ui-bg dark in dark mode), not raw
+// Tailwind utilities — arbitrary-value classes like `bg-[#0A0A0B]/85`
+// are stripped by Tailwind v4's static scan when they appear inside
+// TypeScript config strings (only files matched by `@source` in CSS
+// are scanned). The semantic tokens are guaranteed to ship.
 export default defineAppConfig({
   header: {
     title: 'GenicUI',
@@ -67,9 +72,16 @@ export default defineAppConfig({
     // and the wordmark uses violet-300, which needs ≥4.5:1 contrast).
     // The blur is heavier than the page noise so the header reads as a
     // distinct "bar" rather than blending into the hero gradient.
+    //
+    // Uses Nuxt UI semantic tokens (bg-default, border-default) so the
+    // color flips with the page color mode via the --ui-bg / --ui-border
+    // CSS custom properties, instead of arbitrary-value Tailwind utilities
+    // that the v4 static scanner can't see inside a TS config string.
+    // Tailwind v4 arbitrary-opacity syntax: `bg-default/[.80]` (NOT
+    // `bg-default/80` — that's silently dropped).
     header: {
       slots: {
-        root: 'backdrop-blur-md bg-white/70 dark:bg-[#0A0A0B]/85 border-b border-neutral-200/60 dark:border-white/[0.06]'
+        root: 'backdrop-blur-md bg-default/[.80] border-b border-default'
       }
     }
   },
