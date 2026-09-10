@@ -1,6 +1,10 @@
 // https://docus.dev/en
 // GenicUI Documentation Site — M5.1-T1 Docus scaffold + M5.1-T4 landing wiring
-// + M5.1-T11 Search + SEO + llms.txt wiring.
+// + M5.1-T11 Search + SEO + llms.txt wiring + M5.1-T12 Vercel deploy wiring.
+//
+// Extends the upstream Docus Nuxt 4 layer. Theme + brand config live in
+// app/app.config.ts. Site SEO defaults live in app.vue. Vercel-specific
+// config (build command, output dir, headers, rewrites) lives in vercel.json.
 //
 // Extends the upstream Docus Nuxt 4 layer. Theme + brand config live in
 // app/app.config.ts. Site SEO defaults live in app.vue.
@@ -25,6 +29,14 @@ export default defineNuxtConfig({
   // M5.1-T4 — global app metadata used by `useAppConfig()` and the SEO
   // defaults in app.vue. The `site.url` placeholder points at the eventual
   // production domain; M5.1-T12 (Vercel deploy) wires the real one.
+  //
+  // M5.1-T12 — In the Vercel dashboard (Settings → Environment Variables),
+  // set `NUXT_SITE_URL=https://genicui.dev` for Production. Nuxt Site
+  // Config reads `NUXT_SITE_URL` at build time and overrides this
+  // placeholder, so the placeholder is only used for local dev. This is
+  // the canonical Docus way to set the production URL — it covers
+  // `@nuxtjs/sitemap`, `nuxt-llms`, `nuxt-og-image`, and `<link rel="canonical">`
+  // atomically without per-module config duplication.
   app: {
     head: {
       meta: [

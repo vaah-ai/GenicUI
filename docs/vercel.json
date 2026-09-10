@@ -1,0 +1,48 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run build",
+  "devCommand": "bun run dev",
+  "installCommand": "bun install",
+  "outputDirectory": ".output/public",
+  "framework": "nuxtjs",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/llms-full.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/llms.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/raw/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=3600" },
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ]
+}

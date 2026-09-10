@@ -1,3 +1,10 @@
+<div align="right">
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvaah-ai%2FGenicUI&project-name=genicui-docs&root-directory=docs&build-command=bun+run+build&output-directory=.output%2Fpublic)
+[![Live Site](https://img.shields.io/badge/Live%20Site-genicui.dev-7c3aed)](https://genicui.dev)
+
+</div>
+
 # GenicUI
 
 **The protocol that lets AI agents use your UI.**
