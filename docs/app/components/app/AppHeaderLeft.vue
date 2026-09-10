@@ -49,9 +49,36 @@ const isActive = (to: string) => {
     <NuxtLink
       :to="localePath('/')"
       :aria-label="ariaLabel"
-      class="shrink-0"
+      class="shrink-0 inline-flex"
     >
-      <AppHeaderLogo class="h-6 w-auto shrink-0" />
+      <!--
+        Inline dual <img> instead of Docus's <AppHeaderLogo> (which wraps
+        <UColorModeImage> → <UImage> → @nuxt/image). @nuxt/image rewrites
+        /logo.svg → /_ipx/_/logo.svg on the way out, and on Vercel's
+        "static directory" deploy (vercel.json: outputDirectory) the IPX
+        runtime isn't mounted — the request hits Nitro's no-op 404 handler,
+        and the wordmark shows the browser's broken-image icon.
+
+        Raw <img> with tailwind dark: variants serves the public SVG
+        directly. Confirmed live: /logo.svg and /logo-light.svg both
+        return 200 from the deployed static edge. The pre-rendered
+        /_ipx/_/logo.svg local build output is irrelevant on the
+        static-only deploy.
+      -->
+      <img
+        src="/logo-light.svg"
+        alt="GenicUI"
+        width="132"
+        height="28"
+        class="h-6 w-auto shrink-0 dark:hidden"
+      >
+      <img
+        src="/logo.svg"
+        alt="GenicUI"
+        width="132"
+        height="28"
+        class="h-6 w-auto shrink-0 hidden dark:block"
+      >
     </NuxtLink>
 
     <USeparator
