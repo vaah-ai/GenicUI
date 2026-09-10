@@ -46,14 +46,27 @@
 
     <div class="tool-call-body">
       <!--
-        F47-AC7 (clean-view refactor): the rendered component preview
-        for `render_component` calls is no longer this component's
-        responsibility. `ChatHistory.vue` renders it as a sibling of
-        the status pill so it stays visible when the debug toggle is
-        OFF — hiding it would defeat the whole point of the chat
-        surface (the live CityPicker / WeatherCard widgets).
+        F47-AC7 (clean-view refactor) — the live `render_component`
+        preview now lives in TWO places, depending on the chat column
+        debug toggle:
+          - Debug ON  → inside this accordion's opened body, as the
+                        first child below (rendered by this component).
+          - Debug OFF → in `ChatHistory.vue` as a sibling of the
+                        compact status pill (existing behaviour,
+                        unchanged by this fix).
+
+        The split keeps the preview visible in both modes — the spec
+        at `.vaahagents/.../task-M5-T7-component-event-interactivity.md`
+        (F47-AC7) explicitly mandates this. The lookup is delegated
+        to the shared helper in `./resolve-mounted-component.ts` so
+        both surfaces use the same resolution rules (componentId →
+        name → most-recent-fallback).
 
         What this component still owns:
+          - The live `<RenderedComponent>` preview for `render_component`
+            calls (this element). Visible whenever a mounted component
+            is available, regardless of the debug toggle — the widget
+            is the user-facing surface, not a diagnostic one.
           - Per-component Props accordion (the raw `mountedComponent.props`
             JSON dump) — diagnostic surface, gated by `isDebug`.
           - Tool `Input` block — raw tool input, gated by `isDebug`.
@@ -63,6 +76,15 @@
           - Tool `Error` block — stays unconditional so failures
             surface even in clean mode.
       -->
+      <RenderedComponent
+        v-if="showLivePreview && mountedComponent"
+        :key="mountedComponent.componentId"
+        class="tool-call-live-preview"
+        :name="mountedComponent.name"
+        :props="mountedComponent.props ?? {}"
+        :component-id="mountedComponent.componentId"
+      />
+
       <details
         v-if="showComponentProps && mountedComponent"
         class="tool-call-component-props"
@@ -117,6 +139,7 @@ import {
   resolveMountedComponent,
   isRenderComponentCall,
 } from './resolve-mounted-component.ts';
+import RenderedComponent from './RenderedComponent.vue';
 import type { ToolCallEntry } from '~/composables/useChat.ts';
 
 /**
@@ -137,13 +160,19 @@ import type { ToolCallEntry } from '~/composables/useChat.ts';
  * (`Enter` / `Space` toggle, focusable summary).
  *
  * F47-AC7 responsibility split:
- *   - This component is now a *pure diagnostic* surface: per-
- *     component Props JSON disclosure + tool Input / Result /
- *     Error blocks, all gated by the chat column debug toggle.
  *   - The *live `<RenderedComponent>` preview* for `render_component`
- *     calls lives in `ChatHistory.vue` as a sibling of the compact
- *     status pill. Hiding it inside this accordion made it
- *     invisible in clean mode (debug OFF), so we extracted it.
+ *     calls is rendered in two places, depending on the chat column
+ *     debug toggle:
+ *       * Debug ON  → inside this accordion's opened body, as the
+ *                     first child above the diagnostic blocks.
+ *       * Debug OFF → in `ChatHistory.vue` as a sibling of the
+ *                     compact status pill.
+ *     The two branches are mutually exclusive via `v-if` / `v-else`,
+ *     so the widget is never rendered twice at once.
+ *   - This component also owns the diagnostic surfaces, all gated by
+ *     `isDebug`: per-component Props JSON disclosure + tool Input /
+ *     Result blocks. The tool Error block stays unconditional so
+ *     failures surface even in clean mode.
  *   - Lookup of the mounted component entry is delegated to the
  *     shared helper in `./resolve-mounted-component.ts` so both
  *     surfaces use the same resolution rules (componentId →
@@ -236,6 +265,23 @@ const isOpenByDefault = computed<boolean>(
  */
 const mountedComponent = computed(() =>
   resolveMountedComponent(props.entry, components, findComponent),
+);
+
+/**
+ * F47-AC7 follow-up: gate for the live `<RenderedComponent>` preview
+ * inside the accordion body. Mirrors `isOpenByDefault`'s predicate
+ * shape so the preview and the auto-expand toggle flip in lockstep
+ * the moment the COMPONENT_MOUNTED frame lands.
+ *
+ * The preview is the user-facing surface — visible regardless of the
+ * chat column debug toggle — while the diagnostic blocks
+ * (per-component Props, tool Input/Result) stay gated by `isDebug`.
+ * The Debug-OFF path is handled by `ChatHistory.vue`'s sibling
+ * render (see `<RenderedComponent>` element there); this gate only
+ * owns the Debug-ON path.
+ */
+const showLivePreview = computed<boolean>(
+  () => isRenderComponentCallLocal.value && mountedComponent.value !== undefined,
 );
 
 /**
@@ -363,6 +409,17 @@ function formatJson(value: unknown): string {
   gap: var(--gp-space-2);
   padding: var(--gp-space-2);
   background: var(--gp-surface);
+}
+
+/*
+ * F47-AC7 follow-up: live `<RenderedComponent>` preview lives inside
+ * the accordion body as the first child when Debug is ON. The
+ * surrounding flex column already gives it gap breathing room;
+ * this margin-bottom just nudges it visually apart from the
+ * diagnostic Props disclosure that follows.
+ */
+.tool-call-live-preview {
+  margin-bottom: var(--gp-space-1);
 }
 
 /* ---------- Per-component Props disclosure ---------- */

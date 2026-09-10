@@ -31,6 +31,7 @@ import type {
   ParsedLine,
   ChatEvent,
 } from './types.js';
+import { fileURLToPath } from 'node:url';
 
 /** Marker regex matching `[system/anything]` log prefixes Claude Code
  *  occasionally emits inside text blocks. We strip them so the chat
@@ -248,7 +249,10 @@ function parseSystemEvent(parsed: Record<string, unknown>): ChatEvent | null {
  */
 function resolveMcpConfigPath(): string {
   if (process.env['GENICUI_MCP_CONFIG']) return process.env['GENICUI_MCP_CONFIG'];
-  return new URL('../../../../../.mcp.json', import.meta.url).pathname;
+  // fileURLToPath (not `.pathname`) avoids the `D:\D:\…` doubling that
+  // happens on Windows when Claude CLI re-prefixes a leading-slash
+  // drive-letter path. Portable: returns native separators on each OS.
+  return fileURLToPath(new URL('../../../../../.mcp.json', import.meta.url));
 }
 
 /**

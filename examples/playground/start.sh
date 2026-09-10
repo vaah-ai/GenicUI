@@ -40,6 +40,43 @@ SERVER_LOG="/tmp/genicui-playground-server.log"
 PLAYGROUND_LOG="/tmp/genicui-playground.log"
 
 # ── Pre-flight checks ─────────────────────────────────────────────
+
+# Source .env (gitignored) into the current shell so the spawned server
+# process inherits the ANTHROPIC_* gateway settings. .env.example is
+# committed at the repo root; each developer copies it to .env and
+# fills in their values.
+load_dotenv() {
+  if [ -f "$ROOT_DIR/.env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    . "$ROOT_DIR/.env"
+    set +a
+    info "Loaded .env (ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-<unset>})"
+  fi
+}
+
+# Regenerate .mcp.json from the template if it's missing or older than
+# the template itself. Without this, Claude Code is given a stale or
+# macOS-flavored absolute path and the GenicUI MCP server never loads —
+# every chat tool call then surfaces as `[error: unknown]`.
+ensure_mcp_config() {
+  local repo_root
+  repo_root="$(cd "$SCRIPT_DIR/../.." && pwd)"
+  local example="$repo_root/mcp.json.example"
+  local out="$repo_root/.mcp.json"
+  if [ ! -f "$example" ]; then
+    warn "mcp.json.example not found at $example — skipping MCP config generation"
+    return 0
+  fi
+  if [ ! -f "$out" ] || [ "$example" -nt "$out" ]; then
+    info "Generating .mcp.json from mcp.json.example …"
+    (cd "$repo_root" && bun run scripts/generate-mcp-config.ts --repo-root "$repo_root" >/dev/null) \
+      && ok "Wrote .mcp.json" \
+      || warn "Could not regenerate .mcp.json — Claude Code will fall back to a stale config"
+  fi
+}
+
+# ── Pre-flight checks ─────────────────────────────────────────────
 check_deps() {
   local missing=0
   for cmd in bun; do
@@ -308,23 +345,31 @@ case "${1:---start}" in
   --server)
     stop_services
     sleep 1
+    load_dotenv
     check_deps
+    ensure_mcp_config
     start_genicui_server || exit 1
     ;;
   --playground)
     stop_services
     sleep 1
+    load_dotenv
     check_deps
+    ensure_mcp_config
     start_playground || exit 1
     ;;
   --start|--fg|"")
     stop_services
     sleep 1
+    load_dotenv
+    ensure_mcp_config
     main
     ;;
   --restart|--reload)
     stop_services
     sleep 1
+    load_dotenv
+    ensure_mcp_config
     main
     ;;
   *)

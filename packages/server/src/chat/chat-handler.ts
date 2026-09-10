@@ -213,7 +213,8 @@ export async function runChatTurn(
     `[chat] spawning ${adaptor.id} for session ${session.sessionId}` +
       (resumeId ? ` (resume ${resumeId})` : '') +
       ` source=${options.source ?? 'chat.message'} ` +
-      `prompt=${JSON.stringify(effectivePrompt).slice(0, 80)}…`,
+      `prompt=${JSON.stringify(effectivePrompt).slice(0, 80)}…` +
+      ` ANTHROPIC_BASE_URL=${process.env['ANTHROPIC_BASE_URL'] ?? '<unset>'}`,
   );
 
   // Spawn. Bun.spawn is the only platform API here — the server runs

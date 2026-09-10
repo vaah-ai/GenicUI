@@ -45,6 +45,20 @@ STATIC_LOG="/tmp/genicui-static.log"
 MCP_LOG="/tmp/genicui-mcp.log"
 
 # ── Pre-flight checks ─────────────────────────────────────────────
+
+# Source .env (gitignored) into the current shell so the spawned server
+# process inherits the ANTHROPIC_* gateway settings. .env.example is
+# committed; each developer copies it to .env and fills in their values.
+load_dotenv() {
+  if [ -f "$ROOT_DIR/.env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    . "$ROOT_DIR/.env"
+    set +a
+    info "Loaded .env (ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-<unset>})"
+  fi
+}
+
 check_deps() {
   local missing=0
   for cmd in bun; do
@@ -60,6 +74,23 @@ check_deps() {
     warn "curl is not installed — health checks will be best-effort"
   fi
   if [ "$missing" -eq 1 ]; then exit 1; fi
+}
+
+# Regenerate .mcp.json from the template if it's missing or stale.
+# Without this, Claude Code is given a stale or macOS-flavored absolute
+# path and the GenicUI MCP server never loads — every chat tool call
+# then surfaces as `[error: unknown]` in the playground.
+ensure_mcp_config() {
+  if [ ! -f "$ROOT_DIR/mcp.json.example" ]; then
+    warn "mcp.json.example not found at $ROOT_DIR — skipping MCP config generation"
+    return 0
+  fi
+  if [ ! -f "$ROOT_DIR/.mcp.json" ] || [ "$ROOT_DIR/mcp.json.example" -nt "$ROOT_DIR/.mcp.json" ]; then
+    info "Generating .mcp.json from mcp.json.example …"
+    (cd "$ROOT_DIR" && bun run scripts/generate-mcp-config.ts --repo-root "$ROOT_DIR" >/dev/null) \
+      && ok "Wrote .mcp.json" \
+      || warn "Could not regenerate .mcp.json — Claude Code will fall back to a stale config"
+  fi
 }
 
 # ── Helpers ────────────────────────────────────────────────────────
@@ -390,13 +421,17 @@ case "${1:---start}" in
   --server)
     stop_services
     sleep 1
+    load_dotenv
     check_deps
+    ensure_mcp_config
     start_genicui_server || exit 1
     ;;
   --poc)
     stop_services
     sleep 1
+    load_dotenv
     check_deps
+    ensure_mcp_config
     start_static_server || exit 1
     echo ""
     start_mcp_server || exit 1
@@ -404,11 +439,15 @@ case "${1:---start}" in
   --start|--fg|"")
     stop_services
     sleep 1
+    load_dotenv
+    ensure_mcp_config
     main
     ;;
   --restart|--reload)
     stop_services
     sleep 1
+    load_dotenv
+    ensure_mcp_config
     main
     ;;
   *)

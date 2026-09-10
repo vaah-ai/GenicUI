@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "genicui": {
+      "type": "stdio",
+      "command": "bun",
+      "args": [
+        "run",
+        "${REPO_ROOT}/packages/server/bin/mcp-stdio.ts"
+      ],
+      "alwaysLoad": true
+    }
+  }
+}

@@ -8,7 +8,9 @@
     "poc": "node poc/server/index.mjs",
     "poc:smoke": "node poc/server/smoke-test.mjs",
     "poc:parser-test": "node poc/server/chat-parser.test.mjs",
-    "poc:chat-smoke": "node poc/server/chat-smoke-test.mjs"
+    "poc:chat-smoke": "node poc/server/chat-smoke-test.mjs",
+    "generate:mcp-config": "bun run scripts/generate-mcp-config.ts",
+    "test:generate-mcp-config": "bun test scripts/generate-mcp-config.test.ts"
   },
   "workspaces": [
     "packages/*",

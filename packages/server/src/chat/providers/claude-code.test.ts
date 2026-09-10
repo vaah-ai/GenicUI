@@ -10,6 +10,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 import { ClaudeCodeAdaptor } from './claude-code.js';
 import {
@@ -85,6 +87,52 @@ describe('ClaudeCodeAdaptor', () => {
       const idx = args.indexOf('--resume');
       expect(idx).toBeGreaterThan(-1);
       expect(args[idx + 1]).toBe('claude-sess-abc');
+    });
+
+    it('resolves --mcp-config to a real, non-doubled filesystem path', () => {
+      const originalEnv = process.env['GENICUI_MCP_CONFIG'];
+      delete process.env['GENICUI_MCP_CONFIG'];
+      try {
+        const args = adaptor.buildArgs({ resumeId: null });
+        const idx = args.indexOf('--mcp-config');
+        expect(idx).toBeGreaterThan(-1);
+        const mcpPath = args[idx + 1]!;
+
+        // 1. Must round-trip through path.resolve — guards against URL
+        //    artifacts (no `%20`, no `file:`, no leading `/` + drive).
+        expect(mcpPath).toBe(path.resolve(mcpPath));
+        expect(mcpPath).not.toMatch(/^file:/);
+        expect(mcpPath).not.toMatch(/%\d{2}/); // no encoded chars
+
+        // 2. On Windows specifically, must not look like `/D:/...` — the
+        //    exact shape produced by the old `.pathname` bug which caused
+        //    Claude CLI to re-prefix the drive letter.
+        if (process.platform === 'win32') {
+          expect(mcpPath).not.toMatch(/^\/[A-Za-z]:[\\/]/);
+        }
+
+        // 3. Must point at a file that actually exists and ends in .mcp.json.
+        expect(mcpPath.endsWith('.mcp.json')).toBe(true);
+        expect(fs.existsSync(mcpPath)).toBe(true);
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env['GENICUI_MCP_CONFIG'];
+        } else {
+          process.env['GENICUI_MCP_CONFIG'] = originalEnv;
+        }
+      }
+    });
+
+    it('honors the GENICUI_MCP_CONFIG env-var override', () => {
+      const original = process.env['GENICUI_MCP_CONFIG'];
+      process.env['GENICUI_MCP_CONFIG'] = '/custom/path/.mcp.json';
+      try {
+        const args = adaptor.buildArgs({ resumeId: null });
+        expect(args[args.indexOf('--mcp-config') + 1]).toBe('/custom/path/.mcp.json');
+      } finally {
+        if (original === undefined) delete process.env['GENICUI_MCP_CONFIG'];
+        else process.env['GENICUI_MCP_CONFIG'] = original;
+      }
     });
   });
 
