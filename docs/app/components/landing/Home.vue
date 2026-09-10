@@ -575,7 +575,7 @@ onBeforeUnmount(() => {
               npm · pnpm · yarn
             </NuxtLink>
             <a
-              href="https://github.com/genicui/genicui"
+              href="https://github.com/vaah-ai/GenicUI"
               target="_blank"
               rel="noopener"
               class="hero-link"
@@ -1150,7 +1150,7 @@ onBeforeUnmount(() => {
             Quickstart — render your first component
           </UButton>
           <a
-            href="https://github.com/genicui/genicui"
+            href="https://github.com/vaah-ai/GenicUI"
             target="_blank"
             rel="noopener"
             class="hero-link text-sm"
@@ -1163,7 +1163,7 @@ onBeforeUnmount(() => {
 
         <!-- Open-source line — kept concise. MIT, no telemetry, no lock-in. -->
         <p class="mt-10 sm:mt-12 text-center text-xs font-mono text-[var(--color-text-muted)]">
-          <span class="text-emerald-400">MIT</span> · no telemetry · no lock-in · <a href="https://github.com/genicui/genicui" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-white">view the source</a>
+          <span class="text-emerald-400">MIT</span> · no telemetry · no lock-in · <a href="https://github.com/vaah-ai/GenicUI" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-white">view the source</a>
         </p>
       </div>
     </section>

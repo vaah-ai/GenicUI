@@ -84,7 +84,7 @@ export default defineAppConfig({
   // GitHub — Docus's AppHeader reads appConfig.github.url and renders an
   // icon button in the header right slot. T12 may revise the repo URL.
   github: {
-    url: 'https://github.com/genicui/genicui',
+    url: 'https://github.com/vaah-ai/GenicUI',
     branch: 'main'
   },
 

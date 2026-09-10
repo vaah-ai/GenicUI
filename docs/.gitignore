@@ -16,3 +16,4 @@ bun.lock
 # Env
 .env
 .env.local
+.vercel

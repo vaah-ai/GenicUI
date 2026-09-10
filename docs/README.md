@@ -1,6 +1,6 @@
 # GenicUI Documentation Site
 
-Public documentation for [GenicUI](https://github.com/your-org/genicui) — the generative agentic UI framework.
+Public documentation for [GenicUI](https://github.com/vaah-ai/GenicUI) — the generative agentic UI framework.
 
 This is a [Docus 5.13.0](https://docus.dev/en) layer installed inside the GenicUI monorepo at `docs/`.
 
