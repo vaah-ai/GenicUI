@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-08
-> **Last updated by:** M5.1 added — Documentation Site (12 tasks, F68–F76)
+> **Last updated:** 2026-09-16
+> **Last updated by:** M5.1 extended — 3 new doc-content tasks (T13/T14/T15, F74/F75/F76)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 30/46 tasks complete · 16 tasks not started (M5.1 + M6)
+> **Status:** 5/7 milestones complete (M1–M5 done) · 30/49 tasks complete · 19 tasks not started (M5.1 + M6)
 
 ---
 
@@ -16,7 +16,7 @@
 | M3 | Tool Surface: MCP + 4 Tools | Tool Surface | W3-W4 | 🟢 Complete | Critical | 10-14 days | 7 | F13, F14, F15, F16, F17, F18, F28 |
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 7 | F37, F38, F40, F41, F42, F43, F47 |
-| M5.1 | Documentation Site (Docus + Vercel) | Post-M5, parallel to M6 | W8-W9 | ⚪ Not Started | High | 14 days | 12 | F68, F69a, F69b, F70, F71a–F71f, F72, F73 |
+| M5.1 | Documentation Site (Docus + Vercel) | Post-M5, parallel to M6 | W8-W9 | 🔄 In Progress | High | 17 days | 15 | F68, F69a, F69b, F70, F71a–F71f, F72, F73, F74, F75, F76 |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
@@ -87,11 +87,11 @@
 | M6-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M6-T1 |
 | M6-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
 
-### M5.1 — Documentation Site (Docus + Vercel) (0/12 complete)
+### M5.1 — Documentation Site (Docus + Vercel) (0/15 complete)
 
 > **Folder:** `milestone-05.1-documentation-site/`
 > **Convention note:** `M5.1` deliberately violates the planner's `M{n}` no-zero-pad rule (user-authorized extension). Permitted as a one-off; see project-conventions memory entry.
-> **Manifest mapping:** F68 (scaffold), F69a (corpus reconciliation), F69b (IA), F70 (API Reference), F71a (landing), F71b (Getting Started), F71c (Concepts), F71d (Guides), F71e (Cookbook), F71f (Deployment section), F72 (search/SEO/llms.txt), F73 (Vercel deploy). 12 new IDs; manifest tops out at F67 today, F41/F42/F43/F47 already double-booked.
+> **Manifest mapping:** F68 (scaffold), F69a (corpus reconciliation), F69b (IA), F70 (API Reference), F71a (landing), F71b (Getting Started), F71c (Concepts), F71d (Guides), F71e (Cookbook), F71f (Deployment section), F72 (search/SEO/llms.txt), F73 (Vercel deploy), F74 (Mantine walkthrough), F75 (chat-events vocabulary), F76 (provider registry). 15 new IDs; manifest tops out at F67 today, F41/F42/F43/F47 already double-booked. F74/F75/F76 added 2026-09-16 to close 3 docs-vs-playground gaps (memory: genicui-docs-vs-playground-gap.md).
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
@@ -107,6 +107,9 @@
 | M5.1-T10 | Deployment section (4 landing pages) | ⚪ Not Started | Medium | 1 day | F71f | M5.1-T3 |
 | M5.1-T11 | Search + SEO + llms.txt | ⚪ Not Started | High | 1 day | F72 | M5.1-T4 |
 | M5.1-T12 | Vercel deploy + smoke test | ⚪ Not Started | Critical | 0.5 day | F73 | M5.1-T1–M5.1-T11 |
+| M5.1-T13 | Mantine walkthrough (library-agnosticism proof) | ⚪ Not Started | High | 1 day | F74 | None |
+| M5.1-T14 | Chat events vocabulary (Concepts) | ⚪ Not Started | High | 1 day | F75 | None |
+| M5.1-T15 | Provider registry (Concepts) | ⚪ Not Started | High | 1 day | F76 | None |
 
 ---
 
