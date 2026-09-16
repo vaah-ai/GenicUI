@@ -102,4 +102,17 @@ None. Single-author, single-day task.
 - **Why docs page only, no real registry:** Per user direction, this is a markdown-only deliverable. A real `registries/mantine/` package would be a separate milestone (likely M7 or post-MVP F34 — Mantine is already in the deferred backlog as F34).
 - **No Vue subpath note:** PrimeVue works because the playground is Vue. Mantine is React — the walkthrough explicitly notes that `@genicui/client` is framework-agnostic (no `@genicui/client/react` subpath needed; same `GenicElement` base class works).
 - **Velocity check:** This task is small (1 day) and has no dependency on M6 (deployment) or any other active milestone. Safe to execute immediately after M5.1-T12 lands.
+
+## Follow-up — Mantine walkthrough folded into `/guides/custom-registry`
+
+Per user review, the standalone `/examples/mantine` URL pattern was inconsistent with the rest of the IA: `/api/primevue-registry` documents a *shipped* package, while `/examples/mantine` documented a *pattern* (no `@genicul-mantine/registry` ships). The Mantine page itself cross-linked to `/guides/custom-registry` as "the same four-step recipe," signaling that the content belongs as a worked instance inside that guide.
+
+**Changes applied:**
+
+- The Mantine walkthrough content (trimmed to ~120 lines) is now a third `## Walkthrough` H2 section inside `/Users/pk/Projects/GenicUI/docs/content/3.guides/4.custom-registry.md`, immediately after the PrimeVue walkthrough and before `## Publishing`. The `4-step recipe`, `registry.json` excerpt, and `What's out of MVP scope` / `Cross-refs` blocks were dropped because the parent guide already covers them.
+- `docs/content/10.examples/1.mantine.md` and `docs/content/10.examples/.navigation.yml` deleted; the empty `10.examples/` directory removed.
+- Quick Start cross-ref at `docs/content/1.getting-started/3.quick-start.md:173` rewritten to `/guides/custom-registry#walkthrough--genicul-mantineregistry`.
+- IA tree at `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/ia-tree.md` updated: section-10 rows removed, page/file count decremented, follow-up note added.
+
+**Rationale preserved:** The decision to ship this as *documentation-only* (no real `registries/mantine/` package) and the choice of Mantine over shadcn both remain valid. The change is purely about where the content lives in the IA — not what it says.
 - **ID allocation:** F74 (next after F73 used by M5.1-T12). Consistent with the dirty-ID-space convention documented in `milestone-05.1.md` and `genicui-planner-conventions-extended.md` memory.
