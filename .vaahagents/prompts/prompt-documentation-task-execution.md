@@ -23,6 +23,8 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 - **`{{REGISTRIES_DIR}}`** _(static)_ — `registries/primevue/` — source-of-truth for registry reference.
 - **`{{PROMPT_FILE_PATH}}`** _(static)_ — `.vaahagents/prompts/prompt-documentation-task-execution.md`
 - **`{{STEPS_DIR}}`** _(static)_ — `.vaahagents/prompts/prompt-documentation-task-execution-steps/`
+- **`{{TASK_FILE_PATH}}`** _(dynamic)_ — `.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-{{TASK_ID}}-*.md` (the planning artifact with the live `> **Status:**` field)
+- **`{{DASHBOARD_PATH}}`** _(static)_ — `.vaahagents/milestones-and-tasks/project-dashboard.md` (live task-status surface)
 
 ---
 
@@ -103,18 +105,44 @@ Author documentation-site pages, sections, and infrastructure for milestone M5.1
 
 > **Context recovery:** If compacted, read the TodoWrite list to find the last `completed` step. Load `memory` MCP entry for `"GenicUI — {{TASK_ID}} Documentation Plan"`. Resume from the next `pending` step.
 
+### Task-File & Dashboard Status Lifecycle
+
+The task file (`.vaahagents/milestones-and-tasks/milestone-05.1-documentation-site/task-{{TASK_ID}}-*.md`) and the project dashboard (`.vaahagents/milestones-and-tasks/project-dashboard.md`) track task progress. The orchestrator updates them at **three transition points** so the dashboard never drifts from reality.
+
+**Status values** (mirrored across both files):
+
+| Icon | Status | When |
+|---|---|---|
+| ⚪ | Not Started | Initial authoring state — agent has not begun work |
+| 🔵 | In Progress | Step 0 complete, work has begun, not yet shipped |
+| 🟢 | Complete | Step 11 audit passed, build green, commit landed |
+| 🟠 | Deferred | Shipped but some ACs are `manual-verified` pending user action (e.g., Vercel link/deploy, browser MCP, Lighthouse) — code is done, deploy gate awaits |
+| 🔴 | Blocked | Build fails, link check fails, or audit flags unrecoverable issue — Step 11 cannot pass |
+
+**Transition rules:**
+
+1. **Step 0 (Orientation)** — immediately after the first Read of the task file and BEFORE the TodoWrite call, edit the task file's `> **Status:**` field from `⚪ Not Started` to `🔵 In Progress`. Do NOT touch the dashboard yet — the dashboard row flips only at completion.
+2. **Step 11 (Completion Audit)** — as the LAST action before the Git commit, do BOTH edits in a single batch:
+   - **Task file:** flip `> **Status:**` to `🟢 Complete` (or `🟠 Deferred` if any AC is `manual-verified`; or `🔴 Blocked` if audit fails)
+   - **Dashboard:** edit `.vaahagents/milestones-and-tasks/project-dashboard.md` row matching `| {{TASK_ID}} | ... | <old-status> |` to the same new status. Also update the milestone-row counter (`### M5.1 — Documentation Site (...)` and `### M5.1 — ... | task counts`) so `complete/total` stays in sync. Also update the header banner if the milestone status changed (e.g., last `⚪ Not Started` row → milestone flips `🔄 In Progress → 🟢 Complete`).
+3. **Failure exit (any step)** — if a build fails, link check fails, audit flags a blocker, or the agent must abort, flip BOTH files to `🔴 Blocked` before exiting. Add a one-line note to the deferral note section under the M5.1 register explaining the blocker (mirror the T11/T12 deferral pattern: `> **T{n} deferral note (YYYY-MM-DD):** <reason>`).
+
+**Dashboard edits are reversible:** the user can revert any row with a follow-up edit. Do NOT skip the dashboard update — leaving the dashboard stale is the #1 reason for status drift between memory and ground truth.
+
+**Idempotency:** if a transition is already in the target state (e.g., task file already says `🔵 In Progress` on resume), the Edit is a no-op. Always read the current value before writing.
+
 ---
 
 ## Workflow
 
 Load `{{STEPS_DIR}}/step-{NN}-{slug}.md` for each step. Follow it exactly. Never load multiple.
 
-| Phase                              | Steps  | Step Files                                         |
-| ---------------------------------- | ------ | -------------------------------------------------- |
-| **Phase 1: Orientation**           | 0–2    | `step-00` → `step-02`                              |
-| **Phase 2: Content Sourcing**      | 3–5    | `step-03` → `step-05`                              |
-| **Phase 3: Authoring**             | 6–7    | `step-06` → `step-07`                              |
-| **Phase 4: Polish & Publish**      | 8–11   | `step-08` → `step-11`                              |
+| Phase                              | Steps  | Step Files                                         | Status Transitions |
+| ---------------------------------- | ------ | -------------------------------------------------- | ------------------ |
+| **Phase 1: Orientation**           | 0–2    | `step-00` → `step-02`                              | Step 0: flip task file ⚪ → 🔵 |
+| **Phase 2: Content Sourcing**      | 3–5    | `step-03` → `step-05`                              | —                  |
+| **Phase 3: Authoring**             | 6–7    | `step-06` → `step-07`                              | —                  |
+| **Phase 4: Polish & Publish**      | 8–11   | `step-08` → `step-11`                              | Step 11: flip task file 🔵 → 🟢/🟠/🔴 AND flip dashboard row + counters |
 
 **Reference files** (load when a step instructs you to):
 
@@ -143,6 +171,10 @@ Load `{{STEPS_DIR}}/step-{NN}-{slug}.md` for each step. Follow it exactly. Never
 - **Changes:** [List of files created/modified under {{DOCS_SITE_DIR}}/]
 - **Build:** [Pass/Fail — `bun --filter docs build` output]
 - **Verification:** [What was verified vs `manual-verified`]
+- **Status Transitions Applied:**
+  - Task file `{{TASK_FILE_PATH}}`: ⚪ Not Started → 🔵 In Progress (Step 0) → 🟢 Complete / 🟠 Deferred / 🔴 Blocked (Step 11)
+  - Dashboard `{{DASHBOARD_PATH}}` row `{{TASK_ID}}`: <old> → <new>
+  - Dashboard M5.1 register counter: <old> → <new> (if applicable)
 - **Memory Updated:** [List of entries]
 - **Notes:** [Decisions, IA choices, MDC patterns, follow-ups, skipped steps with justification]
 ```
@@ -157,7 +189,7 @@ At the start of each task (Step 0), invoke **TodoWrite** with the full step list
 
 ```json
 [
-  { "content": "Step 0: Load Session Context", "activeForm": "Loading session context", "status": "in_progress" },
+  { "content": "Step 0: Load Session Context + flip task file to 🔵 In Progress", "activeForm": "Loading session context and flipping task file status", "status": "in_progress" },
   { "content": "Step 1: Create Feature Branch", "activeForm": "Creating feature branch", "status": "pending" },
   { "content": "Step 2: Read Task Spec + Smoke Tests", "activeForm": "Reading task spec and smoke tests", "status": "pending" },
   { "content": "Step 3: Source Content from Corpus", "activeForm": "Sourcing content from corpus", "status": "pending" },
@@ -168,7 +200,7 @@ At the start of each task (Step 0), invoke **TodoWrite** with the full step list
   { "content": "Step 8: Build + Preview Verification", "activeForm": "Running build and preview verification", "status": "pending" },
   { "content": "Step 9: Link Check + Accessibility Audit", "activeForm": "Running link check and accessibility audit", "status": "pending" },
   { "content": "Step 10: Update Memory + Project Context", "activeForm": "Updating memory and project context", "status": "pending" },
-  { "content": "Step 11: Completion Audit + Git Commit", "activeForm": "Auditing completion and committing", "status": "pending" }
+  { "content": "Step 11: Completion Audit + Git Commit + flip task file & dashboard to 🟢 Complete / 🟠 Deferred / 🔴 Blocked", "activeForm": "Auditing completion, committing, and flipping task + dashboard status", "status": "pending" }
 ]
 ```
 

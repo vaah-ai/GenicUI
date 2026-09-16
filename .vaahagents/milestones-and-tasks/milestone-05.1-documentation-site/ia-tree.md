@@ -26,6 +26,8 @@
 
 **Total: 38 page files + 10 `.navigation.yml` files (1 top-level + 9 per-section) + 1 landing `index.md`.**
 
+> **Note:** The `10.examples/` section and the standalone `/examples/mantine` route were removed after M5.1-T13. The Mantine walkthrough is now folded into `/guides/custom-registry` as a third `## Walkthrough` H2 section after the PrimeVue walkthrough. See `~/.claude/plans/playful-dancing-spindle.md`.
+
 ## Routes
 
 Numeric prefix is stripped from the URL — Docus derives the route from the filename suffix. Examples:

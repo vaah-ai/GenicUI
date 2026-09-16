@@ -24,16 +24,6 @@ const showDeployBadge = computed(() => Boolean(siteUrl.value))
 <template>
   <div class="flex items-center gap-4 text-sm text-muted">
     <span>Copyright © {{ new Date().getFullYear() }}</span>
-    <a
-      v-if="showDeployBadge"
-      :href="`https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvaah-ai%2FGenicUI&project-name=genicui-docs&root-directory=docs`"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="inline-flex items-center gap-1.5 text-muted hover:text-default transition-colors"
-      :aria-label="`Deploy this documentation site to Vercel (current site: ${siteUrl})`"
-    >
-      <UIcon name="i-simple-icons-vercel" class="size-3.5" aria-hidden="true" />
-      <span>Deployed on Vercel</span>
-    </a>
+  
   </div>
 </template>
