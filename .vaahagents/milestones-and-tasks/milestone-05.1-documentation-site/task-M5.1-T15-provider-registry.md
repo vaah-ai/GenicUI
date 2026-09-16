@@ -3,7 +3,7 @@
 > **Milestone:** M5.1 (Documentation Site)
 > **Manifest feature:** F76 (new — provider registry reference)
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** 🟢 Complete
 > **Estimated Effort:** 1 day
 
 ## Description

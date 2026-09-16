@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-17
-> **Last updated by:** M5.1 status sync — T1-T10 + T13-T14 ✅ Complete, T11+T12 🟠 Deferred (manual-verified ACs pending user action)
+> **Last updated by:** M5.1 status sync — T1-T10 + T13-T15 ✅ Complete, T11+T12 🟠 Deferred (manual-verified ACs pending user action)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 42/49 tasks complete · 7 tasks not started (M5.1-T15 + M6)
+> **Status:** 5/7 milestones complete (M1–M5 done) · 43/49 tasks complete · 6 tasks not started (M6)
 
 ---
 
@@ -87,7 +87,7 @@
 | M6-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M6-T1 |
 | M6-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
 
-### M5.1 — Documentation Site (Docus + Vercel) (12/15 complete)
+### M5.1 — Documentation Site (Docus + Vercel) (13/15 complete)
 
 > **Folder:** `milestone-05.1-documentation-site/`
 > **Convention note:** `M5.1` deliberately violates the planner's `M{n}` no-zero-pad rule (user-authorized extension). Permitted as a one-off; see project-conventions memory entry.
@@ -109,7 +109,7 @@
 | M5.1-T12 | Vercel deploy + smoke test | 🟠 Deferred | Critical | 0.5 day | F73 | M5.1-T1–M5.1-T11 |
 | M5.1-T13 | Mantine walkthrough (library-agnosticism proof) | 🟢 Complete | High | 1 day | F74 | None |
 | M5.1-T14 | Chat events vocabulary (Concepts) | 🟢 Complete | High | 1 day | F75 | None |
-| M5.1-T15 | Provider registry (Concepts) | ⚪ Not Started | High | 1 day | F76 | None |
+| M5.1-T15 | Provider registry (Concepts) | 🟢 Complete | High | 1 day | F76 | None |
 
 > **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
