@@ -3,7 +3,7 @@
 > **Milestone:** M5.1 (Documentation Site)
 > **Manifest feature:** F75 (new — chat events reference)
 > **Priority:** High
-> **Status:** 🔵 In Progress
+> **Status:** 🟢 Complete
 > **Estimated Effort:** 1 day
 
 ## Description
