@@ -23,8 +23,9 @@
 | Resources | 3 | `content/7.resources/` |
 | Community | 3 | `content/8.community/` |
 | Migration | 1 | `content/9.migration/` |
+| Examples | 1 | `content/10.examples/` |
 
-**Total: 38 page files + 10 `.navigation.yml` files (1 top-level + 9 per-section) + 1 landing `index.md`.**
+**Total: 39 page files + 11 `.navigation.yml` files (1 top-level + 10 per-section) + 1 landing `index.md`.**
 
 ## Routes
 
@@ -33,6 +34,7 @@ Numeric prefix is stripped from the URL — Docus derives the route from the fil
 - File: `content/1.getting-started/1.introduction.md` → URL: `/getting-started/introduction`
 - File: `content/4.api/4.vite-plugin.md` → URL: `/api/vite-plugin`
 - File: `content/9.migration/1.pre-1.0.md` → URL: `/migration/pre-1.0`
+- File: `content/10.examples/1.mantine.md` → URL: `/examples/mantine`
 
 ## Full page inventory
 
@@ -125,6 +127,12 @@ Numeric prefix is stripped from the URL — Docus derives the route from the fil
 |---|---|---|---|---|
 | 1 | `1.pre-1.0.md` | `/migration/pre-1.0` | Pre-1.0 Migration | i-lucide-arrow-right |
 
+### 10.examples
+
+| # | File | URL | Title | nav.icon |
+|---|---|---|---|---|
+| 1 | `1.mantine.md` | `/examples/mantine` | Mantine Walkthrough | i-lucide-package-plus |
+
 ## Navigation files
 
 | File | title | icon |
@@ -139,6 +147,7 @@ Numeric prefix is stripped from the URL — Docus derives the route from the fil
 | `content/7.resources/.navigation.yml` | Resources | i-lucide-life-buoy |
 | `content/8.community/.navigation.yml` | Community | i-lucide-users |
 | `content/9.migration/.navigation.yml` | Migration | i-lucide-arrow-right |
+| `content/10.examples/.navigation.yml` | Examples | i-lucide-flask-conical |
 
 **Per-section `.navigation.yml` shape** (no explicit `children` list — filename numeric order drives the left rail):
 
