@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-16
-> **Last updated by:** M5.1 extended — 3 new doc-content tasks (T13/T14/T15, F74/F75/F76)
+> **Last updated:** 2026-09-17
+> **Last updated by:** M5.1 status sync — T1-T10 ✅ Complete, T11+T12 🟠 Deferred (manual-verified ACs pending user action)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 30/49 tasks complete · 19 tasks not started (M5.1 + M6)
+> **Status:** 5/7 milestones complete (M1–M5 done) · 40/49 tasks complete · 9 tasks not started (M5.1-T13/T14/T15 + M6)
 
 ---
 
@@ -87,7 +87,7 @@
 | M6-T3 | DODurableObjectStore | ⚪ Not Started | High | 3-5 days | F62b | M1-T5, M6-T1 |
 | M6-T4 | Nitro/Nuxt binding | ⚪ Not Started | Medium | 2-3 days | F64 | M2-T1 |
 
-### M5.1 — Documentation Site (Docus + Vercel) (0/15 complete)
+### M5.1 — Documentation Site (Docus + Vercel) (10/15 complete)
 
 > **Folder:** `milestone-05.1-documentation-site/`
 > **Convention note:** `M5.1` deliberately violates the planner's `M{n}` no-zero-pad rule (user-authorized extension). Permitted as a one-off; see project-conventions memory entry.
@@ -95,21 +95,23 @@
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M5.1-T1 | Docus scaffold + workspace wiring | ⚪ Not Started | Critical | 0.5 day | F68 | None |
-| M5.1-T2 | Corpus reconciliation + cross-ref rewrite | ⚪ Not Started | Critical | 1 day | F69a | None |
-| M5.1-T3 | Information architecture + `.navigation.yml` | ⚪ Not Started | Critical | 1 day | F69b | M5.1-T1 |
-| M5.1-T4 | Landing page + global layout | ⚪ Not Started | High | 1 day | F71a | M5.1-T1, M5.1-T3 |
-| M5.1-T5 | Getting Started (3 pages) | ⚪ Not Started | Critical | 1 day | F71b | M5.1-T1, M5.1-T3 |
-| M5.1-T6 | Concepts section (7 pages) | ⚪ Not Started | Critical | 2 days | F71c | M5.1-T1, M5.1-T3 |
-| M5.1-T7 | Guides section (5 pages) | ⚪ Not Started | Critical | 2 days | F71d | M5.1-T1, M5.1-T3 |
-| M5.1-T8 | API Reference (5 packages + 1 registry + MCP tools) | ⚪ Not Started | Critical | 2 days | F70 | M5.1-T1, M5.1-T3 |
-| M5.1-T9 | Cookbook (4–6 recipes) | ⚪ Not Started | Medium | 1 day | F71e | M5.1-T6, M5.1-T8 |
-| M5.1-T10 | Deployment section (4 landing pages) | ⚪ Not Started | Medium | 1 day | F71f | M5.1-T3 |
-| M5.1-T11 | Search + SEO + llms.txt | ⚪ Not Started | High | 1 day | F72 | M5.1-T4 |
-| M5.1-T12 | Vercel deploy + smoke test | ⚪ Not Started | Critical | 0.5 day | F73 | M5.1-T1–M5.1-T11 |
+| M5.1-T1 | Docus scaffold + workspace wiring | 🟢 Complete | Critical | 0.5 day | F68 | None |
+| M5.1-T2 | Corpus reconciliation + cross-ref rewrite | 🟢 Complete | Critical | 1 day | F69a | None |
+| M5.1-T3 | Information architecture + `.navigation.yml` | 🟢 Complete | Critical | 1 day | F69b | M5.1-T1 |
+| M5.1-T4 | Landing page + global layout | 🟢 Complete | High | 1 day | F71a | M5.1-T1, M5.1-T3 |
+| M5.1-T5 | Getting Started (3 pages) | 🟢 Complete | Critical | 1 day | F71b | M5.1-T1, M5.1-T3 |
+| M5.1-T6 | Concepts section (7 pages) | 🟢 Complete | Critical | 2 days | F71c | M5.1-T1, M5.1-T3 |
+| M5.1-T7 | Guides section (5 pages) | 🟢 Complete | Critical | 2 days | F71d | M5.1-T1, M5.1-T3 |
+| M5.1-T8 | API Reference (5 packages + 1 registry + MCP tools) | 🟢 Complete | Critical | 2 days | F70 | M5.1-T1, M5.1-T3 |
+| M5.1-T9 | Cookbook (4–6 recipes) | 🟢 Complete | Medium | 1 day | F71e | M5.1-T6, M5.1-T8 |
+| M5.1-T10 | Deployment section (4 landing pages) | 🟢 Complete | Medium | 1 day | F71f | M5.1-T3 |
+| M5.1-T11 | Search + SEO + llms.txt | 🟠 Deferred | High | 1 day | F72 | M5.1-T4 |
+| M5.1-T12 | Vercel deploy + smoke test | 🟠 Deferred | Critical | 0.5 day | F73 | M5.1-T1–M5.1-T11 |
 | M5.1-T13 | Mantine walkthrough (library-agnosticism proof) | ⚪ Not Started | High | 1 day | F74 | None |
 | M5.1-T14 | Chat events vocabulary (Concepts) | ⚪ Not Started | High | 1 day | F75 | None |
 | M5.1-T15 | Provider registry (Concepts) | ⚪ Not Started | High | 1 day | F76 | None |
+
+> **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
 ---
 
