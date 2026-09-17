@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-17
-> **Last updated by:** M5.2 planning session — VaahStore Guest-Shopper Journey example workspace (`examples/playground-ecommerce/`)
+> **Last updated by:** M5.2-T2 completion — `packages/server/src/chat/providers/vaahstore.ts` (12 TypeBox tools + fixtures + F14 trust boundary)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 44/49 tasks complete · 6 tasks not started (M6) · 4 tasks planned (M5.2) · 1 M5.2 task complete
+> **Status:** 5/7 milestones complete (M1–M5 done) · 45/49 tasks complete · 6 tasks not started (M6) · 3 tasks planned (M5.2) · 2 M5.2 tasks complete
 
 ---
 
@@ -114,7 +114,7 @@
 
 > **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
-### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (1/5 complete)
+### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (2/5 complete)
 
 > **Folder:** `milestone-05.2-worked-examples-vaahstore/`
 > **Workspace:** `examples/playground-ecommerce/` (NEW sibling workspace — separate from `examples/playground/`, picked up by root `workspaces: ["examples/*"]` glob).
@@ -125,7 +125,7 @@
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
 | M5.2-T1 | Verify VaahStore API surface (7 assumptions in §6) | ✅ Completed | Critical | 2 days | None new | None |
-| M5.2-T2 | VaahStore chat provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools, fixtures, F14 wrap) | ⚪ Not Started | Critical | 3 days | None new (extends F13/F14/F76) | M5.2-T1 |
+| M5.2-T2 | VaahStore chat provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools, fixtures, F14 wrap) | ✅ Completed | Critical | 3 days | None new (extends F13/F14/F76) | M5.2-T1 |
 | M5.2-T3 | 18 ecommerce component registry entries + import-graph test (`examples/playground-ecommerce/app/components/ecommerce/registry/`) | ⚪ Not Started | High | 2 days | None new (extends F37/F38) | M5.2-T1 |
 | M5.2-T4 | Ecommerce UI components — 18 `.vue` files in `ui/` (EJG-COMP-1–5) | ⚪ Not Started | High | 3 days | None new (extends F16/F21) | M5.2-T3 |
 | M5.2-T5 | Agent journey state machine + Playwright end-to-end smoke (EJG-AC1–3) | ⚪ Not Started | Critical | 2 days | None new (extends F42/F43) | M5.2-T2, M5.2-T3, M5.2-T4 |

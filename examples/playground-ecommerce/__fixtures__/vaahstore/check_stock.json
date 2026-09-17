@@ -1,0 +1,6 @@
+{
+  "stocks": [
+    { "product_id": "p-101", "variation_id": "v-101-2", "available": 7, "warehouse": "us-west-2" },
+    { "product_id": "p-101", "variation_id": "v-101-3", "available": 3, "warehouse": "us-west-2" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "order_id": "ord-92a31bce-6d10-4ee1-bd80-7b1a2a73f3a4",
+  "status": "shipped",
+  "timeline": [
+    { "status": "placed", "at": "2026-09-17T10:05:32Z" },
+    { "status": "shipped", "at": "2026-09-18T16:00:00Z", "carrier": "UPS", "tracking": "1Z999AA10123456784" }
+  ]
+}

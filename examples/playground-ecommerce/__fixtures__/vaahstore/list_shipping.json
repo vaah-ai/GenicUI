@@ -1,0 +1,6 @@
+{
+  "methods": [
+    { "id": "ship-1", "carrier": "UPS", "service": "Ground", "price": { "currency_code": "USD", "amount": 7.95 }, "eta_days": 5 },
+    { "id": "ship-2", "carrier": "FedEx", "service": "2Day", "price": { "currency_code": "USD", "amount": 14.5 }, "eta_days": 2 }
+  ]
+}

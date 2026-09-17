@@ -1,0 +1,14 @@
+{
+  "id": "p-101",
+  "title": "AeroStride 9",
+  "brand": "Aero",
+  "description": "Lightweight road runner with breathable knit upper.",
+  "price": { "currency_code": "USD", "amount": 119.99, "compare_at": 149.99 },
+  "medias": [{ "url": "/img/p-101-1.jpg", "alt": "AeroStride 9 side" }],
+  "variations": [
+    { "id": "v-101-1", "size": "9", "color": "red" },
+    { "id": "v-101-2", "size": "10", "color": "blue" },
+    { "id": "v-101-3", "size": "10", "color": "red" }
+  ],
+  "stock": { "v-101-1": 4, "v-101-2": 7, "v-101-3": 3 }
+}

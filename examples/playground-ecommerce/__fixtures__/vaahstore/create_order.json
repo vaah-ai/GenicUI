@@ -1,0 +1,7 @@
+{
+  "order_id": "ord-92a31bce-6d10-4ee1-bd80-7b1a2a73f3a4",
+  "status": "paid",
+  "customer_email": "guest@example.com",
+  "total": { "currency_code": "USD", "amount": 127.94 },
+  "placed_at": "2026-09-17T10:05:32Z"
+}

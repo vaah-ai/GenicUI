@@ -1,0 +1,6 @@
+{
+  "methods": [
+    { "id": "pm-1", "name": "Credit Card", "provider": "stripe", "enabled": true },
+    { "id": "pm-2", "name": "PayPal", "provider": "paypal", "enabled": true }
+  ]
+}

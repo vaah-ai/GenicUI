@@ -13,14 +13,27 @@
 import type { ProviderAdaptor } from './types.js';
 import { ClaudeCodeAdaptor } from './claude-code.js';
 import { CodexAdaptor } from './codex.js';
+import { createVaahstoreProvider, VaahstoreProviderAdaptor } from './vaahstore.js';
 
 /**
  * The set of registered providers. Add new adaptors here as they're
  * implemented.
+ *
+ * NOTE: `VaahstoreProviderAdaptor` is built lazily via the factory so
+ * the bearer token is read on first lookup, not at module load —
+ * matches the `genicul-cli`-style "env at use, not at boot" rule.
  */
+let vaahstoreSingleton: VaahstoreProviderAdaptor | null = null;
+
+function vaahstoreAdaptor(): ProviderAdaptor {
+  if (!vaahstoreSingleton) vaahstoreSingleton = createVaahstoreProvider();
+  return vaahstoreSingleton;
+}
+
 const REGISTRY: ReadonlyMap<string, ProviderAdaptor> = new Map<string, ProviderAdaptor>([
   ['claude-code', new ClaudeCodeAdaptor()],
   ['codex', new CodexAdaptor()],
+  ['vaahstore', vaahstoreAdaptor()],
 ]);
 
 /**

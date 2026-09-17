@@ -1,0 +1,8 @@
+{
+  "product_id": "p-101",
+  "variations": [
+    { "id": "v-101-1", "size": "9", "color": "red", "slug": "size-9-red" },
+    { "id": "v-101-2", "size": "10", "color": "blue", "slug": "size-10-blue" },
+    { "id": "v-101-3", "size": "10", "color": "red", "slug": "size-10-red" }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "cart_uuid": "cart-7c6f0a8b-2f4d-4f12-9c9a-9b6a9f2c9c11",
+  "items": [
+    { "line_id": "li-1", "product_id": "p-101", "variation_id": "v-101-2", "quantity": 1, "line_total": 119.99 }
+  ],
+  "subtotal": 119.99
+}
