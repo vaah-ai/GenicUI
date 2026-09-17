@@ -69,3 +69,23 @@ In-memory registry keyed by `ui://components/{name}@{version}`. Validates `addit
 
 - Locked by: [consolidated-requirements.md §K Registry System](../../idea/consolidated-requirements.md#k-registry-system-locked)
 - Security: [security.md §Registry Trust](../security.md#registry-trust)
+
+## Implementation Precedents
+
+The F37 `ComponentEntry` shape is **schema-only** by design — no
+`import` thunk, no Vue file pointer. Workspaces that need lazy Vue
+imports extend the type with an `import: () => Promise<unknown>`
+field and ship the registry inside their own workspace tree
+(never in `packages/`).
+
+| Workspace | Pattern | Reference |
+|---|---|---|
+| `examples/playground/` | `app/providers/registry.ts` extends `ComponentEntry` with `import` thunk for PrimeVue entries | [examples/playground/app/providers/registry.ts](../../examples/playground/app/providers/registry.ts) |
+| `examples/playground-ecommerce/` | `app/components/ecommerce/registry/components.ts` extends `EcommerceComponentEntry` for 19 VaahStore-journey components | [examples/playground-ecommerce/app/components/ecommerce/registry/components.ts](../../examples/playground-ecommerce/app/components/ecommerce/registry/components.ts) |
+
+The second precedent (M5.2-T3, 2026-09-18) established the
+three-layer rule: `ui/` is pure (props in, events out), `agent/` is
+data, `registry/` is metadata. Enforced by two workspace-resident
+tests at `examples/playground-ecommerce/__tests__/`. See
+[docs/content/2.concepts/7.registries.md](../../content/2.concepts/7.registries.md)
+for the full pattern.
