@@ -3,7 +3,7 @@
 > **Milestone:** M5.2 (Worked Examples: VaahStore Guest-Shopper Journey)
 > **Manifest feature:** None new — extends F16 (render_component) + F21 (GenicElement); 18 `.vue` files at `examples/playground-ecommerce/app/components/ecommerce/ui/`
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed (2026-09-18) — 19 .vue SFCs shipped (registry has 19; OrderProcessing split per T3); 100/100 tests pass; build green
 > **Estimated Effort:** 3 days
 > **Workspace isolation constraint (locked, 2026-09-17):** zero edits to `packages/core/`, `packages/server/`, or root `package.json`. The 18 `.vue` components consume the workspace-resident provider at `examples/playground-ecommerce/server/providers/vaahstore/` (12 TypeBox schemas, fixture-mode by default); they do NOT import from `packages/server/src/chat/providers/`.
 
@@ -144,3 +144,28 @@ This task is where the **component-level acceptance criteria** (EJG-COMP-1 throu
 - **Honour the velocity directive:** if any single component takes more than 1 day, surface to the user and propose cutting it (e.g. collapse `StockBadge` + `PriceTag` into `ProductCard` directly if extraction isn't pulling weight).
 - **Workspace-resident provider, not core (locked 2026-09-17).** The 18 `.vue` files in this task consume the workspace-resident VaahStore provider at `examples/playground-ecommerce/server/providers/vaahstore/` (12 TypeBox schemas, fixture-mode by default). They do NOT import from `packages/server/src/chat/providers/`. The fixture probe path stays `examples/playground-ecommerce/__fixtures__/vaahstore/` (unchanged from T2).
 - **Docs update landed in this task.** `examples/playground-ecommerce/docs/ui-vue.md` is authored as part of the Implementation Plan (Step 9). It documents each `.vue` file's props, events, and EJG-COMP-N behaviour, and cross-links to M5.2-T3's `components.md` and to M5.2-T2-1's workspace-resident plugin docs. The page is the canonical reference for the 18 components' props-only data flow contract.
+
+## Delivery Summary (2026-09-18)
+
+**19 .vue SFCs** at `examples/playground-ecommerce/app/components/ecommerce/ui/` (~3000 lines):
+- Product browse: ProductCard, ProductGrid, ProductDetail (EJG-COMP-2 250ms debounce), VariationPicker
+- Cart: CartPanel, CartLineItem, MiniCartToast (EJG-COMP-3 3000ms auto-dismiss), FilterChips
+- Checkout: CheckoutIdentityPrompt, CheckoutForm (4 TabPanels), CheckoutField
+- Order lifecycle: OrderProcessing (EJG-COMP-4 list + retry), OrderConfirmation, ShipmentTracker (EJG-COMP-5 Timeline + 5 marker glyphs), OrderSummaryCard
+- Lookup: OrderLookupPrompt, AccountUpgradePrompt
+- Leaf: PriceTag (decimal, not minor units), StockBadge (severity bands)
+
+**Scaffold fix:** `app/assets/css/primevue.css` was referenced by `nuxt.config.ts:8` but missing on disk. Added minimal token block + light-mode variant (workspace-resident, no `packages/` edits).
+
+**Tests:** 100/100 pass / 10234 expect() calls across 9 files. New: `__tests__/components/ecommerce-components-contract.test.ts` (9 static-analysis tests for EJG-COMP-1..5 + EJG-LAYOUT-1 + file-existence + registry alignment).
+
+**Build:** `bun run build` exits 0 (Nuxt 4.5.2 + Nitro 2.13.4, 2.11 MB / 521 kB gzip).
+
+**Workspace isolation:** `bash scripts/check-isolation.sh --base feature/ProviderPluginArchitecture` → "workspace isolation holds" (zero `packages/` edits).
+
+**Docs:** `examples/playground-ecommerce/docs/ui-vue.md` (~280 lines, ≤300 cap), `app/components/ecommerce/ui/README.md` (dumb-ui contract).
+
+**Notes:**
+- 19 components, not 18 — registry has OrderProcessing split per T3.
+- No `@vue/test-utils` in deps; static-analysis tests (textual grep of `<script setup>`) cover EJG-COMP-N without new infrastructure.
+- E2E (Playwright) deferred to M5.2-T5+ (no host page wiring in T4 scope).

@@ -1,0 +1,18 @@
+# Build artifacts (Nuxt/Nitro)
+.nuxt/
+.output/
+.data/
+dist/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Bun
+bun.lockb
+
+# OS
+.DS_Store

@@ -1,0 +1,35 @@
+/* ============================================================
+   Playground Ecommerce — PrimeVue + Design Tokens
+   ============================================================
+   M5.2-T4 scaffold fix: this file was referenced by nuxt.config.ts
+   (line 8) but missing on disk, blocking `bun run build`. M5.2-T4
+   ships the 18 ecommerce ui/ components (vue/) and the supporting
+   registry/entries; this stylesheet only needs to exist so Nuxt's
+   CSS pipeline resolves ~/assets/css/primevue.css. PrimeVue's
+   own theme is configured via the Nuxt PrimeVue module, not via
+   this file (theme bootstrap is done in app.vue).
+   Full design-token block is intentionally deferred to a later
+   milestone (M5.2-T5+) — for now we ship the bare minimum.
+   ============================================================ */
+
+/* Minimal color tokens (placeholder) */
+:root {
+  --gp-bg: #0b1220;
+  --gp-surface: #111827;
+  --gp-text: #e5e7eb;
+  --gp-muted: #9ca3af;
+  --gp-accent: #34d399;
+  --gp-danger: #ef4444;
+  --gp-warn: #f59e0b;
+  --gp-info: #3b82f6;
+  --gp-success: #10b981;
+  --gp-border: #1f2937;
+}
+
+[data-theme="light"] {
+  --gp-bg: #ffffff;
+  --gp-surface: #f8fafc;
+  --gp-text: #111827;
+  --gp-muted: #4b5563;
+  --gp-border: #e5e7eb;
+}
