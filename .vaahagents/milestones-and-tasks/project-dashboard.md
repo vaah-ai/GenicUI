@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
 > **Last updated:** 2026-09-17
-> **Last updated by:** M5.2-T2-1 plan-file creation — `task-M5.2-T2-1-provider-plugin-architecture.md` (provider plugin architecture: workspace packages, defineProvider/registerProvider, F14 wrap-at-registration, docs rewrite)
+> **Last updated by:** M5.2-T3 completion — 19 catalog entries + 4 seed prompts + 2 enforcement tests + 19 stub .vue files + docs/components.md (109 lines); 91/91 tests pass; check-isolation.sh extended with `--base <ref>` flag
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 45/49 tasks complete · 6 tasks not started (M6) · 4 tasks planned (M5.2) · 2 M5.2 tasks complete
+> **Status:** 5/7 milestones complete (M1–M5 done) · 46/49 tasks complete · 6 tasks not started (M6) · 3 tasks planned (M5.2) · 3 M5.2 tasks complete
 
 ---
 
@@ -114,7 +114,7 @@
 
 > **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
-### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (2/6 complete)
+### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (3/6 complete)
 
 > **Folder:** `milestone-05.2-worked-examples-vaahstore/`
 > **Workspace:** `examples/playground-ecommerce/` (NEW sibling workspace — separate from `examples/playground/`, picked up by root `workspaces: ["examples/*"]` glob).
@@ -127,7 +127,7 @@
 | M5.2-T1 | Verify VaahStore API surface (7 assumptions in §6) | ✅ Completed | Critical | 2 days | None new | None |
 | M5.2-T2 | VaahStore chat provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools, fixtures, F14 wrap) — **superseded location**: VaahStore moves out of core in M5.2-T2-1 | ✅ Completed | Critical | 3 days | None new (extends F13/F14/F76) | M5.2-T1 |
 | M5.2-T2-1 | Provider plugin architecture (move `vaahstore` to `examples/playground-ecommerce/server/providers/vaahstore/`; workspace-resident `defineProvider` + `registerProvider` API co-located in `examples/playground-ecommerce/server/providers/`; F14 wrap-at-registration; workspace boot file + `discoverWorkspaceProviders` helper; worker-isolation opt-in; F76 docs rewrite; per-task docs updates) | ✅ Completed | Critical | 5-7 days | None new (extends F13/F14/F76; **zero edits to `packages/`** — `defineProvider` + `registerProvider` live in the workspace, not in `@genicui/core` or `@genicui/server`) | M5.2-T2 |
-| M5.2-T3 | 18 ecommerce component registry entries + import-graph test (`examples/playground-ecommerce/app/components/ecommerce/registry/`); includes docs-update step per workspace docs-update mandate | ⚪ Not Started | High | 2 days | None new (extends F37/F38; **zero edits to `packages/`**) | M5.2-T1, M5.2-T2-1 |
+| M5.2-T3 | 18 ecommerce component registry entries + import-graph test (`examples/playground-ecommerce/app/components/ecommerce/registry/`); includes docs-update step per workspace docs-update mandate | ✅ Completed | High | 2 days | None new (extends F37/F38; **zero edits to `packages/`**) | M5.2-T1, M5.2-T2-1 |
 | M5.2-T4 | Ecommerce UI components — 18 `.vue` files in `ui/` (EJG-COMP-1–5); includes docs-update step per workspace docs-update mandate | ⚪ Not Started | High | 3 days | None new (extends F16/F21; **zero edits to `packages/`**) | M5.2-T3 |
 | M5.2-T5 | Agent journey state machine + Playwright end-to-end smoke (EJG-AC1–3); includes docs-update step per workspace docs-update mandate | ⚪ Not Started | Critical | 2 days | None new (extends F42/F43; **zero edits to `packages/`**) | M5.2-T2-1, M5.2-T3, M5.2-T4 |
 
@@ -264,6 +264,6 @@ M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → 
 
 - **Current date:** 2026-09-17
 - **Week 6 integration milestone:** Target date ~W6 of 12-week plan
-- **Scope:** 32 features, 93 ACs, 7 milestones (M1–M5 ✅, M5.1 🔄, M5.2 🔄, M6 ⚪), 39 tasks (44 complete, 2 M5.2 complete + 4 M5.2 planned including M5.2-T2-1, 6 not-started in M6)
+- **Scope:** 32 features, 93 ACs, 7 milestones (M1–M5 ✅, M5.1 🔄, M5.2 🔄, M6 ⚪), 39 tasks (46 complete, 3 M5.2 complete + 3 M5.2 planned, 6 not-started in M6)
 - **If any feature slips past W6:** propose cutting to deferred_for_post_mvp
 - **M5.2 note:** VaahStore journey milestone is **additive, not framework-blocking** — every task extends already-shipped surface (F13/F14/F16/F17/F18/F37/F40/F42/F43/F76). Slip beyond W10 is acceptable; M6 Deployment timeline is not coupled.
