@@ -18,6 +18,15 @@
 #   - examples/playground/       must be untouched
 #   - root package.json          must be untouched
 #
+# Base ref:
+#   - default: `develop`
+#   - override: `--base <ref>` — M5.2-T3 branches from
+#     `feature/ProviderPluginArchitecture` (which contains T2-1's
+#     workspace plugin API). Without `--base`, `git diff develop..HEAD`
+#     would include ALL of T2-1's commits and fail the gate. Pass
+#     `--base feature/ProviderPluginArchitecture` (or any ancestor ref)
+#     to gate only the current branch's commits.
+#
 # Implementation note: `git diff` pathspec exclusions (`:!foo`) do not
 # filter deletions, so we can't use them to whitelist a deleted file.
 # Instead we collect the diff, then compare the changed-path set
@@ -27,7 +36,25 @@ set -euo pipefail
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
 
-echo "[check-isolation] verifying zero new edits under packages/ ..."
+# Parse --base <ref> (default: develop).
+BASE_REF="develop"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --base)
+      shift
+      [ $# -gt 0 ] || { echo "ERROR: --base requires a ref argument" >&2; exit 2; }
+      BASE_REF="$1"
+      ;;
+    *)
+      echo "ERROR: unknown argument: $1" >&2
+      echo "Usage: $0 [--base <ref>]" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+echo "[check-isolation] verifying zero new edits under packages/ (base=$BASE_REF) ..."
 
 # Whitelist — all changes outside this list fail.
 # NB: `git diff --name-only` reports deleted files with their basename
@@ -43,9 +70,9 @@ packages/server/src/chat/providers/registry.ts
 WHITELIST_EOF
 )
 
-# Changed file paths under packages/ vs develop.
+# Changed file paths under packages/ vs the base ref.
 CHANGED=$(mktemp)
-git diff --name-only develop..HEAD -- packages/ | sort > "$CHANGED"
+git diff --name-only "${BASE_REF}..HEAD" -- packages/ | sort > "$CHANGED"
 
 # Diff against the whitelist — anything in CHANGED that's NOT in the
 # whitelist is an unauthorised edit.
@@ -57,16 +84,16 @@ if [ -s "$UNEXPECTED" ]; then
   sed 's/^/  /' "$UNEXPECTED" >&2
   echo "" >&2
   echo "Inspect with:" >&2
-  echo "  git diff --stat develop..HEAD -- \$(cat $UNEXPECTED | head -1 | xargs dirname)" >&2
+  echo "  git diff --stat ${BASE_REF}..HEAD -- \$(cat $UNEXPECTED | head -1 | xargs dirname)" >&2
   rm -f "$CHANGED" "$UNEXPECTED"
   exit 1
 fi
 
 # Adjacent isolation zones
 for zone in examples/playground package.json; do
-  if ! git diff --quiet develop..HEAD -- "$zone"; then
+  if ! git diff --quiet "${BASE_REF}..HEAD" -- "$zone"; then
     echo "FAIL: edits detected under $zone" >&2
-    git diff --stat develop..HEAD -- "$zone"
+    git diff --stat "${BASE_REF}..HEAD" -- "$zone"
     rm -f "$CHANGED" "$UNEXPECTED"
     exit 1
   fi

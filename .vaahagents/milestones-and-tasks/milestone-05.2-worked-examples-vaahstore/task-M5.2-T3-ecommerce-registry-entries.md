@@ -3,7 +3,7 @@
 > **Milestone:** M5.2 (Worked Examples: VaahStore Guest-Shopper Journey)
 > **Manifest feature:** None new — extends F37 (registry contract) + F38 (trust tiers); new file at `examples/playground-ecommerce/app/components/ecommerce/registry/components.ts`
 > **Priority:** High
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed
 > **Estimated Effort:** 2 days
 > **Workspace isolation constraint (locked, 2026-09-17):** zero edits to `packages/core/`, `packages/server/`, or root `package.json`. VaahStore provider source lives at `examples/playground-ecommerce/server/providers/vaahstore/` (NOT in `packages/server/src/chat/providers/`). The registry entries in this task read the 12 TypeBox schemas from the workspace-resident provider location, not from core.
 
@@ -112,3 +112,23 @@
 - **Honour the velocity directive:** if the import-graph test's parser exceeds ~80 lines, simplify to a regex check that catches `from '../agent/'` and `useFetch(` — the structural contract matters more than the parser's elegance.
 - **Workspace-resident provider, not core (locked 2026-09-17).** Per user redirect, the VaahStore provider lives at `examples/playground-ecommerce/server/providers/vaahstore/`, NOT at `packages/server/src/chat/providers/vaahstore.ts`. The registry entries in this task import the 12 TypeBox schemas from the workspace-resident provider location. **No edits to `packages/`** are permitted — the workspace isolation script (`examples/playground-ecommerce/scripts/check-isolation.sh`, added by M5.2-T2-1) gates this rule.
 - **Docs update landed in this task.** `examples/playground-ecommerce/docs/components.md` is authored as part of the Implementation Plan (Step 10). It documents the workspace-resident provider location explicitly so future contributors don't re-introduce the core-edit mistake that M5.2-T2 (commit `330e94f`) made.
+
+## Delivery Summary (2026-09-18)
+
+**19 catalog entries** shipped at `examples/playground-ecommerce/app/components/ecommerce/registry/components.ts` (24 executable lines, well under the 50-line cap). 4 seed prompts at `registry/prompts.ts`. 19 stub `.vue` files at `app/components/ecommerce/ui/`. Two enforcement tests at `__tests__/` (EJG-LAYOUT-1 import-graph, EJG-LAYOUT-2 registry-size) — both green.
+
+**Tests:** 91/91 pass in `bun --filter genicui-playground-ecommerce test` (89 prior + 2 new).
+**Isolation:** `check-isolation.sh --base feature/ProviderPluginArchitecture` passes. Script gained a `--base <ref>` flag (T3 branches off `feature/ProviderPluginArchitecture`, NOT develop).
+**Docs:** `docs/components.md` (109 lines, AC9 cap is 250). Cross-links to journey spec §4, plugin-architecture.md, F37 spec, F14 trust-boundary.
+**Memory:** `genicui-m5-2-t3-ecommerce-registry-entries.md` indexed.
+
+**Architecture decisions:**
+- Workspace-local `EcommerceComponentEntry` type adds `import` thunk to F37's server-side `ComponentEntry` shape (mirrors `app/providers/registry.ts` extension pattern).
+- Inline registry entries (24 lines) vs. extracted files — chose inline for the 50-line cap.
+- `Type.Record(Type.String(), Type.Unknown())` everywhere instead of `any` — preserves the F14 `additionalProperties: false` boundary honestly.
+- Event names kebab-case (`product-selected`, `add-to-cart`, etc.) to match the AG-UI event-name convention (F18).
+
+**Out of scope (deferred to follow-up tasks):**
+- Real PrimeVue 4 implementations of the 19 stubs → M5.2-T4
+- Data layer (`agent/` folder) → M5.2-T5
+- E2E tests → after T4/T5 ship a rendered flow
