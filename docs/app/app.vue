@@ -45,14 +45,13 @@ useHead({
     { name: 'color-scheme', content: 'light dark' }
   ],
   link: [
-    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-    // Preload the two variable fonts used by the landing. These are the
-    // only two we can preload reliably — Geist + Geist Mono come from a
-    // fixed CDN URL. Instrument Serif is imported as a Google Fonts CSS
-    // and can't be preloaded directly (no stable hash from the @import),
-    // so it stays on `font-display: swap`.
-    { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.5/files/geist-latin-wght-normal.woff2' },
-    { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.5/files/geist-mono-latin-wght-normal.woff2' }
+    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
+    // M5.1-T12 follow-up: previously preloaded Geist + Geist Mono from
+    // cdn.jsdelivr.net. @nuxt/fonts (auto-registered by @nuxt/ui, with
+    // family overrides in nuxt.config.ts) now self-hosts the same WOFF2
+    // files at /_fonts/<hash>.woff2 and emits its own <link rel="preload">
+    // at build time with stable hashes — so the manual preloads here
+    // were both duplicate and pointed at an external CDN. Removed.
   ],
   htmlAttrs: {
     lang,
