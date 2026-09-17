@@ -565,7 +565,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="stagger mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style="--i:4">
-            <NuxtLink to="/getting-started/quickstart" class="hero-link">
+            <NuxtLink to="/getting-started/quick-start" class="hero-link">
               <UIcon name="i-lucide-book-open" class="size-3.5" />
               Quickstart guide
               <UIcon name="i-lucide-arrow-right" class="size-3 hero-link-arrow" />
@@ -831,12 +831,37 @@ onBeforeUnmount(() => {
           thread below) is collapsed into a single surface that swaps on
           tab activation.
         -->
-        <div class="max-w-3xl mx-auto">
-        <div
-          role="tablist"
-          aria-label="Case studies"
-          class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
-        >
+        <ClientOnly>
+          <!--
+            Hydration flash guard.
+
+            The four case-study tabs and their `v-show`-driven panels both
+            render via Vue 3 reactivity (`activeCase` ref). SSR picks up
+            `activeCase = 0` correctly, but on the very first dev-server
+            request after a fresh boot the client may hydrate a frame
+            later than the server paints — leaving a flash where the wrong
+            tab looks active for ~50ms. `<ClientOnly>` defers the entire
+            case-studies block (tablist + intro banner + panels + pagination)
+            until hydration completes, so what the user sees on first paint
+            matches what they see after hydration. Costs ~50ms perceived
+            load time for the tabbed section; gain is no possible mismatch.
+
+            The slot fallback reserves vertical space (`min-h-[680px]`)
+            so the layout doesn't jump when ClientOnly mounts. 680px is
+            the smaller of UC01's and UC03's panel heights — anything
+            taller grows into the reserved space; anything shorter
+            leaves a small empty band that's preferable to a layout shift.
+          -->
+          <template #fallback>
+            <div class="max-w-3xl mx-auto min-h-[680px]" aria-hidden="true" />
+          </template>
+
+          <div class="max-w-3xl mx-auto">
+          <div
+            role="tablist"
+            aria-label="Case studies"
+            class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
+          >
           <button
             v-for="(item, i) in caseTabs"
             :key="item.id"
@@ -933,6 +958,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
         </div>
+        </ClientOnly>
       </div>
     </section>
 
@@ -1091,7 +1117,7 @@ onBeforeUnmount(() => {
           </li>
           <li>
             <NuxtLink
-              to="/getting-started/quickstart"
+              to="/getting-started/quick-start"
               class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-blue-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
               <div class="flex items-start justify-between mb-5">
@@ -1113,7 +1139,7 @@ onBeforeUnmount(() => {
           </li>
           <li>
             <NuxtLink
-              to="/concepts/architecture"
+              to="/concepts/protocol"
               class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-emerald-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
               <div class="flex items-start justify-between mb-5">
@@ -1121,7 +1147,7 @@ onBeforeUnmount(() => {
                 <UIcon name="i-lucide-book-open" class="size-4 text-emerald-300/80" />
               </div>
               <div class="rounded-lg bg-black/40 border border-white/[0.06] px-3 py-2 mb-4 font-mono text-[0.78rem] text-emerald-300/90 overflow-hidden text-ellipsis whitespace-nowrap">
-                read /concepts/architecture
+                read /concepts/protocol
               </div>
               <h3 class="display-sans text-lg text-white mb-1.5">Read the contract.</h3>
               <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
@@ -1138,7 +1164,7 @@ onBeforeUnmount(() => {
         <div class="mt-12 sm:mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
           <UButton
             size="xl"
-            to="/getting-started/quickstart"
+            to="/getting-started/quick-start"
             trailing-icon="i-lucide-arrow-right"
             class="font-medium group"
           >

@@ -55,6 +55,39 @@ export default defineNuxtConfig({
     name: 'GenicUI'
   },
 
+  // M5.1-T12 (follow-up) — @nuxt/fonts is auto-registered by @nuxt/ui
+  // (with `defaults.defaults.weights: [400, 500, 600, 700]`), but the
+  // landing page's design system uses Geist + Geist Mono as **variable
+  // fonts** (weights 100-900). The UI defaults would force static cuts
+  // and skip the variable axis. We override `families` here so the
+  // fontsource provider serves `@fontsource-variable/geist`,
+  // `geist-mono`, and `instrument-serif` (all three are in fontsource's
+  // catalog — api.fontsource.org/v1/fonts).
+  //
+  // The space-separated range `'100 900'` is what triggers unifont's
+  // `prepareWeights` to set `variable: true` (unifont/dist/index.mjs:135
+  // — `if (weight.includes(" "))` routes into the variable path). Without
+  // the range, fontsource serves 4 static cuts and the landing loses
+  // smooth weight rendering.
+  //
+  // Why this is needed beyond UX: nuxt-og-image scans our CSS for
+  // @font-face rules and tries to fetch those URLs at prerender time.
+  // When the URLs point at cdn.jsdelivr.net or fonts.googleapis.com, it
+  // emits `[Nuxt OG Image] External font URLs are not supported` for
+  // every OG image render (logged ~16× per build). After this change,
+  // @nuxt/fonts rewrites the @font-face `src` to point at its own
+  // `/_fonts/<hash>.woff2` public asset (same-origin), so the OG-image
+  // fetcher falls through to its `fetchWithEvent` path and renders
+  // silently. Verified that Geist is in fontsource's catalog
+  // (`unifont` fontsource provider queries api.fontsource.org/v1/fonts).
+  fonts: {
+    families: [
+      { name: 'Geist', provider: 'fontsource', weights: ['100 900'] },
+      { name: 'Geist Mono', provider: 'fontsource', weights: ['100 900'] },
+      { name: 'Instrument Serif', provider: 'fontsource', weights: ['400'], styles: ['normal', 'italic'] }
+    ]
+  },
+
   // M5.1-T11 — nuxt-llms is already auto-registered by Docus, but it short-
   // circuits silently if `llms.domain` is unset (module.mjs line 25). The
   // domain below is the production URL placeholder; T12 may revise before

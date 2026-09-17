@@ -13,26 +13,21 @@
  */
 
 /* Premium font stack — Geist (sans), Instrument Serif (editorial),
- * Geist Mono (code). Loaded from Vercel's CDN.
+ * Geist Mono (code).
+ *
+ * M5.1-T12 follow-up: previously this file declared manual @font-face
+ * rules with external CDN URLs (cdn.jsdelivr.net, fonts.googleapis.com).
+ * That worked at runtime, but nuxt-og-image's prerender font fetcher saw
+ * the external URLs and emitted `[Nuxt OG Image] External font URLs are
+ * not supported. Load custom fonts via @nuxt/fonts.` for every OG card
+ * (logged ~16× per build — once per page). The fix is to let
+ * @nuxt/fonts — auto-registered by @nuxt/ui, with the Geist family
+ * overrides declared in nuxt.config.ts — self-host the WOFF2 files at
+ * `/_fonts/<hash>.woff2`. Our CSS variable references below are what
+ * @nuxt/fonts uses to discover which families to download; once it
+ * injects the @font-face rules, our manual ones are redundant and the
+ * warnings go away.
  */
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
-
-/* Geist via @fontsource-style CDN */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.5/files/geist-latin-wght-normal.woff2') format('woff2-variations');
-}
-
-@font-face {
-  font-family: 'Geist Mono';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.5/files/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
-}
 
 /* Design tokens — registered via :root so they survive Tailwind's
  * @theme processing. Docus already brings its own Tailwind theme; we
