@@ -5,6 +5,7 @@
 > **Priority:** High
 > **Status:** ⚪ Not Started
 > **Estimated Effort:** 3 days
+> **Workspace isolation constraint (locked, 2026-09-17):** zero edits to `packages/core/`, `packages/server/`, or root `package.json`. The 18 `.vue` components consume the workspace-resident provider at `examples/playground-ecommerce/server/providers/vaahstore/` (12 TypeBox schemas, fixture-mode by default); they do NOT import from `packages/server/src/chat/providers/`.
 
 ## Description
 
@@ -66,6 +67,7 @@ This task is where the **component-level acceptance criteria** (EJG-COMP-1 throu
 6. Run the M5.2-T3 import-graph test after the first `.vue` file lands — verify the test catches a synthetic `from '../agent/'` import before scaling up the rest
 7. Write Vue Test Utils per-component tests at `examples/playground-ecommerce/__tests__/components/{Name}.test.ts` — one happy-path test per EJG-COMP-N + a test that props-only data flow works
 8. Run `bun --filter playground-ecommerce build` — green build is the integration smoke gate
+9. **Docs update — `ui/` Vue reference.** Per the "all should update docs" mandate, author `examples/playground-ecommerce/docs/ui-vue.md` documenting each of the 18 components: file path, props schema summary, emitted events, the EJG-COMP-N behaviour it implements, and a "props-only data flow" callout that mirrors `app/components/ecommerce/ui/README.md` (Step 5). Cross-link to M5.2-T3's `components.md` (component map) and to M5.2-T2-1's `docs/content/2.concepts/9.providers.md` (workspace-resident plugin location). Keep ≤ 300 lines. The page is the canonical reference for "what does each `.vue` file do and what does it emit" — useful for future contributors debugging component-event round-trips.
 
 ### Skills & MCP Servers
 
@@ -87,15 +89,20 @@ This task is where the **component-level acceptance criteria** (EJG-COMP-1 throu
 - **M5.2-T4-AC6** — **EJG-COMP-4:** `OrderProcessing` per-step status reflects API call independently; failed step shows inline API error + Retry button — verified by mocking the journey.ts callbacks
 - **M5.2-T4-AC7** — **EJG-COMP-5:** `ShipmentTracker` renders the `Orders Statuses Logics` timeline with timestamp + carrier + tracking # per transition — verified by a snapshot test with 5 fixture shipments
 - **M5.2-T4-AC8** — `bun --filter playground-ecommerce build` exits 0 — full Nuxt build green
+- **M5.2-T4-AC9** — **No-core-edits gate:** `bun --filter playground-ecommerce check-isolation` exits 0 — the workspace isolation script (added by M5.2-T2-1) asserts `git diff packages/` and `git diff examples/playground/` are empty. Verified by re-running after each commit.
+- **M5.2-T4-AC10** — **Docs update landed:** `examples/playground-ecommerce/docs/ui-vue.md` exists, ≤ 300 lines, documents all 18 components (file path, props, events, EJG-COMP-N behaviour, props-only callout), cross-links to M5.2-T3's `components.md` and M5.2-T2-1's `docs/content/2.concepts/9.providers.md`. Verified by `bun --filter genicui-docs build` exiting 0.
 
 ## Completion Criteria
 
-- [ ] All 8 acceptance criteria above pass
+- [ ] All 10 acceptance criteria above pass
 - [ ] `bun --filter playground-ecommerce test` exits green (component tests + registry-size + import-graph)
 - [ ] `bun --filter playground-ecommerce build` exits 0
+- [ ] `bun --filter playground-ecommerce check-isolation` exits 0 (no-core-edits gate)
+- [ ] `bun --filter genicui-docs build` exits green (no broken cross-refs from the new `ui-vue.md`)
 - [ ] `bun run lint` reports zero errors in the new workspace
 - [ ] Vue Test Utils coverage target met: 80% per-component (per `testing-strategy.md`)
 - [ ] Workspace isolation: `git diff` against `examples/playground/` shows zero changes
+- [ ] Docs update: `examples/playground-ecommerce/docs/ui-vue.md` is published with all 18 component rows
 
 ## Testing Checklist
 
@@ -135,3 +142,5 @@ This task is where the **component-level acceptance criteria** (EJG-COMP-1 throu
 - **The "dumb ui/" rule is the milestone's strongest contract.** The import-graph test from T3 is what enforces it. If a future contributor needs the agent's data inside a component, the right move is to thread it through props from a parent that lives in `agent/` — never to import the agent into `ui/`.
 - **EJG-COMP-1 (no remount on filter)** is the highest-risk component-level AC — getting the `componentId` round-trip right depends on the agent calling `update_component` (M5.2-T5) rather than `render_component` on filter change. The unit test should NOT mock the agent; it should assert the component emits `filter_changed` with the right payload and let the agent-side test (T5) verify the round-trip.
 - **Honour the velocity directive:** if any single component takes more than 1 day, surface to the user and propose cutting it (e.g. collapse `StockBadge` + `PriceTag` into `ProductCard` directly if extraction isn't pulling weight).
+- **Workspace-resident provider, not core (locked 2026-09-17).** The 18 `.vue` files in this task consume the workspace-resident VaahStore provider at `examples/playground-ecommerce/server/providers/vaahstore/` (12 TypeBox schemas, fixture-mode by default). They do NOT import from `packages/server/src/chat/providers/`. The fixture probe path stays `examples/playground-ecommerce/__fixtures__/vaahstore/` (unchanged from T2).
+- **Docs update landed in this task.** `examples/playground-ecommerce/docs/ui-vue.md` is authored as part of the Implementation Plan (Step 9). It documents each `.vue` file's props, events, and EJG-COMP-N behaviour, and cross-links to M5.2-T3's `components.md` and to M5.2-T2-1's workspace-resident plugin docs. The page is the canonical reference for the 18 components' props-only data flow contract.
