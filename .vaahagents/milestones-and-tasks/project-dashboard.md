@@ -1,9 +1,9 @@
 # GenicUI — Project Dashboard
 
-> **Last updated:** 2026-09-17
-> **Last updated by:** M5.2-T3 completion — 19 catalog entries + 4 seed prompts + 2 enforcement tests + 19 stub .vue files + docs/components.md (109 lines); 91/91 tests pass; check-isolation.sh extended with `--base <ref>` flag
+> **Last updated:** 2026-09-18
+> **Last updated by:** M5.2-T4 completion — 19 .vue SFCs at app/components/ecommerce/ui/, EJG-COMP-1..5 enforced via 9 contract tests, docs/ui-vue.md canonical reference, app/assets/css/primevue.css scaffold fix; 100/100 tests pass; bun run build green (2.11 MB / 521 kB gzip); workspace isolation holds
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 46/49 tasks complete · 6 tasks not started (M6) · 3 tasks planned (M5.2) · 3 M5.2 tasks complete
+> **Status:** 5/7 milestones complete (M1–M5 done) · 47/49 tasks complete · 6 tasks not started (M6) · 3 tasks planned (M5.2) · 4 M5.2 tasks complete
 
 ---
 
@@ -114,7 +114,7 @@
 
 > **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
-### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (3/6 complete)
+### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (4/6 complete)
 
 > **Folder:** `milestone-05.2-worked-examples-vaahstore/`
 > **Workspace:** `examples/playground-ecommerce/` (NEW sibling workspace — separate from `examples/playground/`, picked up by root `workspaces: ["examples/*"]` glob).
@@ -128,7 +128,7 @@
 | M5.2-T2 | VaahStore chat provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools, fixtures, F14 wrap) — **superseded location**: VaahStore moves out of core in M5.2-T2-1 | ✅ Completed | Critical | 3 days | None new (extends F13/F14/F76) | M5.2-T1 |
 | M5.2-T2-1 | Provider plugin architecture (move `vaahstore` to `examples/playground-ecommerce/server/providers/vaahstore/`; workspace-resident `defineProvider` + `registerProvider` API co-located in `examples/playground-ecommerce/server/providers/`; F14 wrap-at-registration; workspace boot file + `discoverWorkspaceProviders` helper; worker-isolation opt-in; F76 docs rewrite; per-task docs updates) | ✅ Completed | Critical | 5-7 days | None new (extends F13/F14/F76; **zero edits to `packages/`** — `defineProvider` + `registerProvider` live in the workspace, not in `@genicui/core` or `@genicui/server`) | M5.2-T2 |
 | M5.2-T3 | 18 ecommerce component registry entries + import-graph test (`examples/playground-ecommerce/app/components/ecommerce/registry/`); includes docs-update step per workspace docs-update mandate | ✅ Completed | High | 2 days | None new (extends F37/F38; **zero edits to `packages/`**) | M5.2-T1, M5.2-T2-1 |
-| M5.2-T4 | Ecommerce UI components — 18 `.vue` files in `ui/` (EJG-COMP-1–5); includes docs-update step per workspace docs-update mandate | ⚪ Not Started | High | 3 days | None new (extends F16/F21; **zero edits to `packages/`**) | M5.2-T3 |
+| M5.2-T4 | Ecommerce UI components — 18 `.vue` files in `ui/` (EJG-COMP-1–5); includes docs-update step per workspace docs-update mandate | ✅ Completed | High | 3 days | None new (extends F16/F21; **zero edits to `packages/`**) | M5.2-T3 |
 | M5.2-T5 | Agent journey state machine + Playwright end-to-end smoke (EJG-AC1–3); includes docs-update step per workspace docs-update mandate | ⚪ Not Started | Critical | 2 days | None new (extends F42/F43; **zero edits to `packages/`**) | M5.2-T2-1, M5.2-T3, M5.2-T4 |
 
 > **Workspace isolation rule (2026-09-17):** M5.2 introduces a NEW `examples/playground-ecommerce/` workspace per user direction ("we should completed different ecommerce playground like /Users/pk/Projects/GenicUI/examples/playground-ecommerce so that they don't affect each other"). Zero edits to `examples/playground/`, `packages/`, or root `package.json` — the new workspace is purely additive and is picked up automatically by the existing `workspaces: ["examples/*"]` glob.
