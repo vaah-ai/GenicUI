@@ -3,19 +3,25 @@
 #
 # Workspace-isolation gate (M5.2-T2-1).
 #
-# Asserts that NO file under packages/ has been modified on this branch
-# (with three whitelisted exceptions: the deletion of vaahstore.ts, its
-# test, its fixtures directory, AND the minimal follow-up edit that
-# removes the now-dangling `./vaahstore.js` import from the core
-# provider registry).
+# Asserts that ONLY the four whitelisted packages/ files have been
+# modified/deleted on this branch (relative to `develop`). Anything else
+# under packages/ means someone snuck a core edit past the M5.2
+# redirect — exit 1.
 #
-# Runs against the develop branch (the merge target). If diffing against
-# develop shows ANY packages/ edit outside the whitelisted files, exits 1.
+# Whitelisted files (the vaahstore move + its dangling-import follow-up):
+#   - packages/server/src/chat/providers/vaahstore.ts           (delete)
+#   - packages/server/src/chat/providers/__tests__/vaahstore.test.ts (delete)
+#   - packages/server/src/chat/providers/__fixtures__/vaahstore/        (delete)
+#   - packages/server/src/chat/providers/registry.ts           (modify — remove dangling import)
 #
-# Note: leading `--` after the subcommand is required when pathspec
-# excludes collide with a branch-spec argument, otherwise git treats
-# the exclude list as the merge-base side. This bug burned an hour
-# of debugging during M5.2-T2-1 — keep the syntax in this script.
+# Adjacent isolation zones:
+#   - examples/playground/       must be untouched
+#   - root package.json          must be untouched
+#
+# Implementation note: `git diff` pathspec exclusions (`:!foo`) do not
+# filter deletions, so we can't use them to whitelist a deleted file.
+# Instead we collect the diff, then compare the changed-path set
+# against the whitelist using plain bash + diff.
 
 set -euo pipefail
 ROOT=$(git rev-parse --show-toplevel)
@@ -23,35 +29,48 @@ cd "$ROOT"
 
 echo "[check-isolation] verifying zero new edits under packages/ ..."
 
-# Whitelist the delete-only zones that M5.2-T2-1 introduces, plus the
-# single minimal follow-up edit that removes the now-dangling
-# `./vaahstore.js` import from the core provider registry (same scope
-# as the deletion — without it, `@genicui/server` won't resolve).
-# Anything else under packages/ that has been touched → FAIL.
-git diff --quiet develop..HEAD \
-  -- packages/ \
-  ':!packages/server/src/chat/providers/vaahstore.ts' \
-  ':!packages/server/src/chat/providers/__tests__/vaahstore.test.ts' \
-  ':!packages/server/src/chat/providers/__fixtures__/vaahstore' \
-  ':!packages/server/src/chat/providers/registry.ts' \
-  || {
-    echo "FAIL: edits detected under packages/ (outside the vaahstore move zone)" >&2
-    git diff --stat develop..HEAD \
-      -- packages/ \
-      ':!packages/server/src/chat/providers/vaahstore.ts' \
-      ':!packages/server/src/chat/providers/__tests__/vaahstore.test.ts' \
-      ':!packages/server/src/chat/providers/__fixtures__/vaahstore' \
-      ':!packages/server/src/chat/providers/registry.ts'
-    exit 1
-  }
+# Whitelist — all changes outside this list fail.
+# NB: `git diff --name-only` reports deleted files with their basename
+# only (`vaahstore.test.ts`), not the full path (`__tests__/vaahstore.test.ts`).
+# Match the basename form on the `D`-side and the full path on the
+# `M`-side, so the whitelist covers both rename-deletions AND the
+# matching new file under the workspace.
+WHITELIST=$(cat <<'WHITELIST_EOF'
+packages/server/src/chat/providers/vaahstore.ts
+packages/server/src/chat/providers/vaahstore.test.ts
+packages/server/src/chat/providers/__fixtures__/vaahstore
+packages/server/src/chat/providers/registry.ts
+WHITELIST_EOF
+)
 
-# Also gate two adjacent isolation-guard zones that would leak changes
-# from this task into adjacent workspaces.
-git diff --quiet develop..HEAD -- examples/playground/ package.json \
-  || {
-    echo "FAIL: edits detected under examples/playground/ or root package.json" >&2
-    git diff --stat develop..HEAD -- examples/playground/ package.json
-    exit 1
-  }
+# Changed file paths under packages/ vs develop.
+CHANGED=$(mktemp)
+git diff --name-only develop..HEAD -- packages/ | sort > "$CHANGED"
 
+# Diff against the whitelist — anything in CHANGED that's NOT in the
+# whitelist is an unauthorised edit.
+UNEXPECTED=$(mktemp)
+comm -23 "$CHANGED" <(echo "$WHITELIST" | sort) > "$UNEXPECTED" || true
+
+if [ -s "$UNEXPECTED" ]; then
+  echo "FAIL: edits detected under packages/ (outside the vaahstore move zone):" >&2
+  sed 's/^/  /' "$UNEXPECTED" >&2
+  echo "" >&2
+  echo "Inspect with:" >&2
+  echo "  git diff --stat develop..HEAD -- \$(cat $UNEXPECTED | head -1 | xargs dirname)" >&2
+  rm -f "$CHANGED" "$UNEXPECTED"
+  exit 1
+fi
+
+# Adjacent isolation zones
+for zone in examples/playground package.json; do
+  if ! git diff --quiet develop..HEAD -- "$zone"; then
+    echo "FAIL: edits detected under $zone" >&2
+    git diff --stat develop..HEAD -- "$zone"
+    rm -f "$CHANGED" "$UNEXPECTED"
+    exit 1
+  fi
+done
+
+rm -f "$CHANGED" "$UNEXPECTED"
 echo "[check-isolation] workspace isolation holds"
