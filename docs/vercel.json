@@ -4,7 +4,6 @@
   "devCommand": "bun run dev",
   "installCommand": "bun install",
   "outputDirectory": ".output/public",
-  "framework": "nuxtjs",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [

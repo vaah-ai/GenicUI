@@ -831,12 +831,37 @@ onBeforeUnmount(() => {
           thread below) is collapsed into a single surface that swaps on
           tab activation.
         -->
-        <div class="max-w-3xl mx-auto">
-        <div
-          role="tablist"
-          aria-label="Case studies"
-          class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
-        >
+        <ClientOnly>
+          <!--
+            Hydration flash guard.
+
+            The four case-study tabs and their `v-show`-driven panels both
+            render via Vue 3 reactivity (`activeCase` ref). SSR picks up
+            `activeCase = 0` correctly, but on the very first dev-server
+            request after a fresh boot the client may hydrate a frame
+            later than the server paints — leaving a flash where the wrong
+            tab looks active for ~50ms. `<ClientOnly>` defers the entire
+            case-studies block (tablist + intro banner + panels + pagination)
+            until hydration completes, so what the user sees on first paint
+            matches what they see after hydration. Costs ~50ms perceived
+            load time for the tabbed section; gain is no possible mismatch.
+
+            The slot fallback reserves vertical space (`min-h-[680px]`)
+            so the layout doesn't jump when ClientOnly mounts. 680px is
+            the smaller of UC01's and UC03's panel heights — anything
+            taller grows into the reserved space; anything shorter
+            leaves a small empty band that's preferable to a layout shift.
+          -->
+          <template #fallback>
+            <div class="max-w-3xl mx-auto min-h-[680px]" aria-hidden="true" />
+          </template>
+
+          <div class="max-w-3xl mx-auto">
+          <div
+            role="tablist"
+            aria-label="Case studies"
+            class="flex flex-wrap items-center justify-center gap-2 pb-1 mb-6"
+          >
           <button
             v-for="(item, i) in caseTabs"
             :key="item.id"
@@ -933,6 +958,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
         </div>
+        </ClientOnly>
       </div>
     </section>
 
