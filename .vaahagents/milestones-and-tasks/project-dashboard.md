@@ -3,7 +3,7 @@
 > **Last updated:** 2026-09-17
 > **Last updated by:** M5.2 planning session — VaahStore Guest-Shopper Journey example workspace (`examples/playground-ecommerce/`)
 > **Development phase:** Testable MVP — 32 features / 93 ACs, 8-12 weeks, single maintainer
-> **Status:** 5/7 milestones complete (M1–M5 done) · 43/49 tasks complete · 6 tasks not started (M6) · 5 tasks planned (M5.2)
+> **Status:** 5/7 milestones complete (M1–M5 done) · 44/49 tasks complete · 6 tasks not started (M6) · 4 tasks planned (M5.2) · 1 M5.2 task complete
 
 ---
 
@@ -17,7 +17,7 @@
 | M4 | Runtime: Events + WC + Engine | Runtime | W4-W8 | 🔄 In Progress | Critical | 14-21 days | 7 | F19, F20, F24, F21, F29, F30, F33 |
 | M5 | Registry: Registry + PrimeVue + Playground | Registry | W7 | ✅ Complete | Critical | 10-14 days | 7 | F37, F38, F40, F41, F42, F43, F47 |
 | M5.1 | Documentation Site (Docus + Vercel) | Post-M5, parallel to M6 | W8-W9 | 🔄 In Progress | High | 17 days | 15 | F68, F69a, F69b, F70, F71a–F71f, F72, F73, F74, F75, F76 |
-| M5.2 | Worked Examples: VaahStore Guest-Shopper Journey | Post-M5, parallel to M5.1/M6 | W9-W10 | ⚪ Not Started | High | 12 days | 5 | (none new — extends F13/F14/F16/F17/F18/F37/F40/F42/F43/F76) |
+| M5.2 | Worked Examples: VaahStore Guest-Shopper Journey | Post-M5, parallel to M5.1/M6 | W9-W10 | 🔄 In Progress | High | 12 days | 5 | (none new — extends F13/F14/F16/F17/F18/F37/F40/F42/F43/F76) |
 | M6 | Deployment: CF + Bun + Nitro | Deployment | W11-W12 | ⚪ Not Started | High | 10-14 days | 4 | F61, F62, F62b, F64 |
 
 ---
@@ -114,7 +114,7 @@
 
 > **T11/T12 deferral note (2026-09-17):** T11 (AC9 Vercel preset + AC10 browser MCP) and T12 (Vercel link/deploy/DNS/Lighthouse/preview-banner manual steps) are deferred pending user action — code/config shipped, deploy gate awaits manual verification.
 
-### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (0/5 planned)
+### M5.2 — Worked Examples: VaahStore Guest-Shopper Journey (1/5 complete)
 
 > **Folder:** `milestone-05.2-worked-examples-vaahstore/`
 > **Workspace:** `examples/playground-ecommerce/` (NEW sibling workspace — separate from `examples/playground/`, picked up by root `workspaces: ["examples/*"]` glob).
@@ -124,7 +124,7 @@
 
 | ID | Title | Status | Priority | Effort | Manifest | Dependencies |
 |---|---|---|---|---|---|---|
-| M5.2-T1 | Verify VaahStore API surface (7 assumptions in §6) | ⚪ Not Started | Critical | 2 days | None new | None |
+| M5.2-T1 | Verify VaahStore API surface (7 assumptions in §6) | ✅ Completed | Critical | 2 days | None new | None |
 | M5.2-T2 | VaahStore chat provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools, fixtures, F14 wrap) | ⚪ Not Started | Critical | 3 days | None new (extends F13/F14/F76) | M5.2-T1 |
 | M5.2-T3 | 18 ecommerce component registry entries + import-graph test (`examples/playground-ecommerce/app/components/ecommerce/registry/`) | ⚪ Not Started | High | 2 days | None new (extends F37/F38) | M5.2-T1 |
 | M5.2-T4 | Ecommerce UI components — 18 `.vue` files in `ui/` (EJG-COMP-1–5) | ⚪ Not Started | High | 3 days | None new (extends F16/F21) | M5.2-T3 |
@@ -259,6 +259,6 @@ M2-T2 → M2-T3 → M2-T4 → M3-T1 → M3-T3 → M3-T4 → M3-T5 → M4-T1 → 
 
 - **Current date:** 2026-09-17
 - **Week 6 integration milestone:** Target date ~W6 of 12-week plan
-- **Scope:** 32 features, 93 ACs, 7 milestones (M1–M5 ✅, M5.1 🔄, M5.2 ⚪, M6 ⚪), 38 tasks (43 complete, 5 M5.2 planned, 6 not-started in M6)
+- **Scope:** 32 features, 93 ACs, 7 milestones (M1–M5 ✅, M5.1 🔄, M5.2 🔄, M6 ⚪), 38 tasks (44 complete, 1 M5.2 complete + 4 M5.2 planned, 6 not-started in M6)
 - **If any feature slips past W6:** propose cutting to deferred_for_post_mvp
 - **M5.2 note:** VaahStore journey milestone is **additive, not framework-blocking** — every task extends already-shipped surface (F13/F14/F16/F17/F18/F37/F40/F42/F43/F76). Slip beyond W10 is acceptable; M6 Deployment timeline is not coupled.

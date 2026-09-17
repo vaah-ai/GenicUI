@@ -3,8 +3,9 @@
 > **Milestone:** M5.2 (Worked Examples: VaahStore Guest-Shopper Journey)
 > **Manifest feature:** None new — pre-implementation verification gate for F13/F14/F16 tool surface
 > **Priority:** Critical (gating — must complete before M5.2-T2 tool schemas are frozen)
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed (2026-09-17)
 > **Estimated Effort:** 2 days
+> **Outcome:** All 7 §6 assumptions resolved (1 ✅ verified, 6 🟡 fallback-downgraded, 0 🔴 blocked). No 🔴 blocked items, no user notification required before M5.2-T2 begins.
 
 ## Description
 
@@ -59,28 +60,28 @@ The journey spec at `.vaahagents/requirements/idea/examples-vaahstore-guest-jour
 
 ## Completion Criteria
 
-- [ ] All 5 acceptance criteria above pass
-- [ ] `examples/playground-ecommerce/docs/` directory created
-- [ ] Report cross-references from M5.2-T2 (tool schemas) and M5.2-T5 (journey state machine) point back to this report
-- [ ] Any 🔴 Blocked assumption has an explicit user-visible note in the final completion report
+- [x] All 5 acceptance criteria above pass
+- [x] `examples/playground-ecommerce/docs/` directory created
+- [x] Report cross-references from M5.2-T2 (tool schemas) and M5.2-T5 (journey state machine) point back to this report (see "Summary for M5.2-T2" and "Implication for M5.2-T2 / T3" sections)
+- [x] Any 🔴 Blocked assumption has an explicit user-visible note in the final completion report — none, so N/A
 
 ## Testing Checklist
 
-- [ ] No production code lands in this task — verification is read-only
-- [ ] Report is human-readable (markdown table, links, status emojis)
-- [ ] If WebFetch was used, the fetcher's output is preserved as quotes in the report so a future verifier can re-check
+- [x] No production code lands in this task — verification is read-only (only `examples/playground-ecommerce/docs/vaahstore-api-verification.md` written)
+- [x] Report is human-readable (markdown table, links, status emojis; TL;DR table at top)
+- [x] If WebFetch was used, the fetcher's output is preserved as quotes in the report so a future verifier can re-check — WebFetch on docs.vaah.dev/vaahstore/api returned HTTP 500, recorded in §"Verification methodology"; primary verification used direct source-code inspection of the webreinvent/vaahstore repo (cloned 2026-09-17)
 
 ## Sub Tasks
 
 | SubTask ID | Title | Status | Test Required | Priority |
 | --- | --- | --- | --- | --- |
-| M5.2-T1-01 | Re-attempt `/vaahstore/api` fetch + catalogue HTTP status of all Basics subpages | ⚪ Not Started | ❌ No | High |
-| M5.2-T1-02 | Verify base URL convention (`{host}/api/vaahstore/v1/`) | ⚪ Not Started | ❌ No | High |
-| M5.2-T1-03 | Verify minor-units pricing convention | ⚪ Not Started | ❌ No | High |
-| M5.2-T1-04 | Verify token-based guest cart (or commit to transient `is_guest=1` customer fallback) | ⚪ Not Started | ❌ No | High |
-| M5.2-T1-05 | Verify order-lookup-by-email (or commit to signed-token-out-of-scope fallback) | ⚪ Not Started | ❌ No | High |
-| M5.2-T1-06 | Verify variation filterable attributes + bearer-token per-store + multi-store `store_id` | ⚪ Not Started | ❌ No | Medium |
-| M5.2-T1-07 | Write the consolidated verification report | ⚪ Not Started | ❌ No | High |
+| M5.2-T1-01 | Re-attempt `/vaahstore/api` fetch + catalogue HTTP status of all Basics subpages | ✅ Completed | ❌ No | High |
+| M5.2-T1-02 | Verify base URL convention (`{host}/api/vaahstore/v1/`) | ✅ Completed (🟡 Fallback: real is `{host}/api/store/<resource>`, no `vaahstore` segment, no `/v1/`) | ❌ No | High |
+| M5.2-T1-03 | Verify minor-units pricing convention | ✅ Completed (🟡 Fallback: decimal floats in Currency.code, NOT minor units) | ❌ No | High |
+| M5.2-T1-04 | Verify token-based guest cart (or commit to transient `is_guest=1` customer fallback) | ✅ Completed (🟡 Fallback: Cart UUID with nullable `vh_user_id`; checkout bridge via `POST /carts/{uuid}/user` after `POST /sign-up`. No `is_guest=1` flag exists upstream.) | ❌ No | High |
+| M5.2-T1-05 | Verify order-lookup-by-email (or commit to signed-token-out-of-scope fallback) | ✅ Completed (🟡 Fallback: no public order endpoint; orders group is fully `auth:api`. Step 8 resolved via auto sign-in from stored credentials in `localStorage`.) | ❌ No | High |
+| M5.2-T1-06 | Verify variation filterable attributes + bearer-token per-store + multi-store `store_id` | ✅ Completed (🟡×3 Fallback: variation filter = `filter[product_variations][]=<slug>`; bearer token is per-user Sanctum `PersonalAccessToken`; store scoping via `?selected_store=<id>` query param) | ❌ No | Medium |
+| M5.2-T1-07 | Write the consolidated verification report | ✅ Completed at `examples/playground-ecommerce/docs/vaahstore-api-verification.md` | ❌ No | High |
 
 ## Dependencies
 
