@@ -9,15 +9,27 @@
 
 ## Objective
 
-Ship a **separate workspace** at `examples/playground-ecommerce/` that proves GenicUI drives a real, end-to-end e-commerce flow against the **VaahStore** headless commerce API — a guest-shopper journey across 9 steps (browse → filter → detail → cart → checkout → order → tracking → optional account conversion), supported by a new chat-provider adapter (`packages/server/src/chat/providers/vaahstore.ts`, 12 TypeBox tools) and 18 new PrimeVue-backed registry entries.
+Ship a **separate workspace** at `examples/playground-ecommerce/` that proves GenicUI drives a real, end-to-end e-commerce flow against the **VaahStore** headless commerce API — a guest-shopper journey across 9 steps (browse → filter → detail → cart → checkout → order → tracking → optional account conversion), supported by a new chat-provider adapter (`examples/playground-ecommerce/server/providers/vaahstore/`, 12 TypeBox tools — workspace-resident, NOT in `packages/server/src/chat/providers/`) and 18 new PrimeVue-backed registry entries.
 
-The example is **isolated from `examples/playground/`** — separate Nuxt app, separate component registry, separate fixture harness, separate `devServer.port`. It exists to:
+The example is **isolated from `examples/playground/` AND from `packages/`** — separate Nuxt app, separate component registry, separate fixture harness, separate `devServer.port`, separate provider plugin API. It exists to:
 
 1. Validate the **`M5-T5` agent-bridge + `M5.1-T15` provider-registry** surface against a real external API (not the in-process Claude Code provider).
 2. Demonstrate the **three-layer `ui/agent/registry` split** as a reusable shape — a follow-on worked example (cartviewer.md already proved the multi-framework shape).
-3. Provide the **headline guest-flow demo** (no auth, deferred server-cart handoff, post-purchase conversion) — the kind of journey every framework showcase skips.
+3. Demonstrate the **in-workspace plugin pattern** — a workspace-resident `defineProvider` + `registerProvider` API that lets each example workspace ship its own providers without modifying `@genicui/core` or `@genicui/server`. Future example workspaces can copy this pattern.
+4. Provide the **headline guest-flow demo** (no auth, deferred server-cart handoff, post-purchase conversion) — the kind of journey every framework showcase skips.
 
 The journey spec lives at `.vaahagents/requirements/idea/examples-vaahstore-guest-journey.md` (10 sections, 9-step journey, 18 components, 12 tool calls, 7 unverified API assumptions, EJG-AC1–3 + EJG-COMP-1–5 + EJG-ADAPT-1–3 + EJG-LAYOUT-1–3). This milestone operationalises it.
+
+## Workspace Isolation Rules (Locked, 2026-09-17)
+
+Per user redirect ("provider-vaahstore should exist in `/Users/pk/Projects/GenicUI/examples/playground-ecommerce` ... none of these tasks should affect core of genicui"):
+
+- **Provider location.** VaahStore provider source lives at `examples/playground-ecommerce/server/providers/vaahstore/`. **NOT** at `packages/provider-vaahstore/`, **NOT** at `packages/server/src/chat/providers/vaahstore.ts`.
+- **Plugin API location.** `defineProvider` + `registerProvider` + `unregisterProvider` + `listProviderIds` + `getProviderAdaptor` + `discoverWorkspaceProviders` live at `examples/playground-ecommerce/server/providers/{index,registry,types,boot}.ts`. **NOT** in `@genicui/core`. **NOT** in `@genicui/server`. The API is workspace-resident.
+- **Zero core edits.** No M5.2 task edits any file under `packages/core/`, `packages/server/`, or root `package.json`. The only exception is the deletion of `packages/server/src/chat/providers/vaahstore.ts` + `vaahstore.test.ts` + the 12 VaahStore fixtures (cut-paste into the new workspace location). `packages/server/src/chat/providers/registry.ts` is untouched. `claude-code.ts` and `codex.ts` stay where they are.
+- **Workspace isolation gate.** Every M5.2 task's Completion Criteria invokes `bun --filter playground-ecommerce check-isolation`, which runs `examples/playground-ecommerce/scripts/check-isolation.sh` and asserts `git diff packages/`, `git diff examples/playground/`, and `git diff package.json` are all empty modulo the VaahStore source deletion.
+- **Docs-update mandate.** Every M5.2 task includes a docs-update sub-step in its Implementation Plan. M5.2-T2-1 owns the rewrite of `docs/content/2.concepts/9.providers.md` + `examples/playground-ecommerce/README.md`. M5.2-T3/T4/T5 each own an update to `examples/playground-ecommerce/docs/<their-slug>.md` plus any cross-references they touch.
+- **Bun workspace glob is unchanged.** Root `package.json:9-13` already picks up `examples/*`, so the new workspace is auto-registered without any root-level edit.
 
 ## Success Criteria
 

@@ -1,0 +1,8 @@
+{
+  "data": [
+    { "id": "p-101", "title": "AeroStride 9", "brand": "Aero", "price": { "currency_code": "USD", "amount": 119.99 }, "stock": 14 },
+    { "id": "p-102", "title": "TrailMax Mid", "brand": "TrailMax", "price": { "currency_code": "USD", "amount": 89.5 }, "stock": 0 },
+    { "id": "p-103", "title": "Featherlite Knit", "brand": "Featherlite", "price": { "currency_code": "USD", "amount": 64.0 }, "stock": 22 }
+  ],
+  "meta": { "page": 1, "per_page": 24, "total": 3 }
+}

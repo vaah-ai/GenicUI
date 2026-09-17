@@ -5,14 +5,7 @@
 > **Priority:** High
 > **Status:** ⚪ Not Started
 > **Estimated Effort:** 2 days
-
-## Description
-
-Register the **18 ecommerce components** (named in `.vaahagents/requirements/idea/examples-vaahstore-guest-journey.md` §4 — `ProductGrid`, `ProductDetail`, `VariationPicker`, `CartPanel`, `CheckoutForm`, `OrderProcessing`, `ShipmentTracker`, plus 11 extracted/reused pieces) into a registry that the new Nuxt app's `resolve-mounted-component.ts` consumes.
-
-The registry follows the three-layer rule from §4: **`registry/` does not own logic — only wires names to imports + event lists.** If any single file in this layer grows past 50 lines of logic, the logic belongs in `agent/`. The constraint is enforced by a **structural test** (EJG-LAYOUT-2).
-
-Critically: **the new workspace ships its own `resolve-mounted-component.ts`** — zero edits to `examples/playground/app/components/resolve-mounted-component.ts`. The two playgrounds stay decoupled (the workspace-isolation rationale from M5.2's Objective).
+> **Workspace isolation constraint (locked, 2026-09-17):** zero edits to `packages/core/`, `packages/server/`, or root `package.json`. VaahStore provider source lives at `examples/playground-ecommerce/server/providers/vaahstore/` (NOT in `packages/server/src/chat/providers/`). The registry entries in this task read the 12 TypeBox schemas from the workspace-resident provider location, not from core.
 
 ## Task Goals
 
@@ -47,6 +40,7 @@ Critically: **the new workspace ships its own `resolve-mounted-component.ts`** �
 7. Write `examples/playground-ecommerce/__tests__/ecommerce-import-graph.test.ts` — Bun test that walks the filesystem under `app/components/ecommerce/ui/`, parses each `.vue` file's `<script setup>` block, and asserts no `from '../agent/'` import and no `useFetch(` call. Run as part of `bun --filter playground-ecommerce test` so a future agent that violates the rule fails the build (EJG-LAYOUT-1)
 8. Write `examples/playground-ecommerce/__tests__/registry-size.test.ts` — Bun test that asserts `registry/components.ts` ≤ 50 lines (excluding comments + blank lines). Named after EJG-LAYOUT-2
 9. Run both tests; expect green stub-state (registry imports all `./ui/{Name}.vue` files that T4 will create — until then, mark the test as `@todo` once T4 lands or use a `.skip` that T4 removes)
+10. **Docs update — workspace-resident component map.** Per the "all should update docs" mandate, author `examples/playground-ecommerce/docs/components.md` documenting the 18-component breakdown: file → category (`ui`/`agent`/`registry`) → emits → consumes-from-12-tool-list. Cross-link to M5.2-T2-1's workspace-resident plugin docs (`docs/content/2.concepts/9.providers.md`) and to the journey spec §4. Keep ≤ 250 lines (matches the convention `docs/content/2.concepts/9.providers.md` follows). The page becomes the canonical reference for "what's in the workspace" alongside the new README that M5.2-T2-1 authors at `examples/playground-ecommerce/README.md`. The page must also reference the workspace-resident provider location explicitly (`server/providers/vaahstore/`, NOT `packages/server/src/chat/providers/vaahstore.ts`) so a future contributor doesn't re-introduce the core-edit.
 
 ### Skills & MCP Servers
 
@@ -66,14 +60,19 @@ Critically: **the new workspace ships its own `resolve-mounted-component.ts`** �
 - **M5.2-T3-AC5** — The import-graph test refuses any future change that introduces `from '../agent/'` inside `ui/` (EJG-LAYOUT-1) — verified by intentionally adding a violating import and seeing the test fail
 - **M5.2-T3-AC6** — The 4 seed prompts from §7 are exported from `registry/prompts.ts`
 - **M5.2-T3-AC7** — Zero edits under `examples/playground/`, `packages/`, or root `package.json` (EJG-LAYOUT-3) — verified by `git status` showing only new files under `examples/playground-ecommerce/`
+- **M5.2-T3-AC8** — **No-core-edits gate:** `bun --filter playground-ecommerce check-isolation` exits 0 — the workspace isolation script (added by M5.2-T2-1) asserts `git diff packages/`, `git diff examples/playground/`, and `git diff package.json` are all empty modulo the VaahStore source deletion done by T2-1. Verified by re-running after each commit.
+- **M5.2-T3-AC9** — **Docs update landed:** `examples/playground-ecommerce/docs/components.md` exists, ≤ 250 lines, references the workspace-resident provider location, and cross-links to `docs/content/2.concepts/9.providers.md` (rewritten by M5.2-T2-1). Verified by `bun --filter genicui-docs build` exiting 0 (docs site builds without broken refs).
 
 ## Completion Criteria
 
-- [ ] All 7 acceptance criteria above pass
+- [ ] All 9 acceptance criteria above pass
 - [ ] `bun install` at repo root exits 0 with the new workspace registered
 - [ ] `bun --filter playground-ecommerce test` exits green (registry-size + import-graph)
+- [ ] `bun --filter playground-ecommerce check-isolation` exits 0 (no-core-edits gate, script added by M5.2-T2-1)
+- [ ] `bun --filter genicui-docs build` exits green (no broken cross-refs from the new `components.md`)
 - [ ] `bun run lint` reports zero errors in the new workspace
 - [ ] Workspace isolation: `git diff` against `examples/playground/` shows no changes
+- [ ] Docs update: `examples/playground-ecommerce/docs/components.md` is published with all 18 component rows
 
 ## Testing Checklist
 
@@ -111,3 +110,5 @@ Critically: **the new workspace ships its own `resolve-mounted-component.ts`** �
 - **Workspace decoupling is the headline.** This task creates the entire workspace skeleton so T4 can drop `.vue` files into the right folders without touching anything else. If T4 ever needs to add a new component, the registry update + import-graph test re-run is the only ceremony.
 - **Stub imports are fine in this task** — `import X from './ui/ProductGrid.vue'` resolves to a non-existent file until T4 lands. Either (a) gate the build behind `BUN_SKIP_MISSING_UI=1` until T4 ships, or (b) ship empty stub `.vue` files in T3 that T4 replaces. Pick (b) — fewer moving parts.
 - **Honour the velocity directive:** if the import-graph test's parser exceeds ~80 lines, simplify to a regex check that catches `from '../agent/'` and `useFetch(` — the structural contract matters more than the parser's elegance.
+- **Workspace-resident provider, not core (locked 2026-09-17).** Per user redirect, the VaahStore provider lives at `examples/playground-ecommerce/server/providers/vaahstore/`, NOT at `packages/server/src/chat/providers/vaahstore.ts`. The registry entries in this task import the 12 TypeBox schemas from the workspace-resident provider location. **No edits to `packages/`** are permitted — the workspace isolation script (`examples/playground-ecommerce/scripts/check-isolation.sh`, added by M5.2-T2-1) gates this rule.
+- **Docs update landed in this task.** `examples/playground-ecommerce/docs/components.md` is authored as part of the Implementation Plan (Step 10). It documents the workspace-resident provider location explicitly so future contributors don't re-introduce the core-edit mistake that M5.2-T2 (commit `330e94f`) made.

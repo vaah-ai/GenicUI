@@ -5,6 +5,7 @@
 > **Priority:** Critical
 > **Status:** ⚪ Not Started
 > **Estimated Effort:** 2 days
+> **Workspace isolation constraint (locked, 2026-09-17):** zero edits to `packages/core/`, `packages/server/`, or root `package.json`. The agent layer in this task calls the workspace-resident VaahStore provider at `examples/playground-ecommerce/server/providers/vaahstore/` via the workspace's local `getProviderAdaptor('vaahstore')`; it does NOT touch `packages/server/src/chat/providers/`.
 
 ## Description
 
@@ -61,6 +62,7 @@ Then **Playwright end-to-end smoke** verifies EJG-AC1, EJG-AC2, EJG-AC3 against 
    - **EJG-AC3:** after Step 8, click the AccountUpgrade CTA — assert a new VaahStore customer is created (fixture call) and `claim_order` attaches the prior order
 9. Wire the e2e into the workspace's `package.json` (`"e2e": "playwright test"`) and ensure `bun --filter playground-ecommerce e2e` exits 0 in the milestone's smoke gate
 10. Run `bun --filter playground-ecommerce test && bun --filter playground-ecommerce e2e && bun --filter playground-ecommerce build` — all three green
+11. **Docs update — agent journey reference.** Per the "all should update docs" mandate, author `examples/playground-ecommerce/docs/agent-journey.md` documenting the agent layer: the four-file split (`prompts.ts` / `intents.ts` / `session.ts` / `journey.ts`), the 9-step state-machine diagram (ASCII), the `intents.ts` event-to-tool-call mapping table (linking to M5.2-T2-1's `docs/content/2.concepts/9.providers.md` for the workspace-resident plugin location and to M5.2-T4's `ui-vue.md` for the emit-side counterparts), and the session-storage shape (`localStorage['genicui-ecommerce-session:v1']`). Keep ≤ 350 lines. Cross-link to M5.2-T3's `components.md` (component map) and to M5.2-T2-1's `examples/playground-ecommerce/README.md` (workspace overview). The page becomes the canonical reference for "how does the agent decide what tool to call next" — useful for future contributors extending the journey with new steps.
 
 ### Skills & MCP Servers
 
@@ -85,17 +87,22 @@ Then **Playwright end-to-end smoke** verifies EJG-AC1, EJG-AC2, EJG-AC3 against 
 - **M5.2-T5-AC8** — **EJG-AC3:** Playwright test clicks the `AccountUpgradePrompt`, asserts the customer record is created and `claim_order` attaches the prior order
 - **M5.2-T5-AC9** — `bun --filter playground-ecommerce e2e` exits 0
 - **M5.2-T5-AC10** — `bun --filter playground-ecommerce test && bun --filter playground-ecommerce e2e && bun --filter playground-ecommerce build` all green (full milestone smoke)
+- **M5.2-T5-AC11** — **No-core-edits gate:** `bun --filter playground-ecommerce check-isolation` exits 0 — the workspace isolation script (added by M5.2-T2-1) asserts `git diff packages/` and `git diff examples/playground/` are empty. Verified by re-running after each commit.
+- **M5.2-T5-AC12** — **Docs update landed:** `examples/playground-ecommerce/docs/agent-journey.md` exists, ≤ 350 lines, documents the four-file split + 9-step state diagram + event-to-tool-call mapping, cross-links to M5.2-T2-1's `docs/content/2.concepts/9.providers.md` (workspace-resident plugin location) and M5.2-T4's `ui-vue.md` (emit-side counterparts). Verified by `bun --filter genicui-docs build` exiting 0.
 
 ## Completion Criteria
 
-- [ ] All 10 acceptance criteria above pass
+- [ ] All 12 acceptance criteria above pass
 - [ ] `bun --filter playground-ecommerce test` exits green
 - [ ] `bun --filter playground-ecommerce e2e` exits green
 - [ ] `bun --filter playground-ecommerce build` exits 0
+- [ ] `bun --filter playground-ecommerce check-isolation` exits 0 (no-core-edits gate)
+- [ ] `bun --filter genicui-docs build` exits green (no broken cross-refs from the new `agent-journey.md`)
 - [ ] Workspace isolation: `git diff` against `examples/playground/` shows zero changes (the e2e is in the new workspace, not the existing one)
 - [ ] Regression: `bun --filter playground test` + `bun --filter playground build` still green
 - [ ] Coverage target met: 80% per `testing-strategy.md`
-- [ ] Trust-boundary check: every `journey.runJourney` call sees args that already passed F14 `wrapWithValidation` (verified by reading the M5.2-T2 wrapped adapter's signature)
+- [ ] Trust-boundary check: every `journey.runJourney` call sees args that already passed F14 `wrapWithValidation` (verified by reading the workspace-resident `createVaahstoreProvider`'s signature, which wraps every `callTool` body via the F14 wrap-at-registration contract enforced in M5.2-T2-1)
+- [ ] Docs update: `examples/playground-ecommerce/docs/agent-journey.md` is published with the 9-step state diagram and event-to-tool-call table
 
 ## Testing Checklist
 
@@ -139,3 +146,5 @@ Then **Playwright end-to-end smoke** verifies EJG-AC1, EJG-AC2, EJG-AC3 against 
 - **EJG-AC2's "close the browser, reopen"** is the trickiest e2e step. Playwright's `browser.newContext()` gives isolation; the test must (a) complete EJG-AC1 in context A, (b) capture `localStorage` payload from A, (c) seed that payload into context B's `localStorage` before page-load (via `addInitScript`), (d) visit `/` in context B and assert the order resolves. This pattern is reused from `M5.1-T13`'s Mantine walkthrough.
 - **Honour the velocity directive:** if the Playwright spec exceeds 200 lines, split into 3 separate files (`journey-ac1.spec.ts`, `journey-ac2.spec.ts`, `journey-ac3.spec.ts`) rather than one big file — same tests, easier debugging, parallel CI.
 - **What this task is NOT:** it does not introduce a new GenicUI feature, a new MCP tool, a new transport, a new trust-boundary primitive, or a new package. It is purely additive — wiring existing primitives (F13/F14/F16/F17/F18/F37/F42/F43/F76) into a coherent end-to-end showcase. If any of those primitives proves insufficient, surface to the user — the right answer is a new manifest feature, not a workaround.
+- **Workspace-resident provider, not core (locked 2026-09-17).** `intents.ts` calls the workspace-resident VaahStore provider via the workspace's local `getProviderAdaptor('vaahstore')` (resolved by `examples/playground-ecommerce/server/providers/registry.ts`). It does NOT touch `packages/server/src/chat/providers/`. F14 wrap-at-registration is enforced by the workspace's `registerProvider` (added by M5.2-T2-1) — every tool call inherits the wrap contract.
+- **Docs update landed in this task.** `examples/playground-ecommerce/docs/agent-journey.md` is authored as part of the Implementation Plan (Step 11). It documents the four-file split, the 9-step state diagram, the event-to-tool-call mapping, and the session-storage shape. Cross-links to M5.2-T3's `components.md`, M5.2-T4's `ui-vue.md`, and M5.2-T2-1's `docs/content/2.concepts/9.providers.md`.

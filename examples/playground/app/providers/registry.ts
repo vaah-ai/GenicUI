@@ -40,6 +40,45 @@ export const PROVIDERS: ProviderDescriptor[] = [
     configFields: [],
     disabled: true,
   },
+  {
+    id: 'vaahstore',
+    label: 'VaahStore',
+    description: 'VaahStore headless commerce HTTP API (12 tools)',
+    configFields: [
+      {
+        key: 'baseUrl',
+        label: 'VaahStore base URL',
+        type: 'text',
+        default: '',
+        placeholder: 'https://store.example.com',
+        help: 'Origin without trailing slash. Tools route to {baseUrl}/api/store/<resource>.',
+      },
+      {
+        key: 'storeId',
+        label: 'Store id',
+        type: 'text',
+        default: '',
+        placeholder: '1',
+        help: 'VaahStore multi-store id sent as ?selected_store=<id>. Empty = upstream default.',
+      },
+      {
+        key: 'bearerToken',
+        label: 'Bearer token (Sanctum PersonalAccessToken)',
+        type: 'text',
+        default: '',
+        placeholder: 'Paste a Sanctum token',
+        help: 'Never logged. Stored in localStorage only — server reads it from VAHSTORE_BEARER_TOKEN at startup.',
+      },
+      {
+        key: 'liveSwitch',
+        label: 'Live mode (1 = live, 0 = fixtures)',
+        type: 'text',
+        default: '0',
+        placeholder: '0',
+        help: 'VITE_VAAHSTORE_LIVE — set to 1 to hit the live API, 0 (default) reads from __fixtures__/vaahstore/.',
+      },
+    ],
+  },
 ];
 
 /**
