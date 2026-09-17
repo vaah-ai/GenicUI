@@ -8,32 +8,21 @@
  * @module @genicui/server/chat/providers/registry
  *
  * @see {M5-T6} — Providers dropdown + provider adaptor pattern
+ *
+ * NOTE: As of M5.2-T2-1 the `vaahstore` entry was removed — it now
+ * lives as a workspace-resident plugin at
+ * `examples/playground-ecommerce/server/providers/`. Workspace callers
+ * route through their own `getProviderAdaptor` instead of this core
+ * map. This file no longer imports `./vaahstore.js`.
  */
 
 import type { ProviderAdaptor } from './types.js';
 import { ClaudeCodeAdaptor } from './claude-code.js';
 import { CodexAdaptor } from './codex.js';
-import { createVaahstoreProvider, VaahstoreProviderAdaptor } from './vaahstore.js';
-
-/**
- * The set of registered providers. Add new adaptors here as they're
- * implemented.
- *
- * NOTE: `VaahstoreProviderAdaptor` is built lazily via the factory so
- * the bearer token is read on first lookup, not at module load —
- * matches the `genicul-cli`-style "env at use, not at boot" rule.
- */
-let vaahstoreSingleton: VaahstoreProviderAdaptor | null = null;
-
-function vaahstoreAdaptor(): ProviderAdaptor {
-  if (!vaahstoreSingleton) vaahstoreSingleton = createVaahstoreProvider();
-  return vaahstoreSingleton;
-}
 
 const REGISTRY: ReadonlyMap<string, ProviderAdaptor> = new Map<string, ProviderAdaptor>([
   ['claude-code', new ClaudeCodeAdaptor()],
   ['codex', new CodexAdaptor()],
-  ['vaahstore', vaahstoreAdaptor()],
 ]);
 
 /**
