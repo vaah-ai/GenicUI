@@ -3,7 +3,7 @@
 > **Milestone:** M5.2 (Worked Examples: VaahStore Guest-Shopper Journey)
 > **Manifest feature:** None new — extends F13 (MCP), F14 (trust boundary), F76 (provider-registry docs); introduces **a workspace-resident plugin pattern inside `examples/playground-ecommerce/server/providers/`** and an opt-in `defineProvider` / `registerProvider` surface **co-located with the workspace** (NOT in `@genicui/core`, NOT in `@genicui/server`). Zero edits to `packages/`.
 > **Priority:** Critical (architectural correction — must land before M5.2-T3 opens the integration story)
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Completed (2026-09-18)
 > **Estimated Effort:** 5-7 days (single maintainer)
 > **Outcome (target):** VaahStore adapter no longer lives in `packages/server/src/chat/providers/`. It moves into the new workspace at `examples/playground-ecommerce/server/providers/vaahstore/`. `claude-code.ts` + `codex.ts` stay in core as before — they are tolerable first-party entries (per F76 docs). A workspace-resident `defineProvider` / `registerProvider` API (co-located in `examples/playground-ecommerce/server/providers/`) provides the F14 wrap-at-registration contract, the bearer-scrub closure contract, the opt-in `worker_threads` isolation, and the workspace-scan discovery. **None of this lives in `@genicui/core` or `@genicui/server`.** `docs/content/2.concepts/9.providers.md` is rewritten to describe the "drop a plugin module inside an example workspace and call `registerProvider(...)` from a workspace boot file" model. **Every other M5.2 task gets a docs-update step.**
 

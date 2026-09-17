@@ -10,9 +10,10 @@
  * when `VITE_VAAHSTORE_LIVE=1` the same handlers `fetch()` against
  * `${VAAHSTORE_BASE_URL}/api/<resource>` with the live bearer token.
  *
- * @module @genicui/server/chat/providers/vaahstore
+ * @module playground-ecommerce/server/providers/vaahstore/runtime
  *
- * @see {M5.2-T2} — VaahStore chat provider adapter
+ * @see {M5.2-T2} — VaahStore chat provider adapter (origin)
+ * @see {M5.2-T2-1} — moved out of core into this workspace
  * @see {F14} — trust-boundary validation
  * @see {F76} — provider-registry docs
  *
@@ -31,6 +32,11 @@
  *   - The adapter honours the `VITE_VAAHSTORE_LIVE` env switch at
  *     call time, not construction time — operators can flip the
  *     switch without restarting the server (EJG-ADAPT-1).
+ *   - As of M5.2-T2-1 this file lives at
+ *     `examples/playground-ecommerce/server/providers/vaahstore/runtime/`.
+ *     Validation imports use the workspace-local
+ *     `../validation/` barrel (shallow-copies of F14 primitives).
+ *     `ProviderAdaptor` etc. come from `../../types.js`.
  */
 
 import { readFile } from 'node:fs/promises';
@@ -39,14 +45,14 @@ import { fileURLToPath } from 'node:url';
 
 import type { TSchema } from '@sinclair/typebox';
 
-import { validateToolInput } from '../../validation/schema-validation.js';
+import { validateToolInput } from '../../validation/index.js';
 import { stripProtoKeys } from '../../validation/strip-proto-keys.js';
 import type {
   ProviderAdaptor,
   ProviderConfig,
   ParsedLine,
   ChatEvent,
-} from './types.js';
+} from '../../types.js';
 
 // ---------------------------------------------------------------------------
 // Env contract — single source of truth for the env-var names
@@ -313,17 +319,22 @@ export function scrubBearer(input: unknown): unknown {
  * global `bun run start`.
  */
 export function resolveFixturesDir(): string {
-  // The fixtures folder is a sibling of the `packages/` directory —
+  // The fixtures folder is a sibling of `server/` —
   // i.e. `<repo>/examples/playground-ecommerce/__fixtures__/vaahstore/`.
   // We try a few candidate roots because `import.meta.url` rewrites
   // under `bun test` change the depth at which the file is mounted.
+  //
+  // Layout: `runtime/index.ts` lives at
+  //   examples/playground-ecommerce/server/providers/vaahstore/runtime/
+  // so going `..`/`..`/`..` (3 ups) lands at
+  //   examples/playground-ecommerce/
+  // and the fixtures live at `./__fixtures__/vaahstore/` next to it.
   const here = dirname(fileURLToPath(import.meta.url));
   const candidates = [
-    join(here, '..', '..', '..', '..', 'examples', 'playground-ecommerce', '__fixtures__', 'vaahstore'),
-    join(here, '..', '..', '..', '..', '..', 'examples', 'playground-ecommerce', '__fixtures__', 'vaahstore'),
-    join(here, '..', '..', '..', 'examples', 'playground-ecommerce', '__fixtures__', 'vaahstore'),
+    join(here, '..', '..', '..', '__fixtures__', 'vaahstore'),
+    join(here, '..', '..', '..', '..', '__fixtures__', 'vaahstore'),
     join(process.cwd(), 'examples', 'playground-ecommerce', '__fixtures__', 'vaahstore'),
-    join(process.cwd(), '..', 'examples', 'playground-ecommerce', '__fixtures__', 'vaahstore'),
+    join(process.cwd(), '__fixtures__', 'vaahstore'),
   ];
   for (const candidate of candidates) {
     if (typeof Bun !== 'undefined') {
