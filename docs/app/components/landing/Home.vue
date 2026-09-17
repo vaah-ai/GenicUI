@@ -565,7 +565,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="stagger mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style="--i:4">
-            <NuxtLink to="/getting-started/quickstart" class="hero-link">
+            <NuxtLink to="/getting-started/quick-start" class="hero-link">
               <UIcon name="i-lucide-book-open" class="size-3.5" />
               Quickstart guide
               <UIcon name="i-lucide-arrow-right" class="size-3 hero-link-arrow" />
@@ -1117,7 +1117,7 @@ onBeforeUnmount(() => {
           </li>
           <li>
             <NuxtLink
-              to="/getting-started/quickstart"
+              to="/getting-started/quick-start"
               class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-blue-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
               <div class="flex items-start justify-between mb-5">
@@ -1139,7 +1139,7 @@ onBeforeUnmount(() => {
           </li>
           <li>
             <NuxtLink
-              to="/concepts/architecture"
+              to="/concepts/protocol"
               class="group block h-full rounded-2xl glass-card p-6 sm:p-7 border-l-2 border-l-emerald-400/70 transition-all duration-500 hover:translate-y-[-2px]"
             >
               <div class="flex items-start justify-between mb-5">
@@ -1147,7 +1147,7 @@ onBeforeUnmount(() => {
                 <UIcon name="i-lucide-book-open" class="size-4 text-emerald-300/80" />
               </div>
               <div class="rounded-lg bg-black/40 border border-white/[0.06] px-3 py-2 mb-4 font-mono text-[0.78rem] text-emerald-300/90 overflow-hidden text-ellipsis whitespace-nowrap">
-                read /concepts/architecture
+                read /concepts/protocol
               </div>
               <h3 class="display-sans text-lg text-white mb-1.5">Read the contract.</h3>
               <p class="text-sm text-[var(--color-text-muted,#A1A1AA)] leading-relaxed">
@@ -1164,7 +1164,7 @@ onBeforeUnmount(() => {
         <div class="mt-12 sm:mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
           <UButton
             size="xl"
-            to="/getting-started/quickstart"
+            to="/getting-started/quick-start"
             trailing-icon="i-lucide-arrow-right"
             class="font-medium group"
           >
